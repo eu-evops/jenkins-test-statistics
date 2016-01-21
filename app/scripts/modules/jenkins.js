@@ -126,11 +126,14 @@
             return jenkinsConfiguration;
           };
 
-          var login = function (user, pass) {
+          var login = function (user, pass, server) {
             var jenkinsConfiguration = getConf();
 
+            // Use server passed in, otherwise use the one from configuration;
+            server = server || jenkinsConfiguration.server;
+
             var basicAuth = "Basic " + base64.encode(user + ':' + pass);
-            return http.get(jenkinsConfiguration.server + "/me/configure", {
+            return http.get(server + "/me/configure", {
                 headers: {
                   Authorization: basicAuth
                 }

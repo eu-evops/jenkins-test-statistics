@@ -11,7 +11,9 @@ angular.module('testReporterApp')
   .controller('MainCtrl', [
     '$scope', '$rootScope', 'jenkins', 'localStorageService', 'configuration', 'ngTableParams', 'jenkinsServers',
     function ($scope, $rootScope, jenkins, storage, configuration, ngTableParams, jenkinsServers) {
-      $scope.jenkins = configuration.get('jenkins') || {};
+      $scope.jenkins = configuration.get('jenkins') || {
+          server: jenkinsServers[0]
+        };
 
       $scope.jenkinsServers = jenkinsServers;
 
@@ -24,7 +26,7 @@ angular.module('testReporterApp')
 
         $scope.authenticating = true;
         try {
-          jenkins.login($scope.jenkins.username, $scope.jenkins.token)
+          jenkins.login($scope.jenkins.username, $scope.jenkins.token, $scope.jenkins.server)
             .then(function () {
               $rootScope.authenticated = $scope.authenticated = true;
               configuration.set('jenkins', $scope.jenkins);
