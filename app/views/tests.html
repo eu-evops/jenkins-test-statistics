@@ -1,0 +1,63 @@
+<h1>Tests for job {{ job }}</h1>
+
+<div ng-show="!testReport">
+  <div class="spinner">
+    <div class="dot1"></div>
+    <div class="dot2"></div>
+  </div>
+  <div class="message">Loading test report...</div>
+</div>
+
+<div ng-if="testReport && testReport.cases.length > 0">
+
+  <div class="panel-default panel" pass-rate="testReport.passRate">
+    <div class="panel-heading">
+      <a data-target="#testStatistics" data-toggle="collapse">Test report</a> -
+      <small>Number of tests: {{ testReport.cases.length }}</small>
+      <small>Pass rate: {{ testReport.passRate | percentage }}</small>
+    </div>
+    <div id="testStatistics" class="panel-collapse collapse">
+      <div class="panel-body">
+        <p><input type="text" placeholder="Filter tests..." ng-model="testSearch" class="form-control"></p>
+
+        <table
+          class="table table-bordered table-striped table-responsive table-hover"
+          ng-table="testTableParameters">
+          <tr ng-repeat="case in $data | regex:testSearch" pass-rate="case.getPassRate()">
+            <td title="'Suite'">{{ case.className }}</td>
+            <td title="'Name'">{{ case.name }}</td>
+            <td title="'Pass rate'" sortable="'getPassRate()'">{{ case.getPassRate() | percentage:0 }}</td>
+            <td title="'Number of executions'" sortable="'executions.length'">{{ case.executions.length }}</td>
+            <td title="'Links'"><a ng-href="{{ case.url }}" target="_blank">History</a></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<h2>Builds
+  <small>Count: {{ builds.length }}</small>
+  <small>Pass rate: {{ passRate | percentage }}</small>
+</h2>
+<table class="table table-bordered table-responsive table-striped table-hover">
+  <thead>
+  <tr>
+    <th>Number</th>
+    <th>Name</th>
+    <th>Status</th>
+    <th>Test count</th>
+    <th>Test pass rate</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr ng-repeat="build in builds" pass-rate="build.report.passRate">
+    <td>{{ build.number}}</td>
+    <td><a href="{{ build.url }}" target="_blank">{{ build.fullDisplayName}}</a></td>
+    <td ng-class="{ pass: build.passing, fail: !build.passing, aborted: build.aborted }">{{ build.result }}</td>
+    <td>{{ build.report.totalTests }}</td>
+    <td>{{ build.report.passRate | percentage:0 }}</td>
+  </tr>
+  </tbody>
+</table>

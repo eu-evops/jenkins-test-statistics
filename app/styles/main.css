@@ -1,0 +1,60 @@
+/*
+Error: File to import not found or unreadable: bootstrap-sass/assets/stylesheets/_bootstrap.scss.
+        on line 3 of main.scss
+
+1: $icon-font-path: "../bower_components/bootstrap-sass/assets/fonts/bootstrap/";
+2: // bower:scss
+3: @import "bootstrap-sass/assets/stylesheets/_bootstrap.scss";
+4: // endbower
+5: 
+6: .nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
+7: 
+8: .browsehappy {
+
+Backtrace:
+main.scss:3
+/Users/n450777/.rvm/gems/ruby-2.2.1/gems/sass-3.4.20/lib/sass/tree/import_node.rb:67:in `rescue in import'
+/Users/n450777/.rvm/gems/ruby-2.2.1/gems/sass-3.4.20/lib/sass/tree/import_node.rb:45:in `import'
+/Users/n450777/.rvm/gems/ruby-2.2.1/gems/sass-3.4.20/lib/sass/tree/import_node.rb:28:in `imported_file'
+/Users/n450777/.rvm/gems/ruby-2.2.1/gems/sass-3.4.20/lib/sass/tree/import_node.rb:37:in `css_import?'
+/Users/n450777/.rvm/gems/ruby-2.2.1/gems/sass-3.4.20/lib/sass/tree/visitors/perform.rb:311:in `visit_import'
+/Users/n450777/.rvm/gems/ruby-2.2.1/gems/sass-3.4.20/lib/sass/tree/visitors/base.rb:36:in `visit'
+/Users/n450777/.rvm/gems/ruby-2.2.1/gems/sass-3.4.20/lib/sass/tree/visitors/perform.rb:158:in `block in visit'
+/Users/n450777/.rvm/gems/ruby-2.2.1/gems/sass-3.4.20/lib/sass/stack.rb:79:in `block in with_base'
+/Users/n450777/.rvm/gems/ruby-2.2.1/gems/sass-3.4.20/lib/sass/stack.rb:115:in `with_frame'
+/Users/n450777/.rvm/gems/ruby-2.2.1/gems/sass-3.4.20/lib/sass/stack.rb:79:in `with_base'
+/Users/n450777/.rvm/gems/ruby-2.2.1/gems/sass-3.4.20/lib/sass/tree/visitors/perform.rb:158:in `visit'
+/Users/n450777/.rvm/gems/ruby-2.2.1/gems/sass-3.4.20/lib/sass/tree/visitors/base.rb:52:in `block in visit_children'
+/Users/n450777/.rvm/gems/ruby-2.2.1/gems/sass-3.4.20/lib/sass/tree/visitors/base.rb:52:in `map'
+/Users/n450777/.rvm/gems/ruby-2.2.1/gems/sass-3.4.20/lib/sass/tree/visitors/base.rb:52:in `visit_children'
+/Users/n450777/.rvm/gems/ruby-2.2.1/gems/sass-3.4.20/lib/sass/tree/visitors/perform.rb:167:in `block in visit_children'
+/Users/n450777/.rvm/gems/ruby-2.2.1/gems/sass-3.4.20/lib/sass/tree/visitors/perform.rb:179:in `with_environment'
+/Users/n450777/.rvm/gems/ruby-2.2.1/gems/sass-3.4.20/lib/sass/tree/visitors/perform.rb:166:in `visit_children'
+/Users/n450777/.rvm/gems/ruby-2.2.1/gems/sass-3.4.20/lib/sass/tree/visitors/base.rb:36:in `block in visit'
+/Users/n450777/.rvm/gems/ruby-2.2.1/gems/sass-3.4.20/lib/sass/tree/visitors/perform.rb:186:in `visit_root'
+/Users/n450777/.rvm/gems/ruby-2.2.1/gems/sass-3.4.20/lib/sass/tree/visitors/base.rb:36:in `visit'
+/Users/n450777/.rvm/gems/ruby-2.2.1/gems/sass-3.4.20/lib/sass/tree/visitors/perform.rb:157:in `visit'
+/Users/n450777/.rvm/gems/ruby-2.2.1/gems/sass-3.4.20/lib/sass/tree/visitors/perform.rb:8:in `visit'
+/Users/n450777/.rvm/gems/ruby-2.2.1/gems/sass-3.4.20/lib/sass/tree/root_node.rb:36:in `css_tree'
+/Users/n450777/.rvm/gems/ruby-2.2.1/gems/sass-3.4.20/lib/sass/tree/root_node.rb:29:in `render_with_sourcemap'
+/Users/n450777/.rvm/gems/ruby-2.2.1/gems/sass-3.4.20/lib/sass/engine.rb:378:in `_render_with_sourcemap'
+/Users/n450777/.rvm/gems/ruby-2.2.1/gems/sass-3.4.20/lib/sass/engine.rb:295:in `render_with_sourcemap'
+/Users/n450777/.rvm/gems/ruby-2.2.1/gems/sass-3.4.20/lib/sass/plugin/compiler.rb:490:in `update_stylesheet'
+/Users/n450777/.rvm/gems/ruby-2.2.1/gems/sass-3.4.20/lib/sass/plugin/compiler.rb:215:in `block in update_stylesheets'
+/Users/n450777/.rvm/gems/ruby-2.2.1/gems/sass-3.4.20/lib/sass/plugin/compiler.rb:209:in `each'
+/Users/n450777/.rvm/gems/ruby-2.2.1/gems/sass-3.4.20/lib/sass/plugin/compiler.rb:209:in `update_stylesheets'
+/Users/n450777/.rvm/gems/ruby-2.2.1/gems/sass-3.4.20/lib/sass/plugin.rb:82:in `update_stylesheets'
+/Users/n450777/.rvm/gems/ruby-2.2.1/gems/sass-3.4.20/lib/sass/exec/sass_scss.rb:361:in `watch_or_update'
+/Users/n450777/.rvm/gems/ruby-2.2.1/gems/sass-3.4.20/lib/sass/exec/sass_scss.rb:51:in `process_result'
+/Users/n450777/.rvm/gems/ruby-2.2.1/gems/sass-3.4.20/lib/sass/exec/base.rb:52:in `parse'
+/Users/n450777/.rvm/gems/ruby-2.2.1/gems/sass-3.4.20/lib/sass/exec/base.rb:19:in `parse!'
+/Users/n450777/.rvm/gems/ruby-2.2.1/gems/sass-3.4.20/bin/scss:13:in `<top (required)>'
+/Users/n450777/.rvm/gems/ruby-2.2.1/bin/scss:23:in `load'
+/Users/n450777/.rvm/gems/ruby-2.2.1/bin/scss:23:in `<main>'
+/Users/n450777/.rvm/gems/ruby-2.2.1/bin/ruby_executable_hooks:15:in `eval'
+/Users/n450777/.rvm/gems/ruby-2.2.1/bin/ruby_executable_hooks:15:in `<main>'
+*/
+body:before {
+  white-space: pre;
+  font-family: monospace;
+  content: "Error: File to import not found or unreadable: bootstrap-sass/assets/stylesheets/_bootstrap.scss.\A         on line 3 of main.scss\A \A 1: $icon-font-path: \"../bower_components/bootstrap-sass/assets/fonts/bootstrap/\";\A 2: // bower:scss\A 3: @import \"bootstrap-sass/assets/stylesheets/_bootstrap.scss\";\A 4: // endbower\A 5: \A 6: .nav, .pagination, .carousel, .panel-title a { cursor: pointer; }\A 7: \A 8: .browsehappy {"; }

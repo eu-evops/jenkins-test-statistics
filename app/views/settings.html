@@ -1,0 +1,11 @@
+<div>
+  <h2>Jenkins</h2>
+  <p>Select Jenkins server to use: {{ settings.jenkins.server }}</p>
+  <select
+    name="jenkinsServers"
+    ng-change="settings.setServer()"
+    id="jenkinsServers"
+    ng-model="settings.jenkins.server">
+    <option ng-repeat="server in settings.jenkins.servers">{{ server }}</option>
+  </select>
+</div>

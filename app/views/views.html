@@ -1,0 +1,63 @@
+<h1>Listing for {{ view.name }}</h1>
+
+<div class="panel panel-default" pass-rate="view.passRate">
+  <div class="panel-heading">Statistics</div>
+  <div class="panel-body">
+    <p>Number of jobs: {{ view.allJobs.length }}</p>
+    <p>Build pass rate: {{ view.passRate | percentage:0 }}</p>
+  </div>
+</div>
+
+<div ng-show="!testReport">
+  <div class="spinner">
+    <div class="dot1"></div>
+    <div class="dot2"></div>
+  </div>
+  <div class="message">Loading test report... This can take quite some time</div>
+</div>
+
+<div ng-if="testReport && testReport.cases.length > 0">
+
+  <div class="panel-default panel" pass-rate="testReport.passRate">
+    <div class="panel-heading">
+      <a data-target="#testStatistics" data-toggle="collapse">Test report</a> -
+      <small>Number of tests: {{ testReport.cases.length }}</small>
+      <small>Pass rate: {{ testReport.passRate | percentage }}</small>
+    </div>
+    <div id="testStatistics" class="panel-collapse collapse">
+      <div class="panel-body">
+        <p><input type="text" placeholder="Filter tests..." ng-model="testSearch" class="form-control"></p>
+
+        <table
+          class="table table-bordered table-striped table-responsive table-hover"
+          ng-table="testTableParameters">
+          <tr ng-repeat="case in $data | regex:testSearch" pass-rate="case.getPassRate()">
+            <td title="'Suite'">{{ case.className }}</td>
+            <td title="'Name'">{{ case.name }}</td>
+            <td title="'Pass rate'" sortable="'getPassRate()'">{{ case.getPassRate() | percentage:0 }}</td>
+            <td title="'Number of executions'" sortable="'executions.length'">{{ case.executions.length }}</td>
+            <td title="'Links'"><a ng-href="{{ case.url }}" target="_blank">History</a></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2>Builds</h2>
+
+<p><input type="text" placeholder="Filter builds by name..." ng-model="buildSearch" class="form-control"></p>
+<table ng-table="tableParameters" class="table">
+  <tr data-pass-rate="job.passRate" ng-repeat="job in $data | regex:buildSearch">
+    <td title="'View'">{{ job.view.name }}</td>
+    <td title="'Name'" sortable="'displayName'"><a ng-href="#/tests/{{job.name}}">{{
+      job.displayName }}</a></td>
+    <td title="'Number of builds'" sortable="'builds.length'">{{ job.builds.length }}</td>
+
+    <td title="'Test pass rate'" sortable="'report.passRate'">{{ job.report.passRate | percentage }}</td>
+    <td title="'Test count'" sortable="'report.cases.length'">{{ job.report.cases.length }}</td>
+
+    <td title="'Build Pass rate'" sortable="'passRate || 0'">{{ job.passRate | percentage:0 }}</td>
+  </tr>
+</table>
+

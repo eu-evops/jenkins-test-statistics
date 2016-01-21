@@ -1,0 +1,6 @@
+/node_modules
+/dist
+/app/scripts/config.js
+/.tmp
+/.sass-cache
+/bower_components
