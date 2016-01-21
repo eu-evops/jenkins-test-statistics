@@ -11,4 +11,4 @@ RUN npm install -g grunt-cli bower && npm install && ls -la node_modules && grun
 
 EXPOSE 9000
 
-CMD grunt serve:dist
+CMD npm start
