@@ -155,7 +155,7 @@ gulp.task('serve', function (cb) {
     'watch', cb);
 });
 
-gulp.task('serve:prod', function() {
+gulp.task('serve:prod', ['config:prod'], function() {
   $.connect.server({
     root: [yeoman.dist],
     livereload: true,
