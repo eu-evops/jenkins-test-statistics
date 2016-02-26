@@ -13,7 +13,7 @@ angular.module('testReporterApp')
     this.request = function (config) {
       var jenkinsConfiguration = configuration.get('jenkins') || {};
       if(jenkinsConfiguration.username && jenkinsConfiguration.token) {
-        config.headers['Authorization'] = 'Basic ' + base64.encode(jenkinsConfiguration.username + ':' + jenkinsConfiguration.token);
+        config.headers.Authorization = 'Basic ' + base64.encode(jenkinsConfiguration.username + ':' + jenkinsConfiguration.token);
       }
 
       return config;
