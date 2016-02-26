@@ -7,7 +7,7 @@ WORKDIR /app
 
 ADD . /app
 
-RUN npm install -g grunt-cli bower && npm install && ls -la node_modules && grunt --version && bower install --allow-root && grunt build
+RUN npm install -g gulp bower && npm install && bower install --allow-root && gulp build
 
 EXPOSE 9000
 
