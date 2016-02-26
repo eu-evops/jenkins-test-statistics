@@ -79,7 +79,11 @@ angular
   .run([
     '$rootScope', 'localStorageService', '$window', '$location', 'configuration', 'jenkins', '$route',
     function ($rootScope, storage, window, $location, configuration, jenkins, $route) {
-      $rootScope.numberOfRecentBuilds = 5;
+      $rootScope.numberOfRecentBuilds = 10;
+      var jenkinsConfiguration = configuration.get('jenkins');
+      if(jenkinsConfiguration) {
+        $rootScope.numberOfRecentBuilds = storage.get('numberOfRecentBuilds') || 10;
+      }
 
       $rootScope.$on('$routeChangeStart', function (event, toState, toParams) {
         if(toState.authenticate && !$rootScope.authenticated) {
@@ -88,8 +92,6 @@ angular
         }
       });
 
-      //$rootScope.numberOfRecentBuilds = 10;
-      //var jenkinsConfiguration = configuration.get('jenkins');
       //
       //if(jenkinsConfiguration) {
       //  $rootScope.numberOfRecentBuilds = storage.get('numberOfRecentBuilds') || 10;

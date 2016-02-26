@@ -9,7 +9,7 @@
   <uib-progressbar ng-show="progress < 100" max="100" value="progress"><span style="color:white; white-space:nowrap;">{{ progress / 100 | percentage }}</span></uib-progressbar>
 </div>
 
-<div ng-if="testReport && testReport.cases.length > 0">
+<div ng-show="testReport && testReport.cases.length > 0">
 
   <div class="panel-default panel" pass-rate="testReport.passRate">
     <div class="panel-heading">
@@ -19,12 +19,13 @@
     </div>
     <div id="testStatistics" class="panel-collapse collapse">
       <div class="panel-body">
+        <bloquote ng-if="testSearch">Filtered by: <strong>{{ testSearch }}</strong>, found: {{ testTableParameters.total() }}</bloquote>
         <p><input type="text" placeholder="Filter tests..." ng-model="testSearch" class="form-control"></p>
 
         <table
           class="table table-bordered table-striped table-responsive table-hover"
           ng-table="testTableParameters">
-          <tr ng-repeat="case in $data | regex:testSearch" pass-rate="case.getPassRate()">
+          <tr ng-repeat="case in $data" pass-rate="case.getPassRate()">
             <td title="'Suite'">{{ case.className }}</td>
             <td title="'Name'">{{ case.name }}</td>
             <td title="'Pass rate'" sortable="'getPassRate()'">{{ case.getPassRate() | percentage:0 }}</td>

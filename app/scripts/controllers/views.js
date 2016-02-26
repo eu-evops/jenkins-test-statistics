@@ -39,7 +39,7 @@ angular.module('testReporterApp')
               $scope.$apply();
 
               $scope.testTableParameters = new ngTableParams({
-                  count: 25,
+                  count: 10,
                   sorting: {
                     'getPassRate()': 'asc'
                   }
@@ -47,10 +47,15 @@ angular.module('testReporterApp')
                 {
                   data: $scope.testReport.cases
                 })
+
+
+              $scope.$watch('testSearch', function () {
+                $scope.testTableParameters.filter({name: $scope.testSearch});
+              });
             });
 
           $scope.tableParameters = new ngTableParams({
-              count: 25,
+              count: 10,
               sorting: {
                 passRate: 'asc'
               }
@@ -58,5 +63,10 @@ angular.module('testReporterApp')
             {
               data: view.allJobs
             });
+
+          $scope.$watch('jobSearch', function () {
+            console.log("Filtering", $scope.tableParameters);
+            $scope.tableParameters.filter({displayName: $scope.jobSearch});
+          });
         });
     }]);

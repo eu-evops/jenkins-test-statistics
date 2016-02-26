@@ -31,7 +31,6 @@ angular.module('testReporterApp')
             .then(function () {
               $rootScope.authenticated = $scope.authenticated = true;
               configuration.set('jenkins', $scope.jenkins);
-              console.log("Root scope redirec:", $rootScope.redirectTo);
               var destination = '/';
               if ($rootScope.redirectTo) destination = $rootScope.redirectTo;
               $location.path(destination);

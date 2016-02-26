@@ -48,6 +48,10 @@ angular.module('testReporterApp')
             },
             {
               data: $scope.testReport.cases
-            })
+            });
+
+          $scope.$watch('testSearch', function () {
+            $scope.testTableParameters.filter({name: $scope.testSearch});
+          });
         });
     }]);

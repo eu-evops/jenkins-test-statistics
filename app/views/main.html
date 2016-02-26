@@ -1,12 +1,13 @@
-<div ng-if="!jenkinsViews">
+<div ng-show="!jenkinsViews">
   <div class="spinner">
     <div class="dot1"></div>
     <div class="dot2"></div>
   </div>
   <div class="message">Loading jenkins views...</div>
 </div>
-<div ng-if="jenkinsViews">
-  <h2>Jenkins views {{ search }}</h2>
+<div ng-show="jenkinsViews">
+  <h2>Jenkins views </h2>
+  <bloquote ng-if="search">Filtered by: <strong>{{ search }}</strong>, found: {{ tableParameters.total() }}</bloquote>
   <p>Select jenkins view on which you want to report</p>
   <p><input type="text" ng-model="search" class="form-control" placeholder="Filter builds by name..." autofocus="true"></p>
 

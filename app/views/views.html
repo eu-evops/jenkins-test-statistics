@@ -18,8 +18,7 @@
   <uib-progressbar ng-show="progress < 100" max="100" value="progress"><span style="color:white; white-space:nowrap;">{{ progress / 100 | percentage }}</span></uib-progressbar>
 </div>
 
-<div ng-if="testReport && testReport.cases.length > 0">
-
+<div ng-show="testReport && testReport.cases.length > 0">
   <div class="panel-default panel" pass-rate="testReport.passRate">
     <div class="panel-heading">
       <a data-target="#testStatistics" data-toggle="collapse">Test report</a> -
@@ -28,12 +27,14 @@
     </div>
     <div id="testStatistics" class="panel-collapse collapse">
       <div class="panel-body">
+        <bloquote ng-if="testSearch">Filtered by: <strong>{{ testSearch }}</strong>, found: {{ testTableParameters.total() }}</bloquote>
+
         <p><input type="text" placeholder="Filter tests..." ng-model="testSearch" class="form-control"></p>
 
         <table
           class="table table-bordered table-striped table-responsive table-hover"
           ng-table="testTableParameters">
-          <tr ng-repeat="case in $data | regex:testSearch" pass-rate="case.getPassRate()">
+          <tr ng-repeat="case in $data" pass-rate="case.getPassRate()">
             <td title="'Suite'">{{ case.className }}</td>
             <td title="'Name'">{{ case.name }}</td>
             <td title="'Pass rate'" sortable="'getPassRate()'">{{ case.getPassRate() | percentage:0 }}</td>
@@ -46,11 +47,12 @@
   </div>
 </div>
 
-<h2>Builds</h2>
+<h2>Jobs</h2>
+<bloquote ng-if="jobSearch">Filtered by: <strong>{{ jobSearch }}</strong>, found: {{ tableParameters.total() }}</bloquote>
 
-<p><input type="text" placeholder="Filter builds by name..." ng-model="buildSearch" class="form-control"></p>
+<p><input type="text" placeholder="Filter builds by name..." ng-model="jobSearch" class="form-control"></p>
 <table ng-table="tableParameters" class="table">
-  <tr data-pass-rate="job.passRate" ng-repeat="job in $data | regex:buildSearch">
+  <tr data-pass-rate="job.passRate" ng-repeat="job in $data">
     <td title="'View'">{{ job.view.name }}</td>
     <td title="'Name'" sortable="'displayName'"><a ng-href="#/tests/{{job.name}}">{{
       job.displayName }}</a></td>
