@@ -10,6 +10,7 @@
  */
 angular
   .module('testReporterApp', [
+    'ui.bootstrap',
     'ngAnimate',
     'ngCookies',
     'ngResource',
@@ -85,7 +86,6 @@ angular
           $rootScope.redirectTo = $location.path();
           $location.path('/login');
         }
-        console.log("State change start", toState.authenticate);
       });
 
       //$rootScope.numberOfRecentBuilds = 10;
@@ -111,10 +111,10 @@ angular
       //  $location.path('/');
       //}
       //
-      //$rootScope.saveNumberOfBuildsAndRefresh = function () {
-      //  console.log("Setting number of builds", $rootScope.numberOfRecentBuilds);
-      //  storage.set('numberOfRecentBuilds', $rootScope.numberOfRecentBuilds);
-      //  $route.reload();
-      //}
+      $rootScope.saveNumberOfBuildsAndRefresh = function () {
+        console.log("Setting number of builds", $rootScope.numberOfRecentBuilds);
+        storage.set('numberOfRecentBuilds', $rootScope.numberOfRecentBuilds);
+        $route.reload();
+      }
     }])
 ;

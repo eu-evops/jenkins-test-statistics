@@ -14,6 +14,11 @@ angular.module('testReporterApp')
       $scope.job = route.job;
       var job;
 
+      $scope.progress = 0;
+      $scope.$on('jenkins-report', function (event, progress) {
+        $scope.progress = progress
+      });
+
       jenkins.job($scope.job)
         .then(function (jobObject) {
           job = jobObject;

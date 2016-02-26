@@ -114,7 +114,8 @@
     this.$get =
       ['$http', '$base64', 'configuration', '$rootScope',
         function (http, base64, configuration, $rootScope) {
-          console.log('Getting jenkins instance');
+          $rootScope.$broadcast('jenkins-newInstance');
+
           var self = this;
           var url = self.baseUrl;
 
@@ -251,6 +252,9 @@
               }
             });
 
+            var allBuilds = builds.length;
+            var processedBuilds = 0;
+
             angular.forEach(grouping, function (group, jobName) {
               group.forEach(function (build) {
                 promises.push(http.get(build.url + '/testReport/api/json?tree=failCount,passCount,skipCount,suites[cases[className,duration,name,skipped,status]]')
@@ -258,8 +262,6 @@
                     build.report = response.data;
                     build.report.totalTests = (build.report.passCount + build.report.failCount + build.report.skipCount);
                     build.report.passRate = build.report.passCount / build.report.totalTests;
-
-                    console.log(build.report);
 
                     if (build.job) {
                       build.job.report = new TestReport(build.job.builds);
@@ -274,6 +276,12 @@
                       suites: []
                     };
 
+                    return build;
+                  })
+                  .finally(function (build) {
+                    processedBuilds++;
+                    var progress = processedBuilds / allBuilds * 100;
+                    $rootScope.$broadcast('jenkins-report', progress);
                     return build;
                   })
                 );

@@ -12,8 +12,6 @@ angular.module('testReporterApp')
     '$scope', '$rootScope', 'jenkins', 'localStorageService', 'configuration', 'ngTableParams', 'jenkinsServers', '$location',
     function ($scope, $rootScope, jenkins, storage, configuration, ngTableParams, jenkinsServers, $location) {
 
-      console.log($rootScope.redirectTo);
-
       $scope.jenkins = configuration.get('jenkins') || {
           server: jenkinsServers[0]
         };
