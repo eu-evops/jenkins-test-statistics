@@ -73,6 +73,19 @@ gulp.task('config', function () {
     .pipe(gulp.dest(yeoman.app + '/scripts'));
 });
 
+gulp.task('config:prod', function() {
+  return ngConstant({
+    name: 'testReporterApp',
+    stream: true,
+    deps: false,
+    constants: {
+      jenkinsServers: jenkinsServers
+    }
+  })
+  // Writes config.js to scripts/ folder
+    .pipe(gulp.dest(yeoman.dist + '/scripts'));
+});
+
 gulp.task('styles', function () {
   return gulp.src(paths.styles)
     .pipe(styles());
