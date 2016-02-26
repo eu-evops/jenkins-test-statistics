@@ -46,12 +46,14 @@ angular.module('testReporterApp')
                 },
                 {
                   data: $scope.testReport.cases
-                })
+                });
 
+              $scope.tableParameters.sorting('report.passRate', 'asc');
 
               $scope.$watch('testSearch', function () {
                 $scope.testTableParameters.filter({name: $scope.testSearch});
               });
+              $scope.$apply();
             });
 
           $scope.tableParameters = new ngTableParams({

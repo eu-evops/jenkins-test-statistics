@@ -64,7 +64,7 @@
       })
     });
 
-    this.passRate = this.passingTests / this.totalTests;
+    this.passRate = this.passingTests / this.totalTests || 0;
   }
 
 

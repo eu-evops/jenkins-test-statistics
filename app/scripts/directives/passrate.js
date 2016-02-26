@@ -18,6 +18,10 @@ angular.module('testReporterApp')
           if(typeof $scope.rate == 'undefined') return;
           if($scope.rate == null) return;
 
+          element.removeClass('success', 'bg-success', 'panel-success');
+          element.removeClass('danger', 'bg-danger', 'panel-danger');
+          element.removeClass('warning', 'bg-warning', 'panel-warning');
+
           if($scope.rate >= 0.9) {
             element.addClass('success');
             element.addClass('bg-success');
