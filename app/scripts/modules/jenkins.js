@@ -242,48 +242,52 @@
           var testReport = function (builds) {
             var promises = [];
 
-            builds.forEach(function (build) {
-              promises.push(http.get(build.url + '/testReport/api/json?tree=failCount,passCount,skipCount,suites[cases[className,duration,name,skipped,status]]')
-                .then(function (response) {
-                  build.report = response.data;
-                  build.report.numberOfTests = (build.report.passCount + build.report.failCount + build.report.skipCount);
-                  build.report.passRate = build.report.passCount / build.report.numberOfTests;
+            var grouping = {};
+            builds.forEach(function (b) {
+              b.report = new TestReport([b]);
+              if (b && b.job) {
+                grouping[b.job.name] = grouping[b.job.name] || [];
+                grouping[b.job.name].push(b);
+              }
+            });
 
-                  if (build.job) build.job.report = build.report;
+            angular.forEach(grouping, function (group, jobName) {
+              group.forEach(function (build) {
+                promises.push(http.get(build.url + '/testReport/api/json?tree=failCount,passCount,skipCount,suites[cases[className,duration,name,skipped,status]]')
+                  .then(function (response) {
+                    build.report = response.data;
+                    build.report.totalTests = (build.report.passCount + build.report.failCount + build.report.skipCount);
+                    build.report.passRate = build.report.passCount / build.report.totalTests;
 
-                  return build;
-                })
-                .catch(function () {
-                  build.report = {
-                    numberOfTests: 0,
-                    passRate: null,
-                    suites: []
-                  };
+                    console.log(build.report);
 
-                  return build;
-                })
-              );
+                    if (build.job) {
+                      build.job.report = new TestReport(build.job.builds);
+                    }
+
+                    return build;
+                  })
+                  .catch(function () {
+                    build.report = {
+                      numberOfTests: 0,
+                      passRate: null,
+                      suites: []
+                    };
+
+                    return build;
+                  })
+                );
+              });
             });
 
             return Promise.all(promises)
               .then(function (builds) {
                 var report = new TestReport(builds);
-                var grouping = {};
-                builds.forEach(function (b) {
-                  console.log(b);
-                  b.report = new TestReport([b]);
-                  if (b && b.job) {
-                    grouping[b.job.name] = grouping[b.job.name] || [];
-                    grouping[b.job.name].push({job: b.job, build: b});
-                  }
-                });
 
                 angular.forEach(grouping, function (builds) {
-                  builds[0].job.report = new TestReport(builds.map(function (obj) {
-                    return obj.build;
-                  }));
-
-                  console.log(builds[0].job.report);
+                  //builds[0].job.report = new TestReport(builds.map(function (obj) {
+                  //  return obj.build;
+                  //}));
                 });
 
                 return report;
@@ -309,9 +313,25 @@
           };
 
           var getBuilds = function (job) {
+            if (typeof job == 'object') {
+              job = job.name;
+            }
+
             return http.get(getConf().url + '/job/' + job + '/api/json?tree=builds[*]' + getNumberOfBuilds())
               .then(function (response) {
-                return response.data.builds.map(sanitiseBulid);
+                // excluding currently running builds
+                var filteredBuilds = response.data.builds.filter(function (b) {
+                  return !b.building
+                });
+
+                return filteredBuilds.map(sanitiseBulid);
+              });
+          };
+
+          var getJob = function (name) {
+            return http.get(getConf().url + '/job/' + name + '/api/json')
+              .then(function (response) {
+                return response.data;
               });
           };
 
@@ -319,9 +339,13 @@
             login: login,
             views: getViews,
             view: getView,
+            job: getJob,
             builds: getBuilds,
             testReport: testReport
           };
-        }];
-  });
-})(window, angular);
+        }]
+    ;
+  })
+  ;
+})
+(window, angular);

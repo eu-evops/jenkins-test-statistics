@@ -9,8 +9,18 @@
  */
 angular.module('testReporterApp')
   .controller('MainCtrl', [
-    '$scope', '$rootScope', 'jenkins', 'localStorageService', 'configuration', 'ngTableParams', 'jenkinsServers',
-    function ($scope, $rootScope, jenkins, storage, configuration, ngTableParams, jenkinsServers) {
+    '$scope', '$rootScope', 'jenkins', 'localStorageService', 'configuration', 'ngTableParams', 'jenkinsServers', '$location',
+    function ($scope, $rootScope, jenkins, storage, configuration, ngTableParams, jenkinsServers, $location) {
+
+      console.log($rootScope.redirectTo);
+
+      $scope.$watch('search', function (newValue, oldValue) {
+        console.log(arguments);
+      });
+
+      $scope.search = 'PMD';
+      $scope.search = 'Sauce';
+
       $scope.jenkins = configuration.get('jenkins') || {
           server: jenkinsServers[0]
         };
@@ -30,9 +40,18 @@ angular.module('testReporterApp')
             .then(function () {
               $rootScope.authenticated = $scope.authenticated = true;
               configuration.set('jenkins', $scope.jenkins);
+              console.log("Root scope redirec:", $rootScope.redirectTo);
+              if($rootScope.redirectTo) {
+                console.log("Redirecting to", $rootScope.redirectTo);
+                delete $rootScope.redirectTo;
+                $location.path($rootScope.redirectTo);
+                return $.Deferred().reject("Redirecting to route");
+              }
             })
             .then(jenkins.views)
             .then(function (views) {
+
+
               $scope.jenkinsViews = views;
               $scope.tableParameters = new ngTableParams(
                 {
@@ -52,12 +71,14 @@ angular.module('testReporterApp')
             })
             .finally(function () {
               $scope.authenticating = false;
+              $scope.$watch('search', function (newValue, oldValue) {
+                console.log(arguments);
+              }, true);
             });
         } catch (err) {
           console.log('Error: ', err);
         }
       };
-
 
       $scope.authenticate();
     }])

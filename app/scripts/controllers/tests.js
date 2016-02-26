@@ -12,13 +12,22 @@ angular.module('testReporterApp')
     '$scope', '$routeParams', 'jenkins', 'ngTableParams',
     function ($scope, route, jenkins, ngTableParams) {
       $scope.job = route.job;
+      var job;
 
-      jenkins.builds($scope.job)
+      jenkins.job($scope.job)
+        .then(function (jobObject) {
+          job = jobObject;
+          return jenkins.builds(job);
+        })
         .then(function (builds) {
           $scope.builds = builds;
           $scope.passRate = builds.filter(function (b) {
               return b.passing;
             }).length / builds.length;
+
+          builds.forEach(function (build) {
+            build.job = job;
+          });
 
           return builds;
         })

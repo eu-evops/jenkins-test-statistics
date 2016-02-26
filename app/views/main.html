@@ -1,83 +1,21 @@
-<form name="jenkinsForm" novalidate ng-if="!!!authenticated" class="form-horizontal">
-
-  <div class="panel panel-default panel-danger" ng-if="authenticationError">
-    <div class="panel-heading">Authentication error</div>
-    <div class="panel-body">{{ authenticationError }}<br/>This can be caused by not having CORS plugin installed in
-      Jenkins. You can download it from <a href="https://wiki.jenkins-ci.org/display/JENKINS/Cors+Filter+Plugin">https://wiki.jenkins-ci.org/display/JENKINS/Cors+Filter+Plugin</a> and configure
-      with:
-      <h3>CORS configuration in Jenkins</h3>
-      <table class="table table-striped">
-        <tr>
-          <td>Access-Control-Allow-Origins</td>
-          <td>*</td>
-        </tr>
-        <tr>
-          <td>Access-Control-Allow-Methods</td>
-          <td>GET,PUT,POST,OPTIONS</td>
-        </tr>
-        <tr>
-          <td>Access-Control-Allow-Headers</td>
-          <td>Authorization, Content-Type</td>
-        </tr>
-        </tr>
-      </table>
-    </div>
+<div ng-if="!jenkinsViews">
+  <div class="spinner">
+    <div class="dot1"></div>
+    <div class="dot2"></div>
   </div>
-  <div class="form-group">
+  <div class="message">Loading jenkins views...</div>
+</div>
+<div ng-if="jenkinsViews">
+  <h2>Jenkins views {{ search }}</h2>
+  <p>Select jenkins view on which you want to report</p>
+  <p><input type="text" ng-model="search" class="form-control" placeholder="Filter builds by name..." autofocus="true"></p>
 
-    <div>
-      <label for="jenkinsServer">Using jenkins server:</label>
-      <select id="jenkinsServer" name="jenkinsServer" ng-model="jenkins.server">
-        <option value="{{ server }}" ng-repeat="server in jenkinsServers">{{ server }}</option>
-      </select>
-    </div>
-
-    <label for="username">Jenkins username:</label>
-    <input required type="text"
-           id="username"
-           ng-model="jenkins.username"
-           ng-disabled="authenticating"
-           placeholder="Jenkins username..."
-           class="form-control"
-    />
-  </div>
-
-  <div class="form-group">
-    <label for="password">Jenkins password:</label>
-    <input
-      id="password"
-      required type="password"
-      ng-model="jenkins.token"
-      ng-disabled="authenticating"
-      placeholder="Jenkins password"
-      class="form-control"
-    />
-  </div>
-  <input type="submit" class="btn btn-default" value="Login" ng-disabled="authenticating || !jenkinsForm.$valid"
-         ng-click="authenticate()">
-  <p ng-if="authenticating">Authenticating</p>
-</form>
-
-<div ng-if="authenticated">
-  <div ng-if="!jenkinsViews">
-    <div class="spinner">
-      <div class="dot1"></div>
-      <div class="dot2"></div>
-    </div>
-    <div class="message">Loading jenkins views...</div>
-  </div>
-  <div ng-if="jenkinsViews">
-    <h2>Jenkins views</h2>
-    <p>Select jenkins view on which you want to report</p>
-    <p><input type="text" ng-model="search" class="form-control" placeholder="Filter builds by name..." autofocus="true"></p>
-
-    <table class="table table-bordered table-responsive table-striped" ng-table="tableParameters">
-      <tr ng-repeat="view in $data | regex:search" data-pass-rate="view.passRate">
-        <td title="'View Name'" sortable="'fullName'"><a ng-href="#/views{{ view.relativeUrl }}">{{ view.fullName }}</a>
-        </td>
-        <td title="'Number of jobs'" sortable="'allJobs.length'">{{ view.allJobs.length }}</td>
-        <td title="'Job pass rate'" sortable="'passRate'">{{ view.passRate | percentage:0 }}</td>
-      </tr>
-    </table>
-  </div>
+  <table class="table table-bordered table-responsive table-striped" ng-table="tableParameters">
+    <tr ng-repeat="view in $data" data-pass-rate="view.passRate">
+      <td title="'View Name'" sortable="'fullName'"><a ng-href="#/views{{ view.relativeUrl }}">{{ view.fullName }}</a>
+      </td>
+      <td title="'Number of jobs'" sortable="'allJobs.length'">{{ view.allJobs.length }}</td>
+      <td title="'Job pass rate'" sortable="'passRate'">{{ view.passRate | percentage:0 }}</td>
+    </tr>
+  </table>
 </div>
