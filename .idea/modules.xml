@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/testReporter.iml" filepath="$PROJECT_DIR$/.idea/testReporter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/jenkins-test-statistics-gulp.iml" filepath="$PROJECT_DIR$/.idea/jenkins-test-statistics-gulp.iml" />
     </modules>
   </component>
 </project>

@@ -43,3 +43,4 @@ node_modules
 # Test results
 test-results.xml
 
+bower_components
