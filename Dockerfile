@@ -11,4 +11,4 @@ RUN npm install -g gulp bower && npm install && bower install --allow-root && gu
 
 EXPOSE 9000
 
-CMD npm start
+CMD gulp serve:prod
