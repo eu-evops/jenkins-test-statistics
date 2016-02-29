@@ -10,7 +10,7 @@
 angular.module('testReporterApp')
   .controller('MainCtrl', [
     '$scope', '$rootScope', 'jenkins', 'localStorageService', 'configuration', 'ngTableParams', 'jenkinsServers',
-    function ($scope, $rootScope, jenkins, storage, configuration, ngTableParams, jenkinsServers) {
+    function ($scope, $rootScope, jenkins, storage, configuration, NgTableParams, jenkinsServers) {
       $scope.jenkins = configuration.get('jenkins') || {
           server: jenkinsServers[0]
         };
@@ -20,7 +20,7 @@ angular.module('testReporterApp')
       jenkins.views()
         .then(function (views) {
           $scope.jenkinsViews = views;
-          $scope.tableParameters = new ngTableParams(
+          $scope.tableParameters = new NgTableParams(
             {
               count: 25,
               sorting: {
@@ -35,6 +35,6 @@ angular.module('testReporterApp')
           $scope.$watch('search', function () {
             $scope.tableParameters.filter({ name: $scope.search });
           });
-        })
+        });
     }])
 ;

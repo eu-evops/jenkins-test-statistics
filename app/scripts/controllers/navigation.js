@@ -11,7 +11,7 @@ angular.module('testReporterApp')
   .directive('menuItem', [function() {
     return {
       restrict: 'E'
-    }
+    };
   }])
   .controller('NavigationCtrl', function ($location) {
     this.menus = [
@@ -21,6 +21,6 @@ angular.module('testReporterApp')
     ];
 
     this.active = function(item) {
-      return item.route == $location.$$path;
-    }
+      return item.route === $location.$$path;
+    };
   });

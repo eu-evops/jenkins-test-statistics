@@ -10,6 +10,7 @@ var wiredep = require('wiredep').stream;
 var runSequence = require('run-sequence');
 var ngConstant = require('gulp-ng-constant');
 var browserSync = require('browser-sync');
+var fs = require('fs');
 
 var yeoman = {
   app: require('./bower.json').appPath || 'app',
@@ -198,6 +199,7 @@ gulp.task('client:build', ['html', 'styles', 'config'], function () {
     .pipe(jsFilter)
     .pipe($.ngAnnotate())
     .pipe($.uglify())
+    .on('error', $.util.log)
     .pipe(jsFilter.restore())
     .pipe(cssFilter)
     .pipe($.minifyCss({cache: true}))

@@ -10,14 +10,14 @@
 angular.module('testReporterApp')
   .controller('ViewsCtrl', [
     '$scope', '$routeParams', 'jenkins', 'ngTableParams',
-    function ($scope, route, jenkins, ngTableParams) {
+    function ($scope, route, jenkins, NgTableParams) {
       $scope.view = {
         name: route.view
       };
 
       $scope.progress = 0;
       $scope.$on('jenkins-report', function (event, progress) {
-        $scope.progress = progress
+        $scope.progress = progress;
       });
 
       jenkins.view($scope.view.name)
@@ -38,7 +38,7 @@ angular.module('testReporterApp')
               $scope.testReport = testReport;
               $scope.$apply();
 
-              $scope.testTableParameters = new ngTableParams({
+              $scope.testTableParameters = new NgTableParams({
                   count: 10,
                   sorting: {
                     'getPassRate()': 'asc'
@@ -56,7 +56,7 @@ angular.module('testReporterApp')
               $scope.$apply();
             });
 
-          $scope.tableParameters = new ngTableParams({
+          $scope.tableParameters = new NgTableParams({
               count: 10,
               sorting: {
                 passRate: 'asc'

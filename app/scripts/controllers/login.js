@@ -19,9 +19,9 @@ angular.module('testReporterApp')
       $scope.jenkinsServers = jenkinsServers;
 
       $scope.authenticate = function () {
-        if (!$scope.jenkins.username) return;
-        if (!$scope.jenkins.token) return;
-        if (!$scope.jenkins.server) return;
+        if (!$scope.jenkins.username) { return; }
+        if (!$scope.jenkins.token) { return; }
+        if (!$scope.jenkins.server) { return; }
 
         jenkins.baseUrl = $scope.jenkins.server;
 
@@ -32,16 +32,18 @@ angular.module('testReporterApp')
             $rootScope.jenkins = $scope.jenkins;
             configuration.set('jenkins', $scope.jenkins);
             var destination = '/';
-            if ($rootScope.redirectTo) destination = $rootScope.redirectTo;
+            if ($rootScope.redirectTo) {
+              destination = $rootScope.redirectTo;
+            }
             $location.path(destination);
           })
           .catch(function () {
-            $scope.authenticationError = `Failed to authenticate against ${$scope.jenkins.server}`;
+            $scope.authenticationError = "Failed to authenticate against " + $scope.jenkins.server;
           })
           .finally(function () {
             $scope.authenticating = false;
             $scope.authenticated = false;
-          })
+          });
       };
 
       $scope.authenticate();

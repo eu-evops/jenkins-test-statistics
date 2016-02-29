@@ -87,7 +87,7 @@ angular
 
       $rootScope.jenkins = jenkinsConfiguration;
 
-      $rootScope.$on('$routeChangeStart', function (event, toState, toParams) {
+      $rootScope.$on('$routeChangeStart', function (event, toState) {
         if(toState.authenticate && !$rootScope.authenticated) {
           $rootScope.redirectTo = $location.path();
           $location.path('/login');
@@ -104,6 +104,6 @@ angular
         console.log("Setting number of builds", $rootScope.numberOfRecentBuilds);
         storage.set('numberOfRecentBuilds', $rootScope.numberOfRecentBuilds);
         $route.reload();
-      }
+      };
     }])
 ;

@@ -4,8 +4,7 @@
   function TestCaseExecution(execution) {
     this.execution = execution;
     this.duration = execution.duration;
-    this.passing = this.execution.status == 'PASSED'
-      || this.execution.status == 'FIXED'
+    this.passing = (this.execution.status === 'PASSED' || this.execution.status === 'FIXED');
   }
 
   function TestCase(testCase, baseUrl, job) {
@@ -13,7 +12,7 @@
     this.name = testCase.name;
     this.className = testCase.className;
     this.urlName = this.name.replace(/\s+/g, '_').replace(/[^\w\d]+/g, '_');
-    this.url = baseUrl + "testReport/(root)/" + this.className + "/" + this.urlName + "/history/"
+    this.url = baseUrl + "testReport/(root)/" + this.className + "/" + this.urlName + "/history/";
     this.executions = [new TestCaseExecution(testCase)];
 
     this.getPassRate = function () {
@@ -22,7 +21,7 @@
       }).length;
 
       return this.passingCount / this.executions.length;
-    }
+    };
   }
 
   function TestReport(builds) {
@@ -31,27 +30,34 @@
     builds = builds || [];
 
     builds.forEach(function (build) {
-      if (!build || !build.report || !build.report.suites) return;
+      if (!build || !build.report || !build.report.suites) {
+        return;
+      }
       build.report.suites.forEach(function (suite) {
         suite.cases.forEach(function (testCase) {
-          if (testCase.name == "dummy" || testCase.name == "<init>") return;
+          if (testCase.name === "dummy" || testCase.name === "<init>") {
+            return;
+          }
           var testCaseMatches = self.cases.filter(function (tc) {
-            if (build.job)
-              return tc.name == testCase.name && tc.className == testCase.className && tc.job.name == build.job.name;
+            if (build.job) {
+              return tc.name === testCase.name && tc.className === testCase.className && tc.job.name === build.job.name;
+            }
 
-            return tc.name == testCase.name && tc.className == testCase.className;
+            return tc.name === testCase.name && tc.className === testCase.className;
           });
 
-          if (testCaseMatches.length == 0) {
+          if (testCaseMatches.length === 0) {
             self.cases.push(new TestCase(testCase, build.url, build.job));
           } else {
             var executionMatches = testCaseMatches[0].executions.filter(function (ex) {
-              return ex.duration == testCase.duration;
+              return ex.duration === testCase.duration;
             });
-            if (executionMatches.length > 0) return;
+            if (executionMatches.length > 0) {
+              return;
+            }
             testCaseMatches[0].executions.push(new TestCaseExecution(testCase));
           }
-        })
+        });
       });
     });
 
@@ -59,9 +65,11 @@
     this.totalTests = 0;
     this.cases.forEach(function (testCase) {
       testCase.executions.forEach(function (execution) {
-        if (execution.passing) self.passingTests++;
+        if (execution.passing) {
+          self.passingTests++;
+        }
         self.totalTests++;
-      })
+      });
     });
 
     this.passRate = this.passingTests / this.totalTests || 0;
@@ -95,8 +103,8 @@
   };
 
   var sanitiseBulid = function (build) {
-    build.aborted = build.result == 'ABORTED';
-    build.passing = !build.aborted && build.result != 'FAILURE';
+    build.aborted = build.result === 'ABORTED';
+    build.passing = !build.aborted && build.result !== 'FAILURE';
 
     return build;
   };
@@ -108,16 +116,10 @@
   }]);
 
   jenkins.provider('jenkins', function JenkinsProvider() {
-    // default Jenkins URL
-    this.baseUrl = 'http://localhost:8080/jenkins';
-
     this.$get =
       ['$http', '$base64', 'configuration', '$rootScope',
         function (http, base64, configuration, $rootScope) {
           $rootScope.$broadcast('jenkins-newInstance');
-
-          var self = this;
-          var url = self.baseUrl;
 
           var getConf = function () {
             var jenkinsConfiguration = configuration.get('jenkins') || {};
@@ -146,7 +148,7 @@
                   jenkinsConfiguration.username = user;
                   configuration.set('jenkins', jenkinsConfiguration);
                 }
-              })
+              });
           };
 
           var sanitiseView = function (view, viewName) {
@@ -162,8 +164,8 @@
                 node.views.forEach(function (v) {
                   v.jobs.forEach(function (j) {
                     jobs.push(sanitiseJob(j, v));
-                  })
-                })
+                  });
+                });
               }
 
               return jobs;
@@ -174,7 +176,7 @@
             if (view.allJobs && view.allJobs.length > 0) {
               var sumPassRate = view.allJobs
                 .filter(function (j) {
-                  return j.passRate != null;
+                  return j.passRate !== null;
                 })
                 .map(function (a) {
                   return a.passRate;
@@ -182,11 +184,9 @@
                   return a + b;
                 }, 0);
 
-              var averagePassRate = sumPassRate / view.allJobs.filter(function (j) {
-                  return j.passRate != null;
+              view.passRate = sumPassRate / view.allJobs.filter(function (j) {
+                  return j.passRate !== null;
                 }).length || null;
-
-              view.passRate = averagePassRate;
             }
 
             return view;
@@ -195,7 +195,9 @@
           var sanitiseViews = function (top) {
             var views = [];
 
-            if (!top.views) return views;
+            if (!top.views) {
+              return views;
+            }
             top.views.forEach(function (view) {
               views.push(view);
 
@@ -252,7 +254,7 @@
             var allBuilds = builds.length;
             var processedBuilds = 0;
 
-            angular.forEach(grouping, function (group, jobName) {
+            angular.forEach(grouping, function (group) {
               group.forEach(function (build) {
                 promises.push(http.get(build.url + '/testReport/api/json?tree=failCount,passCount,skipCount,suites[cases[className,duration,name,skipped,status]]')
                   .then(function (response) {
@@ -287,15 +289,7 @@
 
             return Promise.all(promises)
               .then(function (builds) {
-                var report = new TestReport(builds);
-
-                angular.forEach(grouping, function (builds) {
-                  //builds[0].job.report = new TestReport(builds.map(function (obj) {
-                  //  return obj.build;
-                  //}));
-                });
-
-                return report;
+                return new TestReport(builds);
               });
           };
 
@@ -307,7 +301,7 @@
             return http.get(getConf().url + '/api/json?depth=100&tree=' + recursiveTreeCall(10, ['name', 'url', 'jobs[displayName,name,builds[result]' + getNumberOfBuilds() + ']']))
               .then(function (response) {
                 return sanitiseViews(response.data);
-              })
+              });
           };
 
           var getView = function (view) {
@@ -318,7 +312,7 @@
           };
 
           var getBuilds = function (job) {
-            if (typeof job == 'object') {
+            if (typeof job === 'object') {
               job = job.name;
             }
 
@@ -326,7 +320,7 @@
               .then(function (response) {
                 // excluding currently running builds
                 var filteredBuilds = response.data.builds.filter(function (b) {
-                  return !b.building
+                  return !b.building;
                 });
 
                 return filteredBuilds.map(sanitiseBulid);
