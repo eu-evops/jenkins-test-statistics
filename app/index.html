@@ -43,12 +43,13 @@
         <ul class="nav navbar-nav">
           <li ng-class="{ active: navigation.active(menu)}" ng-repeat="menu in navigation.menus"><a
             href="#{{ menu.route }}">{{ menu.name }}</a></li>
+          <li ng-if="authenticated"><a ng-click="signOut()">Sign out <strong>{{ jenkins.username }}</strong></a></li>
         </ul>
       </div>
     </div>
   </div>
 
-  <div class="container" ng-if="$root.authenticated">
+  <div class="container" ng-if="authenticated">
     <div class="panel panel-default">
       <div class="panel-heading">Settings</div>
       <div class="panel-body">

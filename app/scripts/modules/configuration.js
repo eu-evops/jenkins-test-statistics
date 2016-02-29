@@ -20,6 +20,10 @@
       set: function(name, value) {
         config[name] = value;
         storage.set(STORAGE_KEY, JSON.stringify(config));
+      },
+      delete: function(name) {
+        delete config[name];
+        storage.remove(STORAGE_KEY, name);
       }
     };
   }]);

@@ -13,10 +13,15 @@ angular.module('testReporterApp')
       scope: {
         rate: '=passRate'
       },
-      link: function postLink($scope, element, attrs) {
+      link: function postLink($scope, element) {
         $scope.$watch('rate', function () {
-          if(typeof $scope.rate == 'undefined') return;
-          if($scope.rate == null) return;
+          if(typeof $scope.rate === 'undefined') {
+            return;
+          }
+
+          if($scope.rate === null) {
+            return;
+          }
 
           element.removeClass('success', 'bg-success', 'panel-success');
           element.removeClass('danger', 'bg-danger', 'panel-danger');
