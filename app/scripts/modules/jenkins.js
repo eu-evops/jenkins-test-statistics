@@ -147,9 +147,6 @@
                   configuration.set('jenkins', jenkinsConfiguration);
                 }
               })
-              .catch(function (error) {
-                throw 'Authentication error';
-              });
           };
 
           var sanitiseView = function (view, viewName) {

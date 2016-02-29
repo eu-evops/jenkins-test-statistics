@@ -26,18 +26,21 @@ angular.module('testReporterApp')
         jenkins.baseUrl = $scope.jenkins.server;
 
         $scope.authenticating = true;
-        try {
-          jenkins.login($scope.jenkins.username, $scope.jenkins.token, $scope.jenkins.server)
-            .then(function () {
-              $rootScope.authenticated = $scope.authenticated = true;
-              configuration.set('jenkins', $scope.jenkins);
-              var destination = '/';
-              if ($rootScope.redirectTo) destination = $rootScope.redirectTo;
-              $location.path(destination);
-            })
-        } catch (err) {
-          console.log('Error: ', err);
-        }
+        jenkins.login($scope.jenkins.username, $scope.jenkins.token, $scope.jenkins.server)
+          .then(function () {
+            $rootScope.authenticated = $scope.authenticated = true;
+            configuration.set('jenkins', $scope.jenkins);
+            var destination = '/';
+            if ($rootScope.redirectTo) destination = $rootScope.redirectTo;
+            $location.path(destination);
+          })
+          .catch(function (error) {
+            $scope.authenticationError = `Failed to authenticate against ${$scope.jenkins.server}`;
+          })
+          .finally(function () {
+            $scope.authenticating = false;
+            $scope.authenticated = false;
+          })
       };
 
       $scope.authenticate();
