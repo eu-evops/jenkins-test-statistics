@@ -77,13 +77,15 @@ angular
     $locationProvider.html5Mode(false);
   })
   .run([
-    '$rootScope', 'localStorageService', '$window', '$location', 'configuration', 'jenkins', '$route',
-    function ($rootScope, storage, window, $location, configuration, jenkins, $route) {
-      $rootScope.numberOfRecentBuilds = 10;
+    '$rootScope', 'localStorageService', '$window', '$location', 'configuration', 'jenkins', '$route', '$window',
+    function ($rootScope, storage, window, $location, configuration, jenkins, $route, $window) {
+      $rootScope.numberOfRecentBuilds = 7;
       var jenkinsConfiguration = configuration.get('jenkins');
       if(jenkinsConfiguration) {
         $rootScope.numberOfRecentBuilds = storage.get('numberOfRecentBuilds') || 10;
       }
+
+      $rootScope.jenkins = jenkinsConfiguration;
 
       $rootScope.$on('$routeChangeStart', function (event, toState, toParams) {
         if(toState.authenticate && !$rootScope.authenticated) {
@@ -92,27 +94,12 @@ angular
         }
       });
 
-      //
-      //if(jenkinsConfiguration) {
-      //  $rootScope.numberOfRecentBuilds = storage.get('numberOfRecentBuilds') || 10;
-      //  $rootScope.authenticated = jenkinsConfiguration.username && jenkinsConfiguration.token;
-      //
-      //  if ($rootScope.authenticated) {
-      //    jenkins.login(jenkinsConfiguration.username, jenkinsConfiguration.token, jenkinsConfiguration.server)
-      //      .then(function () {
-      //        $rootScope.authenticated = true;
-      //      })
-      //      .catch(function () {
-      //        $window.alert('Failed to authenticate, try again');
-      //        $location.path('/');
-      //      });
-      //  }
-      //} else {
-      //  console.log("Saving location to redirect to", $location.path());
-      //  $rootScope.redirectTo = $location.path();
-      //  $location.path('/');
-      //}
-      //
+      $rootScope.signOut = function () {
+        console.log("Sign out");
+        configuration.delete("jenkins");
+        $window.location.reload();
+      };
+
       $rootScope.saveNumberOfBuildsAndRefresh = function () {
         console.log("Setting number of builds", $rootScope.numberOfRecentBuilds);
         storage.set('numberOfRecentBuilds', $rootScope.numberOfRecentBuilds);
