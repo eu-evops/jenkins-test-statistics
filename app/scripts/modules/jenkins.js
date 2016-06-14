@@ -35,28 +35,7 @@
       }
       build.report.suites.forEach(function (suite) {
         suite.cases.forEach(function (testCase) {
-          if (testCase.name === "dummy" || testCase.name === "<init>") {
-            return;
-          }
-          var testCaseMatches = self.cases.filter(function (tc) {
-            if (build.job) {
-              return tc.name === testCase.name && tc.className === testCase.className && tc.job.name === build.job.name;
-            }
-
-            return tc.name === testCase.name && tc.className === testCase.className;
-          });
-
-          if (testCaseMatches.length === 0) {
             self.cases.push(new TestCase(testCase, build.url, build.job));
-          } else {
-            var executionMatches = testCaseMatches[0].executions.filter(function (ex) {
-              return ex.duration === testCase.duration;
-            });
-            if (executionMatches.length > 0) {
-              return;
-            }
-            testCaseMatches[0].executions.push(new TestCaseExecution(testCase));
-          }
         });
       });
     });
@@ -80,6 +59,7 @@
     job.report = new TestReport();
     job.view = view;
     job.tests = job.tests || [];
+    job.builds = job.builds || [];
 
     job.builds = job.builds.map(function (build) {
       return sanitiseBulid(build);
