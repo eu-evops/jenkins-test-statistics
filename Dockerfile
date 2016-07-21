@@ -1,4 +1,4 @@
-FROM node:4.2.1
+FROM node:4.4.7
 
 ENV NODE_ENV production
 ENV JENKINS_SERVERS http://localhost:8080/jenkins
