@@ -22,6 +22,14 @@
 
       return this.passingCount / this.executions.length;
     };
+
+    this.mapping = function () {
+      return this.job.name + " / " + this.className + " / " + this.name;
+    }
+
+    this.addExecution = function (testCase) {
+      this.executions.push(new TestCaseExecution(testCase));
+    }
   }
 
   function TestReport(builds) {
@@ -29,13 +37,23 @@
     this.cases = [];
     builds = builds || [];
 
+    var testCaseMapping = {};
+
     builds.forEach(function (build) {
       if (!build || !build.report || !build.report.suites) {
         return;
       }
       build.report.suites.forEach(function (suite) {
         suite.cases.forEach(function (testCase) {
-            self.cases.push(new TestCase(testCase, build.url, build.job));
+          var tc = new TestCase(testCase, build.url, build.job);
+
+          if(testCaseMapping[tc.mapping()]) {
+            var previousTC = testCaseMapping[tc.mapping()];
+            previousTC.addExecution(tc);
+          } else {
+            testCaseMapping[tc.mapping()] = tc;
+            self.cases.push(tc);
+          }
         });
       });
     });
@@ -84,7 +102,7 @@
 
   var sanitiseBulid = function (build) {
     build.aborted = build.result === 'ABORTED';
-    build.passing = !build.aborted && build.result !== 'FAILURE';
+    build.passing = !build.aborted && build.result !== 'FAILURE' && build.result != 'UNSTABLE';
 
     return build;
   };
@@ -236,9 +254,13 @@
 
             angular.forEach(grouping, function (group) {
               group.forEach(function (build) {
-                promises.push(http.get(build.url + '/testReport/api/json?tree=failCount,passCount,skipCount,suites[cases[className,duration,name,skipped,status]]')
+                promises.push(
+                  http.get(build.url + '/testReport/api/json?tree=failCount,passCount,skipCount,suites[cases[className,duration,name,skipped,status]]')
                   .then(function (response) {
+                    // Store jenkins test report under report key
                     build.report = response.data;
+
+                    // Update report with calculated statistics
                     build.report.totalTests = (build.report.passCount + build.report.failCount + build.report.skipCount);
                     build.report.passRate = build.report.passCount / build.report.totalTests;
 

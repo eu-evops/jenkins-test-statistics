@@ -26,6 +26,7 @@ angular.module('testReporterApp')
         jenkins.baseUrl = $scope.jenkins.server;
 
         $scope.authenticating = true;
+        console.log($scope.jenkins.server);
         jenkins.login($scope.jenkins.username, $scope.jenkins.token, $scope.jenkins.server)
           .then(function () {
             $rootScope.authenticated = $scope.authenticated = true;
