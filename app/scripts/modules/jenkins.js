@@ -149,26 +149,26 @@
               });
           };
 
+          var getAllJobsRecursive = function (node) {
+            var jobs = node.jobs.map(function (j) {
+              return sanitiseJob(j, node);
+            });
+
+            if (node.views) {
+              // TODO Fix recursion
+              node.views.forEach(function (v) {
+                v.jobs.forEach(function (j) {
+                  jobs.push(sanitiseJob(j, v));
+                });
+              });
+            }
+
+            return jobs;
+          };
+
           var sanitiseView = function (view, viewName) {
             view.name = viewName;
             view.passRate = null;
-
-            var getAllJobsRecursive = function (node) {
-              var jobs = node.jobs.map(function (j) {
-                return sanitiseJob(j, node);
-              });
-
-              if (node.views) {
-                node.views.forEach(function (v) {
-                  v.jobs.forEach(function (j) {
-                    jobs.push(sanitiseJob(j, v));
-                  });
-                });
-              }
-
-              return jobs;
-            };
-
             view.allJobs = getAllJobsRecursive(view);
 
             if (view.allJobs && view.allJobs.length > 0) {
@@ -190,36 +190,47 @@
             return view;
           };
 
-          var sanitiseViews = function (top) {
-            var views = [];
+          var generateFullViewName = function (v) {
+            var n = v.name;
+            var p = v.parent;
+            while(p != null && p.name !== undefined) {
+              n = p.name + ' -> ' + n;
+              p = p.parent;
+            }
 
-            if (!top.views) {
+            return n;
+          };
+
+          var flattenViews = function (jenkinsView, parent) {
+            if(parent === undefined) {
+              parent = null;
+            }
+
+            var views = [];
+            sanitiseView(jenkinsView, jenkinsView.name);
+
+            jenkinsView.parent = parent;
+            jenkinsView.fullName = generateFullViewName(jenkinsView);
+            if(jenkinsView.url) {
+              jenkinsView.relativeUrl = jenkinsView.url.replace(getConf().url, '');
+            }
+
+            if (!jenkinsView.views) {
               return views;
             }
-            top.views.forEach(function (view) {
-              views.push(view);
 
-              view.allJobs = view.jobs.map(function (job) {
-                return sanitiseJob(job, view);
+            jenkinsView.views.forEach(function (subView) {
+              views.push(subView);
+
+              var subViews = flattenViews(subView, jenkinsView);
+              subViews.forEach(function (sv) {
+                views.push(sv);
               });
-
-              view.fullName = view.name;
-              view.relativeUrl = view.url.replace(getConf().url, '');
-              var subViews = sanitiseViews(view);
-              subViews.forEach(function (subView) {
-                subView.fullName = view.fullName + ' -> ' + subView.name;
-                subView.jobs.forEach(function (job) {
-                  view.allJobs.push(sanitiseJob(job, subView));
-                });
-
-                views.push(subView);
-              });
-
-              sanitiseView(view, view.name);
             });
 
             return views;
           };
+
 
           var recursiveTreeCall = function (depth, parameters) {
             var call = parameters.join(',');
@@ -302,7 +313,7 @@
           var getViews = function () {
             return http.get(getConf().url + '/api/json?depth=100&tree=' + recursiveTreeCall(10, ['name', 'url', 'jobs[displayName,name,builds[result]' + getNumberOfBuilds() + ']']))
               .then(function (response) {
-                return sanitiseViews(response.data);
+                return flattenViews(response.data);
               });
           };
 
