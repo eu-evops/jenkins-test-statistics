@@ -24,6 +24,7 @@
       <a data-target="#testStatistics" data-toggle="collapse">Test report</a> -
       <small>Number of tests: {{ testReport.cases.length }}</small>
       <small>Pass rate: {{ testReport.passRate | percentage }}</small>
+      <a class="float-right pointer" ng-click="exportCsv()">Export as CVS</a>
     </div>
     <div id="testStatistics" class="panel-collapse collapse">
       <div class="panel-body">
@@ -64,4 +65,3 @@
     <td title="'Build Pass rate'" sortable="'passRate'">{{ job.passRate | percentage:0 }}</td>
   </tr>
 </table>
-

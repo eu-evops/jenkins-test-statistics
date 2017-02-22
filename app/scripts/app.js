@@ -21,7 +21,8 @@ angular
     'ui.sortable',
     'LocalStorageModule',
     'Jenkins',
-    'Configuration'
+    'Configuration',
+    'ngFileSaver'
   ])
   .config(['localStorageServiceProvider', function (localStorageServiceProvider) {
     localStorageServiceProvider.setPrefix('testReporter');

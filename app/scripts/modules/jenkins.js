@@ -47,7 +47,7 @@
         suite.cases.forEach(function (testCase) {
           var tc = new TestCase(testCase, build.url, build.job);
 
-          if(testCaseMapping[tc.mapping()]) {
+          if (testCaseMapping[tc.mapping()]) {
             var previousTC = testCaseMapping[tc.mapping()];
             previousTC.addExecution(tc);
           } else {
@@ -135,10 +135,10 @@
 
             var basicAuth = "Basic " + base64.encode(user + ':' + pass);
             return http.get(server + "/me/configure", {
-                headers: {
-                  Authorization: basicAuth
-                }
-              })
+              headers: {
+                Authorization: basicAuth
+              }
+            })
               .then(function (response) {
                 var match = response.data.match('name=._\.apiToken. value=["\']?([^"\']+)["\']?');
                 if (match) {
@@ -149,26 +149,28 @@
               });
           };
 
+          var getAllJobsRecursive = function (node) {
+            var jobs = [];
+
+            node.jobs.forEach(function (j) {
+              jobs.push(sanitiseJob(j, node));
+            });
+
+            if (node.views) {
+              // TODO Fix recursion
+              node.views.forEach(function (v) {
+                getAllJobsRecursive(v).forEach(function (sj) {
+                  jobs.push(sj);
+                });
+              });
+            }
+
+            return jobs;
+          };
+
           var sanitiseView = function (view, viewName) {
             view.name = viewName;
             view.passRate = null;
-
-            var getAllJobsRecursive = function (node) {
-              var jobs = node.jobs.map(function (j) {
-                return sanitiseJob(j, node);
-              });
-
-              if (node.views) {
-                node.views.forEach(function (v) {
-                  v.jobs.forEach(function (j) {
-                    jobs.push(sanitiseJob(j, v));
-                  });
-                });
-              }
-
-              return jobs;
-            };
-
             view.allJobs = getAllJobsRecursive(view);
 
             if (view.allJobs && view.allJobs.length > 0) {
@@ -190,36 +192,47 @@
             return view;
           };
 
-          var sanitiseViews = function (top) {
-            var views = [];
+          var generateFullViewName = function (v) {
+            var n = v.name;
+            var p = v.parent;
+            while (p != null && p.name !== undefined) {
+              n = p.name + ' -> ' + n;
+              p = p.parent;
+            }
 
-            if (!top.views) {
+            return n;
+          };
+
+          var flattenViews = function (jenkinsView, parent) {
+            if (parent === undefined) {
+              parent = null;
+            }
+
+            var views = [];
+            sanitiseView(jenkinsView, jenkinsView.name);
+
+            jenkinsView.parent = parent;
+            jenkinsView.fullName = generateFullViewName(jenkinsView);
+            if (jenkinsView.url) {
+              jenkinsView.relativeUrl = jenkinsView.url.replace(getConf().url, '');
+            }
+
+            if (!jenkinsView.views) {
               return views;
             }
-            top.views.forEach(function (view) {
-              views.push(view);
 
-              view.allJobs = view.jobs.map(function (job) {
-                return sanitiseJob(job, view);
+            jenkinsView.views.forEach(function (subView) {
+              views.push(subView);
+
+              var subViews = flattenViews(subView, jenkinsView);
+              subViews.forEach(function (sv) {
+                views.push(sv);
               });
-
-              view.fullName = view.name;
-              view.relativeUrl = view.url.replace(getConf().url, '');
-              var subViews = sanitiseViews(view);
-              subViews.forEach(function (subView) {
-                subView.fullName = view.fullName + ' -> ' + subView.name;
-                subView.jobs.forEach(function (job) {
-                  view.allJobs.push(sanitiseJob(job, subView));
-                });
-
-                views.push(subView);
-              });
-
-              sanitiseView(view, view.name);
             });
 
             return views;
           };
+
 
           var recursiveTreeCall = function (depth, parameters) {
             var call = parameters.join(',');
@@ -256,35 +269,35 @@
               group.forEach(function (build) {
                 promises.push(
                   http.get(build.url + '/testReport/api/json?tree=failCount,passCount,skipCount,suites[cases[className,duration,name,skipped,status]]')
-                  .then(function (response) {
-                    // Store jenkins test report under report key
-                    build.report = response.data;
+                    .then(function (response) {
+                      // Store jenkins test report under report key
+                      build.report = response.data;
 
-                    // Update report with calculated statistics
-                    build.report.totalTests = (build.report.passCount + build.report.failCount + build.report.skipCount);
-                    build.report.passRate = build.report.passCount / build.report.totalTests;
+                      // Update report with calculated statistics
+                      build.report.totalTests = (build.report.passCount + build.report.failCount + build.report.skipCount);
+                      build.report.passRate = build.report.passCount / build.report.totalTests;
 
-                    if (build.job) {
-                      build.job.report = new TestReport(build.job.builds);
-                    }
+                      if (build.job) {
+                        build.job.report = new TestReport(build.job.builds);
+                      }
 
-                    return build;
-                  })
-                  .catch(function () {
-                    build.report = {
-                      numberOfTests: 0,
-                      passRate: null,
-                      suites: []
-                    };
+                      return build;
+                    })
+                    .catch(function () {
+                      build.report = {
+                        numberOfTests: 0,
+                        passRate: null,
+                        suites: []
+                      };
 
-                    return build;
-                  })
-                  .finally(function (build) {
-                    processedBuilds++;
-                    var progress = processedBuilds / allBuilds * 100;
-                    $rootScope.$broadcast('jenkins-report', progress);
-                    return build;
-                  })
+                      return build;
+                    })
+                    .finally(function (build) {
+                      processedBuilds++;
+                      var progress = processedBuilds / allBuilds * 100;
+                      $rootScope.$broadcast('jenkins-report', progress);
+                      return build;
+                    })
                 );
               });
             });
@@ -302,7 +315,7 @@
           var getViews = function () {
             return http.get(getConf().url + '/api/json?depth=100&tree=' + recursiveTreeCall(10, ['name', 'url', 'jobs[displayName,name,builds[result]' + getNumberOfBuilds() + ']']))
               .then(function (response) {
-                return sanitiseViews(response.data);
+                return flattenViews(response.data);
               });
           };
 
