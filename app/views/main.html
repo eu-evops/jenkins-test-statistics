@@ -13,7 +13,8 @@
 
   <table class="table table-bordered table-responsive table-striped" ng-table="tableParameters">
     <tr ng-repeat="view in $data" data-pass-rate="view.passRate">
-      <td title="'View Name'" sortable="'fullName'"><a ng-href="#/views{{ view.relativeUrl }}">{{ view.fullName }}</a>
+      <td title="'View Name'" sortable="'fullName'">
+        <a ng-href="#/views{{ view.relativeUrl }}">{{ view.fullName }}</a>
       </td>
       <td title="'Number of jobs'" sortable="'allJobs.length'">{{ view.allJobs.length }}</td>
       <td title="'Job pass rate'" sortable="'passRate'">{{ view.passRate | percentage:0 }}</td>

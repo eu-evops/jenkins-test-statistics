@@ -30,6 +30,7 @@ angular
     $httpProvider.interceptors.push('JenkinsAuthenticationHttpInterceptor');
   }])
   .config(function ($routeProvider, $locationProvider) {
+    $locationProvider.hashPrefix('');
     $routeProvider
       .when('/login', {
         templateUrl: 'views/login.html',
@@ -65,6 +66,7 @@ angular
         controllerAs: 'settings'
       })
       .when('/views/:view*', {
+        component: 'view',
         templateUrl: 'views/views.html',
         controller: 'ViewsCtrl',
         controllerAs: 'views',
@@ -88,6 +90,7 @@ angular
       $rootScope.jenkins = jenkinsConfiguration;
 
       $rootScope.$on('$routeChangeStart', function (event, toState) {
+        console.log("Routing changing to", toState);
         if(toState.authenticate && !$rootScope.authenticated) {
           $rootScope.redirectTo = $location.path();
           $location.path('/login');
