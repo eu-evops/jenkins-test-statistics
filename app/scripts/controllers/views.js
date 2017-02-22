@@ -9,8 +9,8 @@
  */
 angular.module('testReporterApp')
   .controller('ViewsCtrl', [
-    '$scope', '$routeParams', 'jenkins', 'ngTableParams',
-    function ($scope, route, jenkins, NgTableParams) {
+    '$scope', '$routeParams', 'jenkins', 'ngTableParams', 'FileSaver', 'Blob',
+    function ($scope, route, jenkins, NgTableParams, FileSaver, Blob) {
       $scope.view = {
         name: route.view
       };
@@ -55,6 +55,23 @@ angular.module('testReporterApp')
               });
               $scope.$apply();
             });
+
+          $scope.exportCsv = function() {
+            var tcs = $scope.testReport.cases.map(function (tc) {
+              return [
+                tc.className,
+                tc.name,
+                tc.executions.length,
+                tc.passingCount,
+                tc.getPassRate(),
+                tc.url
+              ].join(",");
+            }).join("\n");
+
+            var header = "Test Suite,Test Name, Number of executions, Passing count, Pass rate, Jenkins Test history URL";
+            var exportBlob = new Blob([header + "\n" + tcs], { type: 'text/csv' });
+            FileSaver.saveAs(exportBlob, "TestReport.csv");
+          };
 
           $scope.tableParameters = new NgTableParams({
               count: 10,
