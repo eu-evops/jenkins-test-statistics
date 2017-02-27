@@ -1,9 +1,9 @@
-<h1>Listing for {{ view.name }}</h1>
+<h1>{{ view.name | breadcrumbs }}</h1>
 
 <div class="panel panel-default" pass-rate="view.passRate">
   <div class="panel-heading">Statistics</div>
   <div class="panel-body">
-    <p>Number of jobs: {{ view.allJobs.length }}</p>
+    <p>Number of jobs in view: {{ view.allJobs.length }}</p>
     <p>Build pass rate: {{ view.passRate | percentage:0 }}</p>
   </div>
 </div>
@@ -21,25 +21,47 @@
 <div ng-show="testReport && testReport.cases.length > 0">
   <div class="panel-default panel" pass-rate="testReport.passRate">
     <div class="panel-heading">
-      <a data-target="#testStatistics" data-toggle="collapse">Test report</a> -
+      <a class="float-right pointer" ng-click="exportCsv()">Export as CSV</a>
+      <a data-target="#testStatistics" class="pointer" data-toggle="collapse">Test report</a> -
       <small>Number of tests: {{ testReport.cases.length }}</small>
       <small>Pass rate: {{ testReport.passRate | percentage }}</small>
-      <a class="float-right pointer" ng-click="exportCsv()">Export as CSV</a>
+      <small>FU Pass rate: {{ testReport.fuPassRate | percentage }}</small>
+
+      <div ng-repeat="a in range(numberOfRecentBuilds) track by $index">
+        <nothing ng-if="$index + 1 === numberOfRecentBuilds">
+        Pass in all builds: {{ testReport.passRatePassingTimes($index + 1) | percentage }}
+        </nothing>
+        <nothing ng-if="$index + 1 !== numberOfRecentBuilds">
+        Passed at least {{ $index + 1 }} times: {{ testReport.passRatePassingTimes($index + 1) | percentage }}
+        </nothing>
+      </div>
+
     </div>
     <div id="testStatistics" class="panel-collapse collapse">
       <div class="panel-body">
         <bloquote ng-if="testSearch">Filtered by: <strong>{{ testSearch }}</strong>, found: {{ testTableParameters.total() }}</bloquote>
 
-        <p><input type="text" placeholder="Filter tests..." ng-model="testSearch" class="form-control"></p>
+        <p><input type="text" placeholder="Filter tests by name..." ng-model="testSearch" class="form-control"></p>
 
         <table
           class="table table-bordered table-striped table-responsive table-hover"
           ng-table="testTableParameters">
           <tr ng-repeat="case in $data" pass-rate="case.getPassRate()">
-            <td title="'Suite'">{{ case.className }}</td>
-            <td title="'Name'">{{ case.name }}</td>
+            <td title="'Job'" sortable="'job.name'">{{ case.job.name }}</td>
+            <td title="'Suite'" sortable="'className'">{{ case.className }}</td>
+            <td title="'Name'" sortable="'name'">{{ case.name }}</td>
             <td title="'Pass rate'" sortable="'getPassRate()'">{{ case.getPassRate() | percentage:0 }}</td>
-            <td title="'Number of executions'" sortable="'executions.length'">{{ case.executions.length }}</td>
+            <td title="'FU Pass rate'" sortable="'getFUPassRate()'">{{ case.getFUPassRate() | percentage:0 }}</td>
+            <td title="'Executions'" sortable="'executions.length'">
+              <p>{{ case.executions.length }} executions</p>
+              <ul>
+                <li ng-repeat="e in case.executions">
+                  <span>
+                    <a ng-class="{ fail: !e.passing, pass: e.passing }" href="{{ e.url }}" target="_blank">Build #{{ e.build.number}}</a>
+                  </span>
+                </li>
+              </ul>
+            </td>
             <td title="'Links'"><a ng-href="{{ case.url }}" target="_blank">History</a></td>
           </tr>
         </table>

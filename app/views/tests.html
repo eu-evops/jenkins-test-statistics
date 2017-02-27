@@ -16,6 +16,7 @@
       <a data-target="#testStatistics" data-toggle="collapse">Test report</a> -
       <small>Number of tests: {{ testReport.cases.length }}</small>
       <small>Pass rate: {{ testReport.passRate | percentage }}</small>
+      <small>MA Pass rate: {{ testReport.fuPassRate | percentage }}</small>
     </div>
     <div id="testStatistics" class="panel-collapse collapse">
       <div class="panel-body">
@@ -29,6 +30,7 @@
             <td title="'Suite'">{{ case.className }}</td>
             <td title="'Name'">{{ case.name }}</td>
             <td title="'Pass rate'" sortable="'getPassRate()'">{{ case.getPassRate() | percentage:0 }}</td>
+            <td title="'MA Pass rate'" sortable="'getFUPassRate()'">{{ case.getFUPassRate() | percentage:0 }}</td>
             <td title="'Number of executions'" sortable="'executions.length'">{{ case.executions.length }}</td>
             <td title="'Links'"><a ng-href="{{ case.url }}" target="_blank">History</a></td>
           </tr>

@@ -39,7 +39,7 @@ angular.module('testReporterApp')
               $scope.$apply();
 
               $scope.testTableParameters = new NgTableParams({
-                  count: 10,
+                  count: 25,
                   sorting: {
                     'getPassRate()': 'asc'
                   }
@@ -56,7 +56,11 @@ angular.module('testReporterApp')
               $scope.$apply();
             });
 
-          $scope.exportCsv = function() {
+          $scope.range = function(n) {
+            return new Array(n);
+          };
+
+          $scope.exportCsv = function () {
             var tcs = $scope.testReport.cases.map(function (tc) {
               return [
                 tc.className,
@@ -64,17 +68,18 @@ angular.module('testReporterApp')
                 tc.executions.length,
                 tc.passingCount,
                 tc.getPassRate(),
+                tc.getFUPassRate(),
                 tc.url
               ].join(",");
             }).join("\n");
 
-            var header = "Test Suite,Test Name, Number of executions, Passing count, Pass rate, Jenkins Test history URL";
-            var exportBlob = new Blob([header + "\n" + tcs], { type: 'text/csv' });
+            var header = "Test Suite,Test Name, Number of executions, Passing count, Pass rate, FU Pass rate, Jenkins Test history URL";
+            var exportBlob = new Blob([header + "\n" + tcs], {type: 'text/csv'});
             FileSaver.saveAs(exportBlob, "TestReport.csv");
           };
 
           $scope.tableParameters = new NgTableParams({
-              count: 10,
+              count: 25,
               sorting: {
                 passRate: 'asc'
               }
@@ -84,7 +89,6 @@ angular.module('testReporterApp')
             });
 
           $scope.$watch('jobSearch', function () {
-            console.log("Filtering", $scope.tableParameters);
             $scope.tableParameters.filter({displayName: $scope.jobSearch});
           });
         });
