@@ -52,4 +52,11 @@ angular.module('testReporterApp')
       return $filter('number')(input * 100, decimals) + '%';
     };
   }])
+  .filter('breadcrumbs', function() {
+    return function(input) {
+      return input.split(/\/?view\/?/).map(function(item) {
+        return item.replace('/', '').replace(/^$/, 'Home');
+      }).join(" / ");
+    }
+  })
 ;
