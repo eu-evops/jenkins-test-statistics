@@ -20,23 +20,16 @@
 
 <div ng-show="testReport && testReport.cases.length > 0">
   <div class="panel-default panel" pass-rate="testReport.passRate">
-    <div class="panel-heading">
+
+    <div class="panel-heading" title="{{ testReportSummary }}">
       <a class="float-right pointer" ng-click="exportCsv()">Export as CSV</a>
       <a data-target="#testStatistics" class="pointer" data-toggle="collapse">Test report</a> -
       <small>Number of tests: {{ testReport.cases.length }}</small>
       <small>Pass rate: {{ testReport.passRate | percentage }}</small>
-      <small>FU Pass rate: {{ testReport.fuPassRate | percentage }}</small>
-
-      <div ng-repeat="a in range(numberOfRecentBuilds) track by $index">
-        <nothing ng-if="$index + 1 === numberOfRecentBuilds">
-        Pass in all builds: {{ testReport.passRatePassingTimes($index + 1) | percentage }}
-        </nothing>
-        <nothing ng-if="$index + 1 !== numberOfRecentBuilds">
-        Passed at least {{ $index + 1 }} times: {{ testReport.passRatePassingTimes($index + 1) | percentage }}
-        </nothing>
-      </div>
-
+      <small>Unstable rate: {{ testReport.unstableRate | percentage }}</small>
+      <small>Fail rate: {{ testReport.failRate | percentage }}</small>
     </div>
+
     <div id="testStatistics" class="panel-collapse collapse">
       <div class="panel-body">
         <bloquote ng-if="testSearch">Filtered by: <strong>{{ testSearch }}</strong>, found: {{ testTableParameters.total() }}</bloquote>
@@ -46,12 +39,12 @@
         <table
           class="table table-bordered table-striped table-responsive table-hover"
           ng-table="testTableParameters">
-          <tr ng-repeat="case in $data" pass-rate="case.getPassRate()">
+          <tr ng-repeat="case in $data track by $index" pass-rate="case.getPassRate()">
+            <td title="Index">{{ $index + 1 }}</td>
             <td title="'Job'" sortable="'job.name'">{{ case.job.name }}</td>
             <td title="'Suite'" sortable="'className'">{{ case.className }}</td>
             <td title="'Name'" sortable="'name'">{{ case.name }}</td>
             <td title="'Pass rate'" sortable="'getPassRate()'">{{ case.getPassRate() | percentage:0 }}</td>
-            <td title="'FU Pass rate'" sortable="'getFUPassRate()'">{{ case.getFUPassRate() | percentage:0 }}</td>
             <td title="'Executions'" sortable="'executions.length'">
               <p>{{ case.executions.length }} executions</p>
               <ul>
@@ -82,6 +75,8 @@
     <td title="'Number of builds'" sortable="'builds.length'">{{ job.builds.length }}</td>
 
     <td title="'Test pass rate'" sortable="'report.passRate'">{{ job.report.passRate | percentage }}</td>
+    <td title="'Unstable rate'" sortable="'report.unstableRate'">{{ job.report.unstableRate | percentage }}</td>
+    <td title="'Fail rate'" sortable="'report.failRate'">{{ job.report.failRate | percentage }}</td>
     <td title="'Test count'" sortable="'report.cases.length'">{{ job.report.cases.length }}</td>
 
     <td title="'Build Pass rate'" sortable="'passRate'">{{ job.passRate | percentage:0 }}</td>

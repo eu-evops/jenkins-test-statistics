@@ -42,18 +42,6 @@
       return this.passingCount / this.executions.length;
     };
 
-    this.getFUPassRate = function () {
-      this.passingCount = this.executions.filter(function (e) {
-        return e.passing;
-      }).length;
-
-      if(this.passingCount > 0) {
-        return 1;
-      } else {
-        return this.getPassRate();
-      }
-    };
-
     this.mapping = function () {
       return this.job.name + " / " + this.className + " / " + this.name;
     };
@@ -94,44 +82,48 @@
     });
 
     this.passingTests = 0;
-    this.fuPassingTests = 0;
-    this.totalTests = 0;
-    this.cases.forEach(function (testCase) {
-      testCase.executions.forEach(function (execution) {
-        if (execution.passing) {
-          self.passingTests++;
-        }
-        self.totalTests++;
-      });
-    });
+    this.failingTests = 0;
+    this.unstableTests = 0;
 
     this.cases.forEach(function (testCase) {
-      var passing = testCase.executions.filter(function(execution) {
-        return execution.passing;
-      }).length > 0;
+      var passing = testCase.executions.every(function(e) { return e.passing })
+      var failing = testCase.executions.every(function(e) { return !e.passing })
+      var unstable = !passing && !failing
 
       if(passing) {
-        self.fuPassingTests += testCase.executions.length;
+        self.passingTests += 1;
+      }
+
+      if(failing) {
+        self.failingTests += 1;
+      }
+
+      if(unstable) {
+        self.unstableTests += 1;
       }
     });
 
-    this.passRate = this.passingTests / this.totalTests || 0;
-    this.fuPassRate = this.fuPassingTests / this.totalTests || 0;
+    this.passRate = this.passingTests / this.cases.length;
+    this.failRate = this.failingTests / this.cases.length;
+    this.unstableRate = this.unstableTests / this.cases.length;
   }
 
-  TestReport.prototype.passRatePassingTimes = function (n) {
+  TestReport.prototype.numberPassingTimes = function (n) {
     var testsPassing = 0;
     this.cases.forEach(function (testCase) {
       var numberPassing = testCase.executions.filter(function(execution) {
           return execution.passing;
-        }).length > n - 1;
+        }).length;
 
-      if(numberPassing) {
-        testsPassing += testCase.executions.length;
+      if(numberPassing === testCase.executions.length || numberPassing > n - 1) {
+        testsPassing += 1;
       }
     });
+    return testsPassing;
+  }
 
-    return testsPassing / this.totalTests || 0;
+  TestReport.prototype.passRatePassingTimes = function (n) {
+    return this.numberPassingTimes(n) / this.cases.length || 0;
   };
 
 
@@ -345,7 +337,8 @@
 
                       return build;
                     })
-                    .catch(function () {
+                    .catch(function (error) {
+                      console.error('Error generating report', error)
                       build.report = {
                         numberOfTests: 0,
                         passRate: null,
