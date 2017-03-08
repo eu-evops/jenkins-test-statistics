@@ -1,19 +1,38 @@
+/**
+ * TestReport
+ *   testCases: [
+ *     {
+ *        suite: 'Test case suite',
+ *        name: 'Test case name',
+ *        executions: [
+   *        {
+   *          build: build,
+   *          passing: boolean
+   *        }
+ *        ]
+ *     }
+ *   ]
+ */
+
 (function (window, angular) {
   'use strict';
 
-  function TestCaseExecution(execution) {
+  function TestCaseExecution(execution, build) {
     this.execution = execution;
     this.duration = execution.duration;
+    this.build = build;
+    this.url = this.build.url + 'testReport/(root)/' + this.execution.className + "/" + this.execution.name;
     this.passing = (this.execution.status === 'PASSED' || this.execution.status === 'FIXED');
   }
 
-  function TestCase(testCase, baseUrl, job) {
+  function TestCase(testCase, build, job) {
     this.job = job;
     this.name = testCase.name;
     this.className = testCase.className;
     this.urlName = this.name.replace(/\s+/g, '_').replace(/[^\w\d]+/g, '_');
-    this.url = baseUrl + "testReport/(root)/" + this.className + "/" + this.urlName + "/history/";
-    this.executions = [new TestCaseExecution(testCase)];
+    this.url = build.url + "testReport/(root)/" + this.className + "/" + this.urlName + "/history/";
+    this.build = build;
+    this.executions = [];
 
     this.getPassRate = function () {
       this.passingCount = this.executions.filter(function (e) {
@@ -25,10 +44,12 @@
 
     this.mapping = function () {
       return this.job.name + " / " + this.className + " / " + this.name;
-    }
+    };
 
-    this.addExecution = function (testCase) {
-      this.executions.push(new TestCaseExecution(testCase));
+    this.mappingString = this.mapping();
+
+    this.addExecution = function (tce) {
+      this.executions.push(tce);
     }
   }
 
@@ -45,12 +66,14 @@
       }
       build.report.suites.forEach(function (suite) {
         suite.cases.forEach(function (testCase) {
-          var tc = new TestCase(testCase, build.url, build.job);
+          var tc = new TestCase(testCase, build, build.job);
+          var tce = new TestCaseExecution(testCase, build);
 
           if (testCaseMapping[tc.mapping()]) {
             var previousTC = testCaseMapping[tc.mapping()];
-            previousTC.addExecution(tc);
+            previousTC.addExecution(tce);
           } else {
+            tc.addExecution(tce);
             testCaseMapping[tc.mapping()] = tc;
             self.cases.push(tc);
           }
@@ -59,18 +82,49 @@
     });
 
     this.passingTests = 0;
-    this.totalTests = 0;
+    this.failingTests = 0;
+    this.unstableTests = 0;
+
     this.cases.forEach(function (testCase) {
-      testCase.executions.forEach(function (execution) {
-        if (execution.passing) {
-          self.passingTests++;
-        }
-        self.totalTests++;
-      });
+      var passing = testCase.executions.every(function(e) { return e.passing })
+      var failing = testCase.executions.every(function(e) { return !e.passing })
+      var unstable = !passing && !failing
+
+      if(passing) {
+        self.passingTests += 1;
+      }
+
+      if(failing) {
+        self.failingTests += 1;
+      }
+
+      if(unstable) {
+        self.unstableTests += 1;
+      }
     });
 
-    this.passRate = this.passingTests / this.totalTests || 0;
+    this.passRate = this.passingTests / this.cases.length;
+    this.failRate = this.failingTests / this.cases.length;
+    this.unstableRate = this.unstableTests / this.cases.length;
   }
+
+  TestReport.prototype.numberPassingTimes = function (n) {
+    var testsPassing = 0;
+    this.cases.forEach(function (testCase) {
+      var numberPassing = testCase.executions.filter(function(execution) {
+          return execution.passing;
+        }).length;
+
+      if(numberPassing === testCase.executions.length || numberPassing > n - 1) {
+        testsPassing += 1;
+      }
+    });
+    return testsPassing;
+  }
+
+  TestReport.prototype.passRatePassingTimes = function (n) {
+    return this.numberPassingTimes(n) / this.cases.length || 0;
+  };
 
 
   var sanitiseJob = function (job, view) {
@@ -80,7 +134,7 @@
     job.builds = job.builds || [];
 
     job.builds = job.builds.map(function (build) {
-      return sanitiseBulid(build);
+      return sanitiseBuild(build);
     });
 
     job.passingBuilds = job.builds.filter(function (b) {
@@ -100,7 +154,7 @@
     return job;
   };
 
-  var sanitiseBulid = function (build) {
+  var sanitiseBuild = function (build) {
     build.aborted = build.result === 'ABORTED';
     build.passing = !build.aborted && build.result !== 'FAILURE' && build.result != 'UNSTABLE';
 
@@ -283,7 +337,8 @@
 
                       return build;
                     })
-                    .catch(function () {
+                    .catch(function (error) {
+                      console.error('Error generating report', error)
                       build.report = {
                         numberOfTests: 0,
                         passRate: null,
@@ -338,7 +393,7 @@
                   return !b.building;
                 });
 
-                return filteredBuilds.map(sanitiseBulid);
+                return filteredBuilds.map(sanitiseBuild);
               });
           };
 

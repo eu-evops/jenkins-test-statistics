@@ -16,6 +16,8 @@
       <a data-target="#testStatistics" data-toggle="collapse">Test report</a> -
       <small>Number of tests: {{ testReport.cases.length }}</small>
       <small>Pass rate: {{ testReport.passRate | percentage }}</small>
+      <small>Unstable rate: {{ testReport.unstableRate | percentage }}</small>
+      <small>Fail rate: {{ testReport.failRate | percentage }}</small>
     </div>
     <div id="testStatistics" class="panel-collapse collapse">
       <div class="panel-body">
@@ -25,7 +27,8 @@
         <table
           class="table table-bordered table-striped table-responsive table-hover"
           ng-table="testTableParameters">
-          <tr ng-repeat="case in $data" pass-rate="case.getPassRate()">
+          <tr ng-repeat="case in $data track by $index" pass-rate="case.getPassRate()">
+            <td title="Index">{{ $index + 1 }}</td>
             <td title="'Suite'">{{ case.className }}</td>
             <td title="'Name'">{{ case.name }}</td>
             <td title="'Pass rate'" sortable="'getPassRate()'">{{ case.getPassRate() | percentage:0 }}</td>
