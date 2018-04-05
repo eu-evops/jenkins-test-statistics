@@ -383,7 +383,7 @@
           };
 
           var getViews = function () {
-            return http.get(getConf().url + '/api/json?depth=100&tree=' + recursiveTreeCall(10, ['name', 'url', 'jobs[displayName,name,builds[result]' + getNumberOfBuilds() + ']']))
+            return http.get(getConf().url + '/api/json?depth=100&tree=' + recursiveTreeCall(5, ['name', 'url', 'jobs[displayName,name,builds[result]' + getNumberOfBuilds() + ']']))
               .then(function (response) {
                 return flattenViews(response.data);
               });
