@@ -13,11 +13,12 @@
 
   <div class="panel-default panel" pass-rate="testReport.passRate">
     <div class="panel-heading">
-      <a data-target="#testStatistics" data-toggle="collapse">Test report</a> -
+      <a data-target="#testStatistics" class="pointer" data-toggle="collapse">Test report</a> -
       <small>Number of tests: {{ testReport.cases.length }}</small>
       <small>Pass rate: {{ testReport.passRate | percentage }}</small>
       <small>Unstable rate: {{ testReport.unstableRate | percentage }}</small>
       <small>Fail rate: {{ testReport.failRate | percentage }}</small>
+      <small>Skip rate: {{ testReport.skippedRate | percentage }}</small>
     </div>
     <div id="testStatistics" class="panel-collapse collapse">
       <div class="panel-body">
@@ -27,12 +28,22 @@
         <table
           class="table table-bordered table-striped table-responsive table-hover"
           ng-table="testTableParameters">
-          <tr ng-repeat="case in $data track by $index" pass-rate="case.getPassRate()">
+          <tr ng-repeat="case in $data track by $index" pass-rate="case.getPassRate()" data-skipped="case.skipped">
             <td title="Index">{{ $index + 1 }}</td>
             <td title="'Suite'">{{ case.className }}</td>
             <td title="'Name'">{{ case.name }}</td>
             <td title="'Pass rate'" sortable="'getPassRate()'">{{ case.getPassRate() | percentage:0 }}</td>
-            <td title="'Number of executions'" sortable="'executions.length'">{{ case.executions.length }}</td>
+            <td title="'Status'" sortable="'status'">{{ case.status }}</td>
+            <td title="'Executions'" sortable="'executions.length'">
+              <p>{{ case.executions.length }} executions</p>
+              <ul>
+                <li ng-repeat="e in case.executions">
+                  <span>
+                    <a ng-class="{ skipped: e.skipped, fail: !e.passing && !e.skipped, pass: e.passing }" href="{{ e.url }}" target="_blank">Build #{{ e.build.number}}</a>
+                  </span>
+                </li>
+              </ul>
+            </td>
             <td title="'Links'"><a ng-href="{{ case.url }}" target="_blank">History</a></td>
           </tr>
         </table>

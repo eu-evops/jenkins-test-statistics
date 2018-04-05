@@ -25,9 +25,10 @@
       <a class="float-right pointer" ng-click="exportCsv()">Export as CSV</a>
       <a data-target="#testStatistics" class="pointer" data-toggle="collapse">Test report</a> -
       <small>Number of tests: {{ testReport.cases.length }}</small>
-      <small>Pass rate: {{ testReport.passRate | percentage }}</small>
-      <small>Unstable rate: {{ testReport.unstableRate | percentage }}</small>
-      <small>Fail rate: {{ testReport.failRate | percentage }}</small>
+      <small>Pass rate: {{ testReport.passRate | percentage }} ({{ testReport.passingTests }})</small>
+      <small>Unstable rate: {{ testReport.unstableRate | percentage }} ({{ testReport.unstableTests }})</small>
+      <small>Fail rate: {{ testReport.failRate | percentage }} ({{ testReport.failingTests }})</small>
+      <small>Skip rate: {{ testReport.skippedRate | percentage }} ({{ testReport.skippedTests }})</small>
     </div>
 
     <div id="testStatistics" class="panel-collapse collapse">
@@ -41,16 +42,17 @@
           ng-table="testTableParameters">
           <tr ng-repeat="case in $data track by $index" pass-rate="case.getPassRate()">
             <td title="Index">{{ $index + 1 }}</td>
-            <td title="'Job'" sortable="'job.name'">{{ case.job.name }}</td>
+            <td title="'Job'" sortable="'job.name'">{{ case.job.displayName }}</td>
             <td title="'Suite'" sortable="'className'">{{ case.className }}</td>
             <td title="'Name'" sortable="'name'">{{ case.name }}</td>
             <td title="'Pass rate'" sortable="'getPassRate()'">{{ case.getPassRate() | percentage:0 }}</td>
+            <td title="'Status'" sortable="'status'">{{ case.status }}</td>
             <td title="'Executions'" sortable="'executions.length'">
               <p>{{ case.executions.length }} executions</p>
               <ul>
                 <li ng-repeat="e in case.executions">
                   <span>
-                    <a ng-class="{ fail: !e.passing, pass: e.passing }" href="{{ e.url }}" target="_blank">Build #{{ e.build.number}}</a>
+                    <a ng-class="{ skipped: e.skipped, fail: !e.passing && !e.skipped, pass: e.passing }" href="{{ e.url }}" target="_blank">Build #{{ e.build.number}}</a>
                   </span>
                 </li>
               </ul>
@@ -77,6 +79,7 @@
     <td title="'Test pass rate'" sortable="'report.passRate'">{{ job.report.passRate | percentage }}</td>
     <td title="'Unstable rate'" sortable="'report.unstableRate'">{{ job.report.unstableRate | percentage }}</td>
     <td title="'Fail rate'" sortable="'report.failRate'">{{ job.report.failRate | percentage }}</td>
+    <td title="'Skip rate'" sortable="'report.skippedRate'">{{ job.report.skippedRate | percentage }}</td>
     <td title="'Test count'" sortable="'report.cases.length'">{{ job.report.cases.length }}</td>
 
     <td title="'Build Pass rate'" sortable="'passRate'">{{ job.passRate | percentage:0 }}</td>

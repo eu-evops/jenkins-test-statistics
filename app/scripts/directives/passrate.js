@@ -11,7 +11,8 @@ angular.module('testReporterApp')
     return {
       restrict: 'A',
       scope: {
-        rate: '=passRate'
+        rate: '=passRate',
+        skipped: '='
       },
       link: function postLink($scope, element) {
         $scope.$watch('rate', function () {
@@ -23,11 +24,17 @@ angular.module('testReporterApp')
             return;
           }
 
+          console.log($scope);
+
           element.removeClass('success', 'bg-success', 'panel-success');
           element.removeClass('danger', 'bg-danger', 'panel-danger');
           element.removeClass('warning', 'bg-warning', 'panel-warning');
 
-          if($scope.rate >= 0.9) {
+          if($scope.skipped === true) {
+            element.addClass('warning');
+            element.addClass('bg-warning');
+            element.addClass('panel-warning');
+          } else if($scope.rate >= 0.9) {
             element.addClass('success');
             element.addClass('bg-success');
             element.addClass('panel-success');

@@ -9,11 +9,15 @@
  */
 angular.module('testReporterApp')
   .controller('ViewsCtrl', [
-    '$scope', '$routeParams', 'jenkins', 'ngTableParams', 'FileSaver', 'Blob', '$rootScope',
-    function ($scope, route, jenkins, NgTableParams, FileSaver, Blob, $rootScope) {
+    '$scope', '$routeParams', 'jenkins', 'ngTableParams', 'FileSaver', 'Blob', '$rootScope', '$filter',
+    function ($scope, route, jenkins, NgTableParams, FileSaver, Blob, $rootScope, $filter) {
+      var percentageFilter = $filter('percentage');
+
       $scope.view = {
         name: route.view
       };
+
+
 
       $scope.progress = 0;
       $scope.$on('jenkins-report', function (event, progress) {
@@ -39,7 +43,7 @@ angular.module('testReporterApp')
 
               var testReportSummary = '';
               for(var i=0; i<$rootScope.numberOfRecentBuilds; i++) {
-                testReportSummary += 'Passing at least ' + (i + 1) + ' times: ' + testReport.passRatePassingTimes(i + 1);
+                testReportSummary += 'Passing at least ' + (i + 1) + ' times: ' + percentageFilter(testReport.passRatePassingTimes(i + 1));
                 testReportSummary += ' (' + testReport.numberPassingTimes(i + 1) + ')';
                 testReportSummary += "\n";
               }
@@ -73,6 +77,7 @@ angular.module('testReporterApp')
           $scope.exportCsv = function () {
             var tcs = $scope.testReport.cases.map(function (tc) {
               return [
+                tc.job.name,
                 tc.className,
                 tc.name,
                 tc.executions.length,
@@ -84,7 +89,7 @@ angular.module('testReporterApp')
               }).join(",");
             }).join("\n");
 
-            var header = "Test Suite,Test Name,Number of executions,Passing count,Pass rate,Jenkins Test history URL";
+            var header = "Job, Test Suite,Test Name,Number of executions,Passing count,Pass rate,Jenkins Test history URL";
             var exportBlob = new Blob([header + "\n" + tcs], {type: 'text/csv'});
             FileSaver.saveAs(exportBlob, "TestReport.csv");
           };

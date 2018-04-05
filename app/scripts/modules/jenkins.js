@@ -17,19 +17,24 @@
 (function (window, angular) {
   'use strict';
 
+  function testCaseUrlName(name) {
+    return name.replace(/\s+/g, '_').replace(/[^a-zA-Z\d]/g, '_');
+  }
+
   function TestCaseExecution(execution, build) {
     this.execution = execution;
     this.duration = execution.duration;
     this.build = build;
-    this.url = this.build.url + 'testReport/(root)/' + this.execution.className + "/" + this.execution.name;
+    this.url = this.build.url + 'testReport/(root)/' + this.execution.className + "/" + testCaseUrlName(this.execution.name);
     this.passing = (this.execution.status === 'PASSED' || this.execution.status === 'FIXED');
+    this.skipped = this.execution.status === 'SKIPPED';
   }
 
   function TestCase(testCase, build, job) {
     this.job = job;
     this.name = testCase.name;
     this.className = testCase.className;
-    this.urlName = this.name.replace(/\s+/g, '_').replace(/[^\w\d]+/g, '_');
+    this.urlName = testCaseUrlName(this.name);
     this.url = build.url + "testReport/(root)/" + this.className + "/" + this.urlName + "/history/";
     this.build = build;
     this.executions = [];
@@ -84,28 +89,38 @@
     this.passingTests = 0;
     this.failingTests = 0;
     this.unstableTests = 0;
+    this.skippedTests = 0;
 
     this.cases.forEach(function (testCase) {
-      var passing = testCase.executions.every(function(e) { return e.passing })
-      var failing = testCase.executions.every(function(e) { return !e.passing })
-      var unstable = !passing && !failing
+      testCase.passing = testCase.executions.every(function(e) { return e.passing });
 
-      if(passing) {
+      // Only check latest executions
+      testCase.skipped = testCase.executions[0].skipped;
+      testCase.failing = testCase.executions.every(function(e) { return !e.passing && !e.skipped });
+      testCase.unstable = !testCase.passing && !testCase.failing && !testCase.skipped;
+
+      if(testCase.passing) {
+        testCase.status = 'Passed';
         self.passingTests += 1;
       }
-
-      if(failing) {
+      if(testCase.skipped) {
+        testCase.status = 'Skipped';
+        self.skippedTests += 1;
+      }
+      if(testCase.failing) {
+        testCase.status = 'Failed';
         self.failingTests += 1;
       }
-
-      if(unstable) {
+      if(testCase.unstable) {
+        testCase.status = 'Unstable';
         self.unstableTests += 1;
       }
     });
 
-    this.passRate = this.passingTests / this.cases.length;
-    this.failRate = this.failingTests / this.cases.length;
-    this.unstableRate = this.unstableTests / this.cases.length;
+    this.passRate = this.passingTests / this.cases.length || 0;
+    this.failRate = this.failingTests / this.cases.length || 0;
+    this.unstableRate = this.unstableTests / this.cases.length || 0;
+    this.skippedRate = this.skippedTests / this.cases.length || 0;
   }
 
   TestReport.prototype.numberPassingTimes = function (n) {
