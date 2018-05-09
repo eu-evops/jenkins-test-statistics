@@ -35,14 +35,12 @@
           <span class="icon-bar"></span>
         </button>
 
-        <a class="navbar-brand" href="/#/">testReporter</a>
+        <a class="navbar-brand" href="/">testReporter</a>
       </div>
 
       <div class="collapse navbar-collapse" id="js-navbar-collapse">
-
         <ul class="nav navbar-nav">
-          <li ng-class="{ active: navigation.active(menu)}" ng-repeat="menu in navigation.menus"><a
-            ng-href="{{ $state.href(menu.route) }}">{{ menu.name }}</a></li>
+          <li ng-class="{ active: navigation.active(menu)}" ng-repeat="menu in navigation.menus"><a href="{{ menu.route }}">{{ menu.name }}</a></li>
           <li ng-if="authenticated"><a ng-click="signOut()">Sign out <strong>{{ jenkins.name }}</strong></a></li>
         </ul>
       </div>
