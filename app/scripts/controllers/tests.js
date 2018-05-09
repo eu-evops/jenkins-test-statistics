@@ -9,9 +9,9 @@
  */
 angular.module('testReporterApp')
   .controller('TestsCtrl', [
-    '$scope', '$routeParams', 'jenkins', 'ngTableParams',
-    function ($scope, route, jenkins, NgTableParams) {
-      $scope.job = route.job;
+    '$scope', '$stateParams', 'jenkins', 'ngTableParams',
+    function ($scope, $stateParams, jenkins, NgTableParams) {
+      $scope.job = $stateParams.job;
       var job;
 
       $scope.progress = 0;

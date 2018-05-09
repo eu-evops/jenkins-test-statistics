@@ -72,7 +72,7 @@
 <table ng-table="tableParameters" class="table">
   <tr data-pass-rate="job.report.passRate" ng-repeat="job in $data">
     <td title="'View'">{{ job.view.name }}</td>
-    <td title="'Name'" sortable="'displayName'"><a ng-href="#/tests/{{job.name}}">{{
+    <td title="'Name'" sortable="'displayName'"><a ui-sref="tests({ job: job.name })">{{
       job.displayName }}</a></td>
     <td title="'Number of builds'" sortable="'builds.length'">{{ job.builds.length }}</td>
 

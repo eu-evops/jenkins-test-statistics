@@ -22,7 +22,8 @@ angular
     'LocalStorageModule',
     'Jenkins',
     'Configuration',
-    'ngFileSaver'
+    'ngFileSaver',
+    'ui.router'
   ])
   .config(['localStorageServiceProvider', function (localStorageServiceProvider) {
     localStorageServiceProvider.setPrefix('testReporter');
@@ -30,84 +31,99 @@ angular
   .config(['$httpProvider', function ($httpProvider) {
     $httpProvider.interceptors.push('JenkinsAuthenticationHttpInterceptor');
   }])
-  .config(function ($routeProvider, $locationProvider) {
-    $locationProvider.hashPrefix('');
-    $routeProvider
-      .when('/login', {
-        templateUrl: 'views/login.html',
-        controller: 'LoginCtrl',
-        controllerAs: 'login'
-      })
-      .when('/', {
+  .config(function ($stateProvider, $locationProvider) {
+    // $locationProvider.hashPrefix('');
+
+    $stateProvider
+      .state('/', {
+        url: '/',
         templateUrl: 'views/main.html',
         controller: 'MainCtrl',
         controllerAs: 'main',
         authenticate: true
       })
-      .when('/about', {
+      .state('login', {
+        url: '/login',
+        templateUrl: 'views/login.html',
+        controller: 'LoginCtrl',
+        controllerAs: 'login',
+        authenticate: false
+      })
+      .state('about', {
+        url: '/about',
         templateUrl: 'views/about.html',
         controller: 'AboutCtrl',
         controllerAs: 'about'
       })
-      .when('/tests/:job', {
+      .state('tests', {
+        url: '/tests/:job',
         templateUrl: 'views/tests.html',
         controller: 'TestsCtrl',
         controllerAs: 'tests',
         authenticate: true
       })
-      .when('/builds', {
+      .state('builds', {
+        url: '/builds',
         templateUrl: 'views/builds.html',
         controller: 'BuildsCtrl',
         controllerAs: 'builds',
         authenticate: true
       })
-      .when('/settings', {
+      .state('settings', {
+        url: '/settings',
         templateUrl: 'views/settings.html',
         controller: 'SettingsCtrl',
         controllerAs: 'settings'
       })
-      .when('/views/:view*', {
-        component: 'view',
-        templateUrl: 'views/views.html',
-        controller: 'ViewsCtrl',
-        controllerAs: 'views',
+      .state('view', {
+        url: '/view/{view:any}',
+        templateUrl: 'views/view.html',
+        controller: 'ViewCtrl',
+        controllerAs: 'view',
         authenticate: true
-      })
-      .otherwise({
-        redirectTo: '/'
       });
-    // use the HTML5 History API
-    $locationProvider.html5Mode(false);
+
+    $locationProvider.html5Mode(true);
   })
   .run([
-    '$rootScope', 'localStorageService', '$window', '$location', 'configuration', 'jenkins', '$route', '$window',
-    function ($rootScope, storage, window, $location, configuration, jenkins, $route, $window) {
-      $rootScope.numberOfRecentBuilds = 7;
+    '$rootScope', 'localStorageService', '$window', '$location', 'configuration', 'jenkins', '$transitions', '$state',
+    function ($rootScope, storage, window, $location, configuration, jenkins, $transitions, $state) {
+      $rootScope.numberOfRecentBuilds = 3;
       var jenkinsConfiguration = configuration.get('jenkins');
-      if(jenkinsConfiguration) {
+      if (jenkinsConfiguration) {
         $rootScope.numberOfRecentBuilds = storage.get('numberOfRecentBuilds') || 10;
       }
 
       $rootScope.jenkins = jenkinsConfiguration;
 
-      $rootScope.$on('$routeChangeStart', function (event, toState) {
-        console.log("Routing changing to", toState);
-        if(toState.authenticate && !$rootScope.authenticated) {
+      console.log('Setting up $stateChangeStart listener', $transitions);
+      $transitions.onBefore({}, function (transition) {
+        console.log(transition);
+        if(transition.to().authenticate && !$rootScope.authenticated) {
           $rootScope.redirectTo = $location.path();
-          $location.path('/login');
+          return transition.router.stateService.target('login');
         }
       });
 
       $rootScope.signOut = function () {
         console.log("Sign out");
-        configuration.delete("jenkins");
-        $window.location.reload();
+        delete jenkinsConfiguration.token;
+        configuration.set('jenkins', jenkinsConfiguration);
+        $rootScope.authenticated = false;
+        $state.go('login');
       };
 
       $rootScope.saveNumberOfBuildsAndRefresh = function () {
+        if($rootScope.numberOfRecentBuilds > 5) {
+          var shouldContinue = confirm('Are you sure you want more than 5 recent builds? This generates quite a lot of requests to Jenkins.');
+          if(!shouldContinue) {
+            return;
+          }
+        }
+
         console.log("Setting number of builds", $rootScope.numberOfRecentBuilds);
         storage.set('numberOfRecentBuilds', $rootScope.numberOfRecentBuilds);
-        $route.reload();
+        $state.reload();
       };
     }])
 ;
