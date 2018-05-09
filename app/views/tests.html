@@ -6,7 +6,9 @@
     <div class="dot2"></div>
   </div>
   <div class="message">Loading test report...</div>
-  <uib-progressbar ng-show="progress < 100" max="100" value="progress"><span style="color:white; white-space:nowrap;">{{ progress / 100 | percentage }}</span></uib-progressbar>
+  <uib-progressbar ng-show="downloadProgress.progress < 100" value="downloadProgress.processed" max="downloadProgress.total">
+    <span style="color:white; white-space:nowrap;">{{ downloadProgress.processed }} / {{ downloadProgress.total }}</span>
+  </uib-progressbar>
 </div>
 
 <div ng-show="testReport && testReport.cases.length > 0">

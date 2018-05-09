@@ -19,14 +19,12 @@ angular.module('testReporterApp')
         name: $stateParams.view
       };
 
-      $scope.progress = 0;
-      $scope.$on('jenkins-report', function (event, progress) {
-        $scope.progress = progress;
+      $scope.$on('jenkins-report', function (event, downloadProgress) {
+        $scope.downloadProgress = downloadProgress;
       });
 
       jenkins.view($scope.view.name)
         .then(function (view) {
-          console.log(view);
           $scope.jobs = view.allJobs;
           $scope.view = view;
 
