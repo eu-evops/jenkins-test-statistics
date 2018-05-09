@@ -92,26 +92,30 @@
     this.skippedTests = 0;
 
     this.cases.forEach(function (testCase) {
-      testCase.passing = testCase.executions.every(function(e) { return e.passing });
+      testCase.passing = testCase.executions.every(function (e) {
+        return e.passing
+      });
 
       // Only check latest executions
       testCase.skipped = testCase.executions[0].skipped;
-      testCase.failing = testCase.executions.every(function(e) { return !e.passing && !e.skipped });
+      testCase.failing = testCase.executions.every(function (e) {
+        return !e.passing && !e.skipped
+      });
       testCase.unstable = !testCase.passing && !testCase.failing && !testCase.skipped;
 
-      if(testCase.passing) {
+      if (testCase.passing) {
         testCase.status = 'Passed';
         self.passingTests += 1;
       }
-      if(testCase.skipped) {
+      if (testCase.skipped) {
         testCase.status = 'Skipped';
         self.skippedTests += 1;
       }
-      if(testCase.failing) {
+      if (testCase.failing) {
         testCase.status = 'Failed';
         self.failingTests += 1;
       }
-      if(testCase.unstable) {
+      if (testCase.unstable) {
         testCase.status = 'Unstable';
         self.unstableTests += 1;
       }
@@ -126,11 +130,11 @@
   TestReport.prototype.numberPassingTimes = function (n) {
     var testsPassing = 0;
     this.cases.forEach(function (testCase) {
-      var numberPassing = testCase.executions.filter(function(execution) {
-          return execution.passing;
-        }).length;
+      var numberPassing = testCase.executions.filter(function (execution) {
+        return execution.passing;
+      }).length;
 
-      if(numberPassing === testCase.executions.length || numberPassing > n - 1) {
+      if (numberPassing === testCase.executions.length || numberPassing > n - 1) {
         testsPassing += 1;
       }
     });
@@ -266,8 +270,8 @@
                 }, 0);
 
               view.passRate = sumPassRate / view.allJobs.filter(function (j) {
-                  return j.passRate !== null;
-                }).length || null;
+                return j.passRate !== null;
+              }).length || null;
             }
 
             return view;
@@ -365,7 +369,6 @@
                       return build;
                     })
                     .catch(function (error) {
-                      console.error('Error generating report', error)
                       build.report = {
                         numberOfTests: 0,
                         passRate: null,
@@ -376,8 +379,14 @@
                     })
                     .finally(function (build) {
                       processedBuilds++;
-                      var progress = processedBuilds / allBuilds * 100;
-                      $rootScope.$broadcast('jenkins-report', progress);
+                      var progress = Math.ceil(processedBuilds / allBuilds * 100);
+                      if(progress % 10 === 0) {
+                        $rootScope.$broadcast('jenkins-report', {
+                          progress: progress,
+                          processed: processedBuilds,
+                          total: allBuilds
+                        });
+                      }
                       return build;
                     })
                 );
