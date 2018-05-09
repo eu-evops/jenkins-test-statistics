@@ -24,7 +24,7 @@ angular.module('testReporterApp')
             {
               count: 25,
               sorting: {
-                passRate: 'asc'
+                'allJobs.length': 'desc'
               }
             },
             {
