@@ -24,8 +24,6 @@ angular.module('testReporterApp')
             return;
           }
 
-          console.log($scope);
-
           element.removeClass('success', 'bg-success', 'panel-success');
           element.removeClass('danger', 'bg-danger', 'panel-danger');
           element.removeClass('warning', 'bg-warning', 'panel-warning');

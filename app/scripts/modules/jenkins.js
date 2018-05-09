@@ -209,12 +209,24 @@
               }
             })
               .then(function (response) {
-                var match = response.data.match('name=._\.apiToken. value=["\']?([^"\']+)["\']?');
-                if (match) {
-                  jenkinsConfiguration.token = match[1];
+                var tokenMatch = response.data.match('name=._\.apiToken..*?value=["\']?([^"\']+)["\']?');
+                if (tokenMatch) {
+                  jenkinsConfiguration.token = tokenMatch[1];
                   jenkinsConfiguration.username = user;
-                  configuration.set('jenkins', jenkinsConfiguration);
                 }
+
+                var userMatch = response.data.match('name=._\.fullName..*?value="(.*?)"');
+                if (userMatch) {
+                  jenkinsConfiguration.name = userMatch[1];
+                }
+
+                var emailMatch = response.data.match('name=.email.address..*?value="(.*?)"');
+                if (emailMatch) {
+                  jenkinsConfiguration.email = emailMatch[1];
+                }
+
+                configuration.set('jenkins', jenkinsConfiguration);
+                return jenkinsConfiguration;
               });
           };
 
@@ -390,7 +402,8 @@
           };
 
           var getView = function (view) {
-            return http.get(getConf().url + '/' + view + '/api/json?depth=3&tree=' + recursiveTreeCall(10, ['jobs[name,displayName,builds[name,result,number,url]' + getNumberOfBuilds() + ']']))
+            let treeCallParameters = recursiveTreeCall(10, ['jobs[name,displayName,builds[name,result,number,url]' + getNumberOfBuilds() + ']']);
+            return http.get(getConf().url + '/' + view + '/api/json?depth=3&tree=' + treeCallParameters)
               .then(function (response) {
                 return sanitiseView(response.data, view);
               });

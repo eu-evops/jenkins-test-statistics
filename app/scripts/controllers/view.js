@@ -8,16 +8,16 @@
  * Controller of the testReporterApp
  */
 angular.module('testReporterApp')
-  .controller('ViewsCtrl', [
-    '$scope', '$routeParams', 'jenkins', 'ngTableParams', 'FileSaver', 'Blob', '$rootScope', '$filter',
-    function ($scope, route, jenkins, NgTableParams, FileSaver, Blob, $rootScope, $filter) {
+  .controller('ViewCtrl', [
+    '$scope', 'jenkins', 'ngTableParams', 'FileSaver', 'Blob', '$rootScope', '$filter', '$stateParams',
+    function ($scope, jenkins, NgTableParams, FileSaver, Blob, $rootScope, $filter, $stateParams) {
       var percentageFilter = $filter('percentage');
 
+      console.log("In the view controller", $stateParams);
+
       $scope.view = {
-        name: route.view
+        name: $stateParams.view
       };
-
-
 
       $scope.progress = 0;
       $scope.$on('jenkins-report', function (event, progress) {
@@ -26,6 +26,7 @@ angular.module('testReporterApp')
 
       jenkins.view($scope.view.name)
         .then(function (view) {
+          console.log(view);
           $scope.jobs = view.allJobs;
           $scope.view = view;
 

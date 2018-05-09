@@ -8,11 +8,11 @@
   <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
   <!-- build:css(.) styles/vendor.css -->
   <!-- bower:css -->
-  <link rel="stylesheet" href="bower_components/ng-table/dist/ng-table.min.css" />
+  <link rel="stylesheet" href="/bower_components/ng-table/dist/ng-table.min.css" />
   <!-- endbower -->
   <!-- endbuild -->
   <!-- build:css(.tmp) styles/main.css -->
-  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="/styles/main.css">
   <!-- endbuild -->
   <base href="/index.html#/">
 </head>
@@ -42,8 +42,8 @@
 
         <ul class="nav navbar-nav">
           <li ng-class="{ active: navigation.active(menu)}" ng-repeat="menu in navigation.menus"><a
-            href="#{{ menu.route }}">{{ menu.name }}</a></li>
-          <li ng-if="authenticated"><a ng-click="signOut()">Sign out <strong>{{ jenkins.username }}</strong></a></li>
+            ng-href="{{ $state.href(menu.route) }}">{{ menu.name }}</a></li>
+          <li ng-if="authenticated"><a ng-click="signOut()">Sign out <strong>{{ jenkins.name }}</strong></a></li>
         </ul>
       </div>
     </div>
@@ -64,7 +64,7 @@
 </div>
 
 <div class="container">
-  <div ng-view=""></div>
+  <div ui-view=""></div>
 </div>
 
 <div class="footer">
@@ -89,42 +89,43 @@
 
 <!-- build:js(.) scripts/vendor.js -->
 <!-- bower:js -->
-<script src="bower_components/jquery/dist/jquery.js"></script>
-<script src="bower_components/angular/angular.js"></script>
-<script src="bower_components/bootstrap-sass/assets/javascripts/bootstrap.js"></script>
-<script src="bower_components/angular-animate/angular-animate.js"></script>
-<script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
-<script src="bower_components/angular-cookies/angular-cookies.js"></script>
-<script src="bower_components/angular-resource/angular-resource.js"></script>
-<script src="bower_components/angular-route/angular-route.js"></script>
-<script src="bower_components/angular-sanitize/angular-sanitize.js"></script>
-<script src="bower_components/angular-touch/angular-touch.js"></script>
-<script src="bower_components/jquery-ui/jquery-ui.js"></script>
-<script src="bower_components/angular-ui-sortable/sortable.js"></script>
-<script src="bower_components/angular-local-storage/dist/angular-local-storage.js"></script>
-<script src="bower_components/angular-base64/angular-base64.js"></script>
-<script src="bower_components/ng-table/dist/ng-table.min.js"></script>
-<script src="bower_components/blob-polyfill/Blob.js"></script>
-<script src="bower_components/file-saver.js/FileSaver.js"></script>
-<script src="bower_components/angular-file-saver/dist/angular-file-saver.bundle.js"></script>
+<script src="/bower_components/jquery/dist/jquery.js"></script>
+<script src="/bower_components/angular/angular.js"></script>
+<script src="/bower_components/bootstrap-sass/assets/javascripts/bootstrap.js"></script>
+<script src="/bower_components/angular-animate/angular-animate.js"></script>
+<script src="/bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+<script src="/bower_components/angular-cookies/angular-cookies.js"></script>
+<script src="/bower_components/angular-resource/angular-resource.js"></script>
+<script src="/bower_components/angular-route/angular-route.js"></script>
+<script src="/bower_components/angular-sanitize/angular-sanitize.js"></script>
+<script src="/bower_components/angular-touch/angular-touch.js"></script>
+<script src="/bower_components/jquery-ui/jquery-ui.js"></script>
+<script src="/bower_components/angular-ui-sortable/sortable.js"></script>
+<script src="/bower_components/angular-local-storage/dist/angular-local-storage.js"></script>
+<script src="/bower_components/angular-base64/angular-base64.js"></script>
+<script src="/bower_components/ng-table/dist/ng-table.min.js"></script>
+<script src="/bower_components/blob-polyfill/Blob.js"></script>
+<script src="/bower_components/file-saver.js/FileSaver.js"></script>
+<script src="/bower_components/angular-file-saver/dist/angular-file-saver.bundle.js"></script>
+<script src="/bower_components/angular-ui-router/release/angular-ui-router.js"></script>
 <!-- endbower -->
 <!-- endbuild -->
 
 <!-- build:js({.tmp,app}) scripts/scripts.js -->
-<script src="scripts/app.js"></script>
-<script src="scripts/modules/jenkins.js"></script>
-<script src="scripts/modules/configuration.js"></script>
-<script src="scripts/controllers/main.js"></script>
-<script src="scripts/controllers/login.js"></script>
-<script src="scripts/controllers/about.js"></script>
-<script src="scripts/controllers/builds.js"></script>
-<script src="scripts/controllers/tests.js"></script>
-<script src="scripts/controllers/settings.js"></script>
-<script src="scripts/controllers/navigation.js"></script>
-<script src="scripts/controllers/views.js"></script>
-<script src="scripts/filters/filters.js"></script>
-<script src="scripts/services/jenkinsauthenticationhttpinterceptor.js"></script>
-<script src="scripts/directives/passrate.js"></script>
+<script src="/scripts/app.js"></script>
+<script src="/scripts/modules/jenkins.js"></script>
+<script src="/scripts/modules/configuration.js"></script>
+<script src="/scripts/controllers/main.js"></script>
+<script src="/scripts/controllers/login.js"></script>
+<script src="/scripts/controllers/about.js"></script>
+<script src="/scripts/controllers/builds.js"></script>
+<script src="/scripts/controllers/tests.js"></script>
+<script src="/scripts/controllers/settings.js"></script>
+<script src="/scripts/controllers/navigation.js"></script>
+<script src="/scripts/controllers/view.js"></script>
+<script src="/scripts/filters/filters.js"></script>
+<script src="/scripts/services/jenkinsauthenticationhttpinterceptor.js"></script>
+<script src="/scripts/directives/passrate.js"></script>
 <!-- endbuild -->
 
 <!-- build:js(app) scripts/ngConstants.js -->

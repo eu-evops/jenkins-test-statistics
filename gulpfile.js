@@ -10,7 +10,7 @@ var wiredep = require('wiredep').stream;
 var runSequence = require('run-sequence');
 var ngConstant = require('gulp-ng-constant');
 var browserSync = require('browser-sync');
-var fs = require('fs');
+var history = require('connect-history-api-fallback');
 
 var yeoman = {
   app: require('./bower.json').appPath || 'app',
@@ -112,7 +112,10 @@ gulp.task('start:server', function() {
     // Change this to '0.0.0.0' to access the server from outside.
     port: 9000,
     middleware: function(connect) {
-        return [connect().use('/bower_components', connect.static('bower_components'))];
+        return [
+          connect().use('/bower_components', connect.static('bower_components')),
+          history()
+        ];
     }
   });
   browserSync({ proxy: 'localhost:9000' });
