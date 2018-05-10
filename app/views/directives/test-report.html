@@ -1,0 +1,80 @@
+<div ng-show="!testReport">
+  <div class="spinner">
+    <div class="dot1"></div>
+    <div class="dot2"></div>
+  </div>
+  <div class="message">Loading test report... This can take quite some time</div>
+  <uib-progressbar ng-show="downloadProgress.progress < 100" value="downloadProgress.processed" max="downloadProgress.total">
+    <span style="color:white; white-space:nowrap;">{{ downloadProgress.processed }} / {{ downloadProgress.total }}</span>
+  </uib-progressbar>
+</div>
+
+<div ng-show="testReport && testReport.cases.length > 0">
+  <div class="panel-default panel" pass-rate="testReport.passRate">
+
+    <div class="panel-heading" title="{{ testReportSummary }}">
+      <a class="float-right pointer" ng-click="exportCsv()">Export as CSV</a>
+      <a data-target="#testStatistics" class="pointer" data-toggle="collapse">Test report</a> -
+      <small>Number of tests: {{ testReport.cases.length }}</small>
+      <small>Pass rate: {{ testReport.passRate | percentage }} ({{ testReport.passingTests }})</small>
+      <small>Unstable rate: {{ testReport.unstableRate | percentage }} ({{ testReport.unstableTests }})</small>
+      <small>Fail rate: {{ testReport.failRate | percentage }} ({{ testReport.failingTests }})</small>
+      <small>Skip rate: {{ testReport.skippedRate | percentage }} ({{ testReport.skippedTests }})</small>
+    </div>
+
+    <div id="testStatistics" class="panel-collapse collapse">
+      <div class="panel-body">
+        <bloquote ng-if="testSearch">Filtered by: <strong>{{ testSearch }}</strong>, found: {{ testTableParameters.total() }}</bloquote>
+
+        <p><input type="text" placeholder="Filter tests by name..." ng-model="testSearch" class="form-control"></p>
+
+        <table
+          class="table table-bordered table-striped table-responsive table-hover"
+          ng-table="testTableParameters">
+          <tr ng-repeat-start="case in $data track by $index" pass-rate="case.getPassRate()">
+            <td title="Index">{{ $index + 1 }}</td>
+            <td title="'Job'" sortable="'job.name'">{{ case.job.displayName }}</td>
+            <td title="'Suite'" sortable="'className'">{{ case.className }}</td>
+            <td title="'Name'" sortable="'name'">{{ case.name }}</td>
+            <td title="'Pass rate'" sortable="'getPassRate()'">{{ case.getPassRate() | percentage:0 }}</td>
+            <td title="'Status'" sortable="'status'">{{ case.status }}</td>
+            <td title="'Executions'" sortable="'executions.length'">
+              <p>{{ case.executions.length }} executions</p>
+              <ul>
+                <li ng-repeat="e in case.executions">
+                  <span>
+                    <a ng-class="{ skipped: e.skipped, fail: !e.passing && !e.skipped, pass: e.passing }" href="{{ e.url }}" target="_blank">Build #{{ e.build.number}}</a>
+                  </span>
+                </li>
+              </ul>
+            </td>
+            <td title="'Links'">
+            <td title="'Links'">
+              <a ng-href="{{ case.url }}" target="_blank">History</a>
+              <a ng-if="case.executions[0].error" ng-href="#" ng-click="case.showException = !case.showException">Toggle exception</a>
+            </td>
+          </tr>
+          <tr ng-repeat-end ng-if="case.showException">
+            <td colspan="7">
+              <h3>Exception</h3>
+              <pre>{{ case.executions[0].error }}</pre>
+
+              <h3>Stack trace</h3>
+              <pre>{{ case.executions[0].errorStackTrace }}</pre>
+
+              <div ng-if="case.executions[0].stderr">
+                <h3>Standard error</h3>
+                <pre>{{ case.executions[0].stderr}}</pre>
+              </div>
+
+              <div ng-if="case.executions[0].stdout">
+                <h3>Standard output</h3>
+                <pre>{{ case.executions[0].stdout}}</pre>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

@@ -15,8 +15,6 @@ angular.module('testReporterApp')
         path: '=viewBreadcrumbs'
       },
       link: function postLink($scope, element) {
-        console.log('Linking breadcrumbs', $scope, element);
-
         $scope.$watch('path', function (path) {
           if (!path) {
             return;
@@ -35,11 +33,8 @@ angular.module('testReporterApp')
               };
               crumbsArray.push(crumb);
               crumb.path = '/view/' + crumbsArray.slice(1).map(function (el) {
-                console.log(el);
                 return el.name;
               }).join('/view/');
-
-              console.log(crumbsArray);
 
               return crumbsArray;
             }, []);

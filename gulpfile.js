@@ -9,7 +9,7 @@ var rimraf = require('rimraf');
 var wiredep = require('wiredep').stream;
 var runSequence = require('run-sequence');
 var ngConstant = require('gulp-ng-constant');
-var browserSync = require('browser-sync');
+var browserSync = require('browser-sync').create();
 var history = require('connect-history-api-fallback');
 
 var yeoman = {
@@ -118,7 +118,7 @@ gulp.task('start:server', function() {
         ];
     }
   });
-  browserSync({ proxy: 'localhost:9000' });
+  browserSync.init({ proxy: 'localhost:9000' });
 });
 
 gulp.task('start:server:test', function() {

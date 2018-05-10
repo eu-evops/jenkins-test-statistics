@@ -18,7 +18,7 @@ angular.module('testReporterApp')
 
       $scope.jenkinsServers = jenkinsServers;
       jenkins.baseUrl = $scope.jenkins.server;
-      jenkins.views()
+      jenkins.getAllViews()
         .then(function (views) {
           $scope.jenkinsViews = views;
           $scope.tableParameters = new NgTableParams(
