@@ -13,8 +13,6 @@ angular.module('testReporterApp')
     function ($scope, jenkins, NgTableParams, FileSaver, Blob, $rootScope, $filter, $stateParams) {
       var percentageFilter = $filter('percentage');
 
-      console.log("In the view controller", $stateParams);
-
       $scope.view = {
         name: $stateParams.view
       };
