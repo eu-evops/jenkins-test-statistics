@@ -96,9 +96,7 @@ angular
 
       $rootScope.jenkins = jenkinsConfiguration;
 
-      console.log('Setting up $stateChangeStart listener', $transitions);
       $transitions.onBefore({}, function (transition) {
-        console.log(transition);
         if(transition.to().authenticate && !$rootScope.authenticated) {
           $rootScope.redirectTo = $location.path();
           return transition.router.stateService.target('login');
