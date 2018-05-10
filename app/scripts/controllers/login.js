@@ -9,8 +9,8 @@
  */
 angular.module('testReporterApp')
   .controller('LoginCtrl', [
-    '$scope', '$rootScope', 'jenkins', 'localStorageService', 'configuration', 'ngTableParams', 'jenkinsServers', '$location',
-    function ($scope, $rootScope, jenkins, storage, configuration, ngTableParams, jenkinsServers, $location) {
+    '$scope', '$rootScope', 'jenkins', 'localStorageService', 'configuration', 'jenkinsServers', '$location',
+    function ($scope, $rootScope, jenkins, storage, configuration, jenkinsServers, $location) {
 
       $scope.jenkins = configuration.get('jenkins') || {
           server: jenkinsServers[0]

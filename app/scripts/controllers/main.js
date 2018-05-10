@@ -9,7 +9,7 @@
  */
 angular.module('testReporterApp')
   .controller('MainCtrl', [
-    '$scope', '$rootScope', 'jenkins', 'localStorageService', 'configuration', 'ngTableParams', 'jenkinsServers',
+    '$scope', '$rootScope', 'jenkins', 'localStorageService', 'configuration', 'NgTableParams', 'jenkinsServers',
     function ($scope, $rootScope, jenkins, storage, configuration, NgTableParams, jenkinsServers) {
 
       $scope.jenkins = configuration.get('jenkins') || {
@@ -29,7 +29,7 @@ angular.module('testReporterApp')
               }
             },
             {
-              data: views
+              dataset: views
             }
           );
 

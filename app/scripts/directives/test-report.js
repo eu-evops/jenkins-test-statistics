@@ -15,13 +15,18 @@ angular.module('testReporterApp')
         testReport: '=',
         testReportSummary: '='
       },
-      link: function($scope) {
-        $scope.$watch('testReport', function(testReport) {
-          if(!testReport) {
+      link: function ($scope) {
+        $scope.$watch('testReport', function (testReport) {
+          if (!testReport) {
             return;
           }
 
-          console.log('Linking test report', testReport.cases);
+          var testStatuses = testReport.cases.map(function (tc) {
+            return tc.status;
+          });
+          $scope.testStatuses = testStatuses.filter(function (el, index) {
+            return testStatuses.indexOf(el) === index;
+          });
 
           $scope.testTableParameters = new NgTableParams({
               count: 25,
@@ -30,13 +35,9 @@ angular.module('testReporterApp')
               }
             },
             {
-              data: testReport.cases
+              dataset: testReport.cases
             });
 
-
-          $scope.$watch('testSearch', function () {
-            $scope.testTableParameters.filter({name: $scope.testSearch});
-          });
         });
 
         $scope.exportCsv = function () {
@@ -49,7 +50,7 @@ angular.module('testReporterApp')
               tc.passingCount,
               tc.getPassRate(),
               tc.url
-            ].map(function(item) {
+            ].map(function (item) {
               return '"' + item + '"';
             }).join(",");
           }).join("\n");

@@ -24,20 +24,17 @@
 
     <div id="testStatistics" class="panel-collapse collapse">
       <div class="panel-body">
-        <bloquote ng-if="testSearch">Filtered by: <strong>{{ testSearch }}</strong>, found: {{ testTableParameters.total() }}</bloquote>
-
-        <p><input type="text" placeholder="Filter tests by name..." ng-model="testSearch" class="form-control"></p>
-
         <table
           class="table table-bordered table-striped table-responsive table-hover"
-          ng-table="testTableParameters">
+          ng-table="testTableParameters" show-filter="true">
           <tr ng-repeat-start="case in $data track by $index" pass-rate="case.getPassRate()">
             <td title="Index">{{ $index + 1 }}</td>
-            <td title="'Job'" sortable="'job.name'">{{ case.job.displayName }}</td>
-            <td title="'Suite'" sortable="'className'">{{ case.className }}</td>
-            <td title="'Name'" sortable="'name'">{{ case.name }}</td>
+
+            <td title="'Job'" sortable="'job.displayName'" filter="{ 'job.displayName': 'text' }">{{ case.job.displayName }}</td>
+            <td title="'Suite'" sortable="'className'" filter="{ 'className': 'text' }">{{ case.className }}</td>
+            <td title="'Name'" sortable="'name'" filter="{ 'name': 'text' }">{{ case.name }}</td>
             <td title="'Pass rate'" sortable="'getPassRate()'">{{ case.getPassRate() | percentage:0 }}</td>
-            <td title="'Status'" sortable="'status'">{{ case.status }}</td>
+            <td title="'Status'" sortable="'status'" filter="{ status: 'text' }">{{ case.status }}</td>
             <td title="'Executions'" sortable="'executions.length'">
               <p>{{ case.executions.length }} executions</p>
               <ul>
@@ -48,7 +45,6 @@
                 </li>
               </ul>
             </td>
-            <td title="'Links'">
             <td title="'Links'">
               <a ng-href="{{ case.url }}" target="_blank">History</a>
               <a ng-if="case.executions[0].error" ng-href="#" ng-click="case.showException = !case.showException">Toggle exception</a>
