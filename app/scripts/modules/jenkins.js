@@ -248,22 +248,24 @@
               });
           };
 
-          var getAllJobsRecursive = function (node, parentPath) {
+          var getAllJobsRecursive = function (view, parentPath) {
             var jobs = [];
+            view.jobs = view.jobs || [];
 
-            node.jobs.forEach(function (j) {
+            view.jobs.forEach(function (j) {
               jobs.push(sanitiseJob(j, parentPath));
             });
 
-            if (node.views) {
+            if (view.views) {
               // TODO Fix recursion
-              node.views.forEach(function (v) {
+              view.views.forEach(function (v) {
                 getAllJobsRecursive(v, parentPath + '/view/' + v.name).forEach(function (sj) {
                   jobs.push(sj);
                 });
               });
             }
 
+            view.allJobs = view.allJobs || jobs;
             return jobs;
           };
 
@@ -317,7 +319,7 @@
             }
 
             var views = [];
-            sanitiseView(jenkinsView, jenkinsView.name);
+            sanitiseView(jenkinsView, jenkinsView.name || "");
 
             jenkinsView.parent = parent;
             jenkinsView.fullName = generateFullViewName(jenkinsView);
@@ -426,8 +428,8 @@
             return '{,' + $rootScope.numberOfRecentBuilds + '}';
           };
 
-          var getViews = function () {
-            return http.get(getConf().url + '/api/json?tree=' + recursiveTreeCall(5, ['name', 'url', 'jobs[displayName,name,builds[result]' + getNumberOfBuilds() + ']']))
+          var getAllViews = function () {
+            return http.get(getConf().url + '/api/json?tree=' + recursiveTreeCall(5, ['name', 'url', 'jobs[name]']))
               .then(function (response) {
                 return flattenViews(response.data);
               });
@@ -437,7 +439,6 @@
             let treeCallParameters = recursiveTreeCall(10, ['name,jobs[name,displayName,builds[name,result,number,url]' + getNumberOfBuilds() + ']']);
             return http.get(getConf().url + '/' + view + '/api/json?depth=3&tree=' + treeCallParameters)
               .then(function (response) {
-                console.log(response);
                 return sanitiseView(response.data, view);
               });
           };
@@ -467,7 +468,7 @@
 
           return {
             login: login,
-            views: getViews,
+            getAllViews: getAllViews,
             view: getView,
             job: getJob,
             builds: getBuilds,

@@ -36,7 +36,6 @@ angular.module('testReporterApp')
             str += item[prop];
           }
         }
-        console.log(str);
         return r.test(str);
       });
     };
