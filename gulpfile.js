@@ -114,6 +114,7 @@ gulp.task('start:server', function() {
     middleware: function(connect) {
         return [
           connect().use('/bower_components', connect.static('bower_components')),
+          connect().use('/node_modules', connect.static('node_modules')),
           history()
         ];
     }

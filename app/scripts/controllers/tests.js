@@ -9,7 +9,7 @@
  */
 angular.module('testReporterApp')
   .controller('TestsCtrl', [
-    '$scope', '$stateParams', 'jenkins', 'ngTableParams',
+    '$scope', '$stateParams', 'jenkins', 'NgTableParams',
     function ($scope, $stateParams, jenkins, NgTableParams) {
       $scope.job = $stateParams.job;
       var job;
@@ -46,7 +46,7 @@ angular.module('testReporterApp')
               }
             },
             {
-              data: $scope.testReport.cases
+              dataset: $scope.testReport.cases
             });
 
           $scope.$watch('testSearch', function () {

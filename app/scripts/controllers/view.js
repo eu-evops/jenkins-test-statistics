@@ -9,7 +9,7 @@
  */
 angular.module('testReporterApp')
   .controller('ViewCtrl', [
-    '$scope', 'jenkins', 'ngTableParams', 'FileSaver', 'Blob', '$rootScope', '$filter', '$stateParams',
+    '$scope', 'jenkins', 'NgTableParams', 'FileSaver', 'Blob', '$rootScope', '$filter', '$stateParams',
     function ($scope, jenkins, NgTableParams, FileSaver, Blob, $rootScope, $filter, $stateParams) {
       var percentageFilter = $filter('percentage');
 
@@ -64,7 +64,7 @@ angular.module('testReporterApp')
               }
             },
             {
-              data: view.allJobs
+              dataset: view.allJobs
             });
 
           $scope.$watch('jobSearch', function () {
