@@ -27,14 +27,10 @@ angular.module('testReporterApp')
 
         $scope.authenticating = true;
 
-        console.log($scope.jenkins.server);
-
-
         jenkins.login($scope.jenkins.username, $scope.jenkins.token, $scope.jenkins.server)
           .then(function (jenkinsConfiguration) {
             $rootScope.authenticated = $scope.authenticated = true;
             $rootScope.jenkins = $scope.jenkins = jenkinsConfiguration;
-            console.log($scope.jenkins);
 
             var destination = '/';
             if ($rootScope.redirectTo) {
