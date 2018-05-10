@@ -30,23 +30,40 @@
         <table
           class="table table-bordered table-striped table-responsive table-hover"
           ng-table="testTableParameters">
-          <tr ng-repeat="case in $data track by $index" pass-rate="case.getPassRate()" data-skipped="case.skipped">
+          <tr ng-repeat-start="case in $data track by $index" pass-rate="case.getPassRate()" data-skipped="case.skipped">
             <td title="Index">{{ $index + 1 }}</td>
             <td title="'Suite'">{{ case.className }}</td>
             <td title="'Name'">{{ case.name }}</td>
             <td title="'Pass rate'" sortable="'getPassRate()'">{{ case.getPassRate() | percentage:0 }}</td>
             <td title="'Status'" sortable="'status'">{{ case.status }}</td>
             <td title="'Executions'" sortable="'executions.length'">
-              <p>{{ case.executions.length }} executions</p>
-              <ul>
-                <li ng-repeat="e in case.executions">
-                  <span>
-                    <a ng-class="{ skipped: e.skipped, fail: !e.passing && !e.skipped, pass: e.passing }" href="{{ e.url }}" target="_blank">Build #{{ e.build.number}}</a>
+                  <span ng-repeat="e in case.executions">
+                    <a ng-class="{ skipped: e.skipped, fail: !e.passing && !e.skipped, pass: e.passing }" href="{{ e.url }}" target="_blank">#{{ e.build.number}}</a>
                   </span>
-                </li>
-              </ul>
             </td>
-            <td title="'Links'"><a ng-href="{{ case.url }}" target="_blank">History</a></td>
+            <td title="'Links'">
+              <a ng-href="{{ case.url }}" target="_blank">History</a>
+              <a ng-if="case.executions[0].error" ng-href="#" ng-click="case.showException = !case.showException">Toggle exception</a>
+            </td>
+          </tr>
+          <tr ng-repeat-end ng-if="case.showException">
+            <td colspan="7">
+              <h3>Exception</h3>
+              <pre>{{ case.executions[0].error }}</pre>
+
+              <h3>Stack trace</h3>
+              <pre>{{ case.executions[0].errorStackTrace }}</pre>
+
+              <div ng-if="case.executions[0].stderr">
+                <h3>Standard error</h3>
+                <pre>{{ case.executions[0].stderr}}</pre>
+              </div>
+
+              <div ng-if="case.executions[0].stdout">
+                <h3>Standard output</h3>
+                <pre>{{ case.executions[0].stdout}}</pre>
+              </div>
+            </td>
           </tr>
         </table>
       </div>

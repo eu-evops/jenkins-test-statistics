@@ -50,7 +50,7 @@ angular.module('testReporterApp')
             });
 
           $scope.$watch('testSearch', function () {
-            $scope.testTableParameters.filter({name: $scope.testSearch});
+            $scope.testTableParameters.filter({name: $scope.testSearch });
           });
         });
     }]);

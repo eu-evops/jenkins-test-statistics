@@ -57,6 +57,6 @@ angular.module('testReporterApp')
       return input.split(/\/?view\/?/).map(function(item) {
         return item.replace('/', '').replace(/^$/, 'Home');
       }).join(" / ");
-    }
+    };
   })
 ;

@@ -86,8 +86,8 @@ angular
     $locationProvider.html5Mode(true);
   })
   .run([
-    '$rootScope', 'localStorageService', '$window', '$location', 'configuration', 'jenkins', '$transitions', '$state',
-    function ($rootScope, storage, window, $location, configuration, jenkins, $transitions, $state) {
+    '$rootScope', 'localStorageService', '$window', '$location', 'configuration', 'jenkins', '$transitions', '$state', '$window',
+    function ($rootScope, storage, window, $location, configuration, jenkins, $transitions, $state, $window) {
       $rootScope.numberOfRecentBuilds = 3;
       var jenkinsConfiguration = configuration.get('jenkins');
       if (jenkinsConfiguration) {
@@ -113,7 +113,7 @@ angular
 
       $rootScope.saveNumberOfBuildsAndRefresh = function () {
         if($rootScope.numberOfRecentBuilds > 5) {
-          var shouldContinue = confirm('Are you sure you want more than 5 recent builds? This generates quite a lot of requests to Jenkins.');
+          var shouldContinue = $window.confirm('Are you sure you want more than 5 recent builds? This generates quite a lot of requests to Jenkins.');
           if(!shouldContinue) {
             return;
           }

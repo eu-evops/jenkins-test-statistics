@@ -25,6 +25,9 @@
     this.name = execution.name;
     this.execution = execution;
     this.error = execution.errorDetails || execution.stderr;
+    this.errorStackTrace = execution.errorStackTrace;
+    this.stderr = execution.stderr;
+    this.stdout = execution.stdout;
     this.duration = execution.duration;
     this.build = build;
 
@@ -67,7 +70,7 @@
 
     this.addExecution = function (tce) {
       this.executions.push(tce);
-    }
+    };
   }
 
   function TestReport(builds) {
@@ -105,13 +108,13 @@
 
     this.cases.forEach(function (testCase) {
       testCase.passing = testCase.executions.every(function (e) {
-        return e.passing
+        return e.passing;
       });
 
       // Only check latest executions
       testCase.skipped = testCase.executions[0].skipped;
       testCase.failing = testCase.executions.every(function (e) {
-        return !e.passing && !e.skipped
+        return !e.passing && !e.skipped;
       });
       testCase.unstable = !testCase.passing && !testCase.failing && !testCase.skipped;
 
@@ -151,12 +154,18 @@
       }
     });
     return testsPassing;
-  }
+  };
 
   TestReport.prototype.passRatePassingTimes = function (n) {
     return this.numberPassingTimes(n) / this.cases.length || 0;
   };
 
+  var sanitiseBuild = function (build) {
+    build.aborted = build.result === 'ABORTED';
+    build.passing = !build.aborted && build.result !== 'FAILURE' && build.result !== 'UNSTABLE';
+
+    return build;
+  };
 
   var sanitiseJob = function (job, view) {
     job.report = new TestReport();
@@ -183,13 +192,6 @@
     }
 
     return job;
-  };
-
-  var sanitiseBuild = function (build) {
-    build.aborted = build.result === 'ABORTED';
-    build.passing = !build.aborted && build.result !== 'FAILURE' && build.result != 'UNSTABLE';
-
-    return build;
   };
 
   var jenkins = angular.module('Jenkins', ['LocalStorageModule', 'base64', 'Configuration']);
@@ -246,17 +248,17 @@
               });
           };
 
-          var getAllJobsRecursive = function (node) {
+          var getAllJobsRecursive = function (node, parentPath) {
             var jobs = [];
 
             node.jobs.forEach(function (j) {
-              jobs.push(sanitiseJob(j, node));
+              jobs.push(sanitiseJob(j, parentPath));
             });
 
             if (node.views) {
               // TODO Fix recursion
               node.views.forEach(function (v) {
-                getAllJobsRecursive(v).forEach(function (sj) {
+                getAllJobsRecursive(v, parentPath + '/view/' + v.name).forEach(function (sj) {
                   jobs.push(sj);
                 });
               });
@@ -265,13 +267,22 @@
             return jobs;
           };
 
-          var sanitiseView = function (view, viewName) {
-            view.name = viewName;
-            view.passRate = null;
-            view.allJobs = getAllJobsRecursive(view);
+          /**
+           * Flattens the view structure associating each
+           * job with it's view path
+           * @param view
+           * @param viewPath
+           * @returns {*}
+           */
+          var sanitiseView = function (view, viewPath) {
+            var sanitisedView = {};
 
-            if (view.allJobs && view.allJobs.length > 0) {
-              var sumPassRate = view.allJobs
+            sanitisedView.name = viewPath;
+            sanitisedView.passRate = null;
+            sanitisedView.allJobs = getAllJobsRecursive(view, viewPath);
+
+            if (sanitisedView.allJobs && sanitisedView.allJobs.length > 0) {
+              var sumPassRate = sanitisedView.allJobs
                 .filter(function (j) {
                   return j.passRate !== null;
                 })
@@ -281,18 +292,18 @@
                   return a + b;
                 }, 0);
 
-              view.passRate = sumPassRate / view.allJobs.filter(function (j) {
+              sanitisedView.passRate = sumPassRate / sanitisedView.allJobs.filter(function (j) {
                 return j.passRate !== null;
               }).length || null;
             }
 
-            return view;
+            return sanitisedView;
           };
 
           var generateFullViewName = function (v) {
             var n = v.name;
             var p = v.parent;
-            while (p != null && p.name !== undefined) {
+            while (p !== null && p.name !== undefined) {
               n = p.name + ' -> ' + n;
               p = p.parent;
             }
@@ -380,7 +391,7 @@
 
                       return build;
                     })
-                    .catch(function (error) {
+                    .catch(function () {
                       build.report = {
                         numberOfTests: 0,
                         passRate: null,
@@ -423,9 +434,10 @@
           };
 
           var getView = function (view) {
-            let treeCallParameters = recursiveTreeCall(10, ['jobs[name,displayName,builds[name,result,number,url]' + getNumberOfBuilds() + ']']);
+            let treeCallParameters = recursiveTreeCall(10, ['name,jobs[name,displayName,builds[name,result,number,url]' + getNumberOfBuilds() + ']']);
             return http.get(getConf().url + '/' + view + '/api/json?depth=3&tree=' + treeCallParameters)
               .then(function (response) {
+                console.log(response);
                 return sanitiseView(response.data, view);
               });
           };
