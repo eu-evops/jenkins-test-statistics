@@ -4,8 +4,10 @@
     <div class="dot2"></div>
   </div>
   <div class="message">Loading test report... This can take quite some time</div>
-  <uib-progressbar ng-show="downloadProgress.progress < 100" value="downloadProgress.processed" max="downloadProgress.total">
-    <span style="color:white; white-space:nowrap;">{{ downloadProgress.processed }} / {{ downloadProgress.total }}</span>
+  <uib-progressbar ng-show="downloadProgress.progress < 100" value="downloadProgress.processed"
+                   max="downloadProgress.total">
+    <span
+      style="color:white; white-space:nowrap;">{{ downloadProgress.processed }} / {{ downloadProgress.total }}</span>
   </uib-progressbar>
 </div>
 
@@ -30,24 +32,24 @@
           <tr ng-repeat-start="case in $data track by $index" pass-rate="case.getPassRate()">
             <td title="Index">{{ $index + 1 }}</td>
 
-            <td title="'Job'" sortable="'job.displayName'" filter="{ 'job.displayName': 'text' }">{{ case.job.displayName }}</td>
+            <td title="'Job'" sortable="'job.displayName'" filter="{ 'job.displayName': 'text' }">{{
+              case.job.displayName }}
+            </td>
             <td title="'Suite'" sortable="'className'" filter="{ 'className': 'text' }">{{ case.className }}</td>
             <td title="'Name'" sortable="'name'" filter="{ 'name': 'text' }">{{ case.name }}</td>
             <td title="'Pass rate'" sortable="'getPassRate()'">{{ case.getPassRate() | percentage:0 }}</td>
             <td title="'Status'" sortable="'status'" filter="{ status: 'text' }">{{ case.status }}</td>
             <td title="'Executions'" sortable="'executions.length'">
               <p>{{ case.executions.length }} executions</p>
-              <ul>
-                <li ng-repeat="e in case.executions">
-                  <span>
-                    <a ng-class="{ skipped: e.skipped, fail: !e.passing && !e.skipped, pass: e.passing }" href="{{ e.url }}" target="_blank">Build #{{ e.build.number}}</a>
+              <span ng-repeat="e in case.executions">
+                    <a ng-class="{ skipped: e.skipped, fail: !e.passing && !e.skipped, pass: e.passing }"
+                       href="{{ e.url }}" target="_blank">#{{ e.build.number}}</a>
                   </span>
-                </li>
-              </ul>
             </td>
             <td title="'Links'">
               <a ng-href="{{ case.url }}" target="_blank">History</a>
-              <a ng-if="case.executions[0].error" ng-href="#" ng-click="case.showException = !case.showException">Toggle exception</a>
+              <a ng-if="case.executions[0].error" ng-href="#" ng-click="case.showException = !case.showException">Toggle
+                exception</a>
             </td>
           </tr>
           <tr ng-repeat-end ng-if="case.showException">
