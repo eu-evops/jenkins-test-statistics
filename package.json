@@ -17,7 +17,8 @@
   },
   "scripts": {
     "test": "grunt test",
-    "start": "node app/web.js"
+    "start": "node app/web.js",
+    "postinstall": "bower install"
   },
   "dependencies": {
     "autoprefixer-core": "^5.2.1",
