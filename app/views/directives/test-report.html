@@ -4,10 +4,8 @@
     <div class="dot2"></div>
   </div>
   <div class="message">Loading test report... This can take quite some time</div>
-  <uib-progressbar ng-show="downloadProgress.progress < 100" value="downloadProgress.processed"
-                   max="downloadProgress.total">
-    <span
-      style="color:white; white-space:nowrap;">{{ downloadProgress.processed }} / {{ downloadProgress.total }}</span>
+  <uib-progressbar ng-show="downloadProgress.progress < 100" value="downloadProgress.processed" max="downloadProgress.total">
+    <span style="color:white; white-space:nowrap;">{{ downloadProgress.processed }} / {{ downloadProgress.total }}</span>
   </uib-progressbar>
 </div>
 
@@ -32,9 +30,7 @@
           <tr ng-repeat-start="case in $data track by $index" pass-rate="case.getPassRate()">
             <td title="Index">{{ $index + 1 }}</td>
 
-            <td title="'Job'" sortable="'job.displayName'" filter="{ 'job.displayName': 'text' }">{{
-              case.job.displayName }}
-            </td>
+            <td title="'Job'" sortable="'job.displayName'" filter="{ 'job.displayName': 'text' }">{{ case.job.displayName }}</td>
             <td title="'Suite'" sortable="'className'" filter="{ 'className': 'text' }">{{ case.className }}</td>
             <td title="'Name'" sortable="'name'" filter="{ 'name': 'text' }">{{ case.name }}</td>
             <td title="'Pass rate'" sortable="'getPassRate()'">{{ case.getPassRate() | percentage:0 }}</td>
