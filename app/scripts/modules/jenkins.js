@@ -436,7 +436,7 @@
           };
 
           var getView = function (view) {
-            let treeCallParameters = recursiveTreeCall(10, ['name,jobs[name,displayName,builds[name,result,number,url]' + getNumberOfBuilds() + ']']);
+            var treeCallParameters = recursiveTreeCall(10, ['name,jobs[name,displayName,builds[name,result,number,url]' + getNumberOfBuilds() + ']']);
             return http.get(getConf().url + '/' + view + '/api/json?depth=3&tree=' + treeCallParameters)
               .then(function (response) {
                 return sanitiseView(response.data, view);
