@@ -43,13 +43,12 @@
                   </span>
             </td>
             <td title="'Links'">
-              <a ng-href="{{ case.url }}" target="_blank">History</a>
-              <a ng-if="case.executions[0].error" ng-href="#" ng-click="case.showException = !case.showException">Toggle
-                exception</a>
+              <a ng-href="{{ case.url }}" target="_blank">Test History</a>
+              <a ng-if="case.executions[0].error" ng-href="#" ng-click="case.showException = !case.showException">Show error</a>
             </td>
           </tr>
           <tr ng-repeat-end ng-if="case.showException">
-            <td colspan="7">
+            <td colspan="8">
               <h3>Exception</h3>
               <pre>{{ case.executions[0].error }}</pre>
 

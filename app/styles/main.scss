@@ -206,5 +206,9 @@ table[ng-table=testTableParameters] {
   td[data-title-text='Suite'] {
     direction: rtl;
   }
+
+  pre {
+    white-space: pre-wrap;
+  }
 }
 
