@@ -9,8 +9,8 @@
  */
 angular.module('testReporterApp')
   .controller('ViewCtrl', [
-    '$scope', 'jenkins', 'NgTableParams', 'FileSaver', 'Blob', '$rootScope', '$filter', '$stateParams',
-    function ($scope, jenkins, NgTableParams, FileSaver, Blob, $rootScope, $filter, $stateParams) {
+    '$scope', 'jenkins', 'NgTableParams', 'FileSaver', 'Blob', '$rootScope', '$filter', '$stateParams', '$http',
+    function ($scope, jenkins, NgTableParams, FileSaver, Blob, $rootScope, $filter, $stateParams, $http) {
       var percentageFilter = $filter('percentage');
 
       $scope.view = {
@@ -34,7 +34,37 @@ angular.module('testReporterApp')
             });
           });
 
+          var indexInSolr = function(testReport) {
+            var solrReport = [];
+
+            testReport.cases.forEach(function(tc) {
+              tc.executions.forEach(function (te) {
+                solrReport.push({
+                  id: te.id,
+                  name: te.name,
+                  className: te.className,
+                  error: te.error || '',
+                  shortError: (te.error || '').substr(0, 255),
+                  stderr: te.stderr || '',
+                  stdout: te.stdout || '',
+                  errorStackTrace: te.errorStackTrace || ''
+                });
+              });
+            });
+
+            $http.post('http://localhost:8983/solr/stats/update?commit=true', solrReport)
+              .then(function(response) {
+                console.log(response);
+              });
+
+            console.log("Indexing in solr", solrReport);
+          };
+
           jenkins.testReport(allBuilds)
+            .then(function(testReport) {
+              indexInSolr(testReport);
+              return testReport;
+            })
             .then(function (testReport) {
               $scope.testReport = testReport;
 

@@ -17,12 +17,24 @@
 (function (window, angular) {
   'use strict';
 
+  String.prototype.hashCode = function() {
+    var hash = 0, i, chr;
+    if (this.length === 0) return hash;
+    for (i = 0; i < this.length; i++) {
+      chr   = this.charCodeAt(i);
+      hash  = ((hash << 5) - hash) + chr;
+      hash |= 0; // Convert to 32bit integer
+    }
+    return hash;
+  };
+
   function testCaseUrlName(name) {
     return name.replace(/\s+/g, '_').replace(/[^a-zA-Z\d]/g, '_');
   }
 
   function TestCaseExecution(execution, build) {
     this.name = execution.name;
+    this.className = execution.className;
     this.execution = execution;
     this.error = execution.errorDetails || execution.stderr;
     this.errorStackTrace = execution.errorStackTrace;
@@ -30,6 +42,8 @@
     this.stdout = execution.stdout;
     this.duration = execution.duration;
     this.build = build;
+    //
+    this.id = (build.url + this.className + this.name).hashCode();
 
     var urlComps = this.execution.className.split('.');
     var packageName = urlComps.splice(0, urlComps.length - 1).join('.') || '(root)';
@@ -73,14 +87,14 @@
     };
   }
 
-  function TestReport(builds) {
+  function TestReport(buildsWithTestReports) {
     var self = this;
     this.cases = [];
-    builds = builds || [];
+    buildsWithTestReports = buildsWithTestReports || [];
 
     var testCaseMapping = {};
 
-    builds.forEach(function (build) {
+    buildsWithTestReports.forEach(function (build) {
       if (!build || !build.report || !build.report.suites) {
         return;
       }
