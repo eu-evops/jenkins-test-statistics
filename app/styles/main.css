@@ -5970,4 +5970,7 @@ table[ng-table=testTableParameters] td[data-title-text='Suite'] {
 table[ng-table=testTableParameters] pre {
   white-space: pre-wrap; }
 
+.csstooltip:hover .tooltiptext {
+  visibility: visible;
+}
 /*# sourceMappingURL=main.css.map */

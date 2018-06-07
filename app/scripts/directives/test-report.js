@@ -40,10 +40,10 @@ angular.module('testReporterApp')
 
         });
 
-        $scope.showError = function (id) {
-          $scope.showException = true;
-          SolrSearch.getSimilarDocuments(id).then(function (docs) {
-            $scope.testNames = SolrSearch.getTestNames(docs)
+        $scope.showError = function (execution) {
+          execution.showException = true;
+          SolrSearch.getSimilarDocuments(execution.id).then(function (docs) {
+            $scope.testNames = docs.response.docs;
           });
         };
 

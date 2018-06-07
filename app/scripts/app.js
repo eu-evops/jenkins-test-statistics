@@ -23,7 +23,8 @@ angular
     'Jenkins',
     'Configuration',
     'ngFileSaver',
-    'ui.router'
+    'ui.router',
+    'tooltips'
   ])
   .config(['localStorageServiceProvider', function (localStorageServiceProvider) {
     localStorageServiceProvider.setPrefix('testReporter');

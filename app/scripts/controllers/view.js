@@ -37,21 +37,24 @@ angular.module('testReporterApp')
             var solrReport = [];
             var regexp = new RegExp('.*?\/testReport\/');
             testReport.cases.forEach(function(tc) {
-              tc.executions.forEach(function (te) {
-                var document = {
-                  id: te.id,
-                  name: te.name.replace("]","").replace("[",""),
-                  className: te.className.replace("]","").replace("[",""),
-                  error: (te.error || '').replace("[","").replace("]",""),
-                  shortError: (te.shortError || '').substr(0, 255).replace("[","").replace("]",""),
-                  stderr: (te.stderr || '').replace("[","").replace("]",""),
-                  stdout: (te.stdout || '' ).replace("[","").replace("]",""),
-                  errorStackTrace: (te.errorStackTrace || '').replace("[","").replace("]",""),
-                  buildUrl: tc.url.match(regexp)[0],
-                  appView: $scope.view.name
-                };
-                solrReport.push(document);
-              });
+              //index only failures
+              if(tc.status !== 'Passed') {
+                tc.executions.forEach(function (te) {
+                  var document = {
+                    id: te.id,
+                    name: te.name.replace("]", "").replace("[", ""),
+                    className: te.className.replace("]", "").replace("[", ""),
+                    error: (te.error || '').replace("[", "").replace("]", ""),
+                    shortError: (te.shortError || '').substr(0, 255).replace("[", "").replace("]", ""),
+                    stderr: (te.stderr || '').replace("[", "").replace("]", ""),
+                    stdout: (te.stdout || '' ).replace("[", "").replace("]", ""),
+                    errorStackTrace: (te.errorStackTrace || '').replace("[", "").replace("]", ""),
+                    buildUrl: tc.url.match(regexp)[0],
+                    appView: $scope.view.name
+                  };
+                  solrReport.push(document);
+                });
+              }
             });
             $http.post('http://localhost:8983/solr/stats/update?commit=true', solrReport)
               .then(function(response) {

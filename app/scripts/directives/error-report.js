@@ -8,44 +8,40 @@ angular.module('testReporterApp')
           errorReport: '='
         },
         link: function ($scope) {
-
           $scope.$watch('errorReport', function (testReport) {
               if(!testReport) {
                 return;
               }
               var promises = [];
-              angular.forEach(testReport.cases, function (tc) {
+              testReport.cases.forEach(function (tc) {
                 if(tc.status !== 'Passed') {
-                  angular.forEach(tc.executions, function (tcE) {
+                  tc.executions.forEach(function (tcE) {
                     if(tcE.error != null|| tcE.error != undefined) {
-                      promises.push(
-                        SolrSearch.getSimilarDocuments(tcE.id)
-                          .then(function (errordocs) {
-                            if(errordocs.response != undefined && errordocs.response != null) {
-                              var tests = errordocs.response.docs;
-                              if(tests !== undefined || tests !== null) {
-                                return {
-                                  tests: tests,
-                                  error:tcE.error
-                                };
+                         promises.push(
+                          SolrSearch.getSimilarDocuments(tcE.id)
+                            .then(function (doc) {
+                              if(doc.response != undefined && doc.response != null) {
+                                var tests = doc.response.docs;
+                                if(tests !== undefined || tests !== null) {
+                                  return {
+                                    tests: tests,
+                                    error:tcE.error
+                                  };
+                                }
                               }
-                            }
-                          }).catch(function (error) {
-                          console.log(error);
-                        })
-                      );
+                            }).catch(function (error) {
+                            console.log(error);
+                          })
+                        );
                     }
                   })
                 }
               });
-
               $q.all(promises).then(function (data) {
                   $scope.errorDetails = data;
-                  console.log(data);
                 }).catch(function (err) {
                   console.log(err);
               });
-
           });
         }
     }

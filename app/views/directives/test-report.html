@@ -45,10 +45,12 @@
             </td>
             <td title="'Links'">
               <a ng-href="{{ case.url }}" target="_blank">Test History</a>
-              <a ng-if="case.executions[0].error" ng-href="#" ng-click="showError(case.executions[0].id)">Show error</a>
+              <a ng-if="case.executions[case.executions.length-1].error && !case.executions[case.executions.length-1].showException" ng-href="#" ng-click="showError(case.executions[case.executions.length-1])">Show error</a>
+              <a ng-if="case.executions[case.executions.length-1].error && case.executions[case.executions.length-1].showException"
+                 ng-href="#" ng-click="case.executions[case.executions.length-1].showException = false">Collapse</a>
             </td>
           </tr>
-          <tr ng-repeat-end ng-if="showException">
+          <tr ng-repeat-end ng-if="case.executions[case.executions.length-1].showException">
             <td colspan="8">
               <h3>Exception</h3>
               <pre>{{ case.executions[0].error }}</pre>
@@ -68,7 +70,17 @@
               <div>
                 <h4>There are {{testNames.length}} tests in the test run</h4>
                 <ul>
-                  <li ng-repeat="testName in testNames track by $index">{{testName}}</li>
+                  <table class="table table-boardered table-striped table-response table-hover">
+                    <tr ng-repeat="test in testNames track by $index">
+                      <td title="Index">{{$index+1}}</td>
+                      <td title="Jenkins View"><a href="{{test.appView}}">{{test.appView}}</a></td>
+                      <td title="test name" class="csstooltip"><a href="{{test.buildUrl}}">{{test.name}}</a></td>
+                      <div class="tooltiptext">
+                        <span>{{test.error}}</span>
+                        <span>{{test.errorStackTrace}}</span>
+                      </div>
+                    </tr>
+                  </table>
                 </ul>
               </div>
             </td>
