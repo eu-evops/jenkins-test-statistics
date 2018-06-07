@@ -9,8 +9,8 @@
  */
 angular.module('testReporterApp')
   .controller('ViewCtrl', [
-    '$scope', 'jenkins', 'NgTableParams', 'FileSaver', 'Blob', '$rootScope', '$filter', '$stateParams', '$http',
-    function ($scope, jenkins, NgTableParams, FileSaver, Blob, $rootScope, $filter, $stateParams, $http) {
+    '$scope', 'jenkins', 'NgTableParams', 'FileSaver', 'Blob', '$rootScope', '$filter', '$stateParams', '$http','$q',
+    function ($scope, jenkins, NgTableParams, FileSaver, Blob, $rootScope, $filter, $stateParams, $http,$q) {
       var percentageFilter = $filter('percentage');
 
       $scope.view = {
@@ -25,7 +25,6 @@ angular.module('testReporterApp')
         .then(function (view) {
           $scope.jobs = view.allJobs;
           $scope.view = view;
-
           var allBuilds = [];
           $scope.jobs.forEach(function (j) {
             j.builds.forEach(function (b) {
@@ -36,27 +35,28 @@ angular.module('testReporterApp')
 
           var indexInSolr = function(testReport) {
             var solrReport = [];
-
+            var regexp = new RegExp('.*?\/testReport\/');
             testReport.cases.forEach(function(tc) {
               tc.executions.forEach(function (te) {
-                solrReport.push({
+                var document = {
                   id: te.id,
-                  name: te.name,
-                  className: te.className,
-                  error: te.error || '',
-                  shortError: (te.error || '').substr(0, 255),
-                  stderr: te.stderr || '',
-                  stdout: te.stdout || '',
-                  errorStackTrace: te.errorStackTrace || ''
-                });
+                  name: te.name.replace("]","").replace("[",""),
+                  className: te.className.replace("]","").replace("[",""),
+                  error: (te.error || '').replace("[","").replace("]",""),
+                  shortError: (te.shortError || '').substr(0, 255).replace("[","").replace("]",""),
+                  stderr: (te.stderr || '').replace("[","").replace("]",""),
+                  stdout: (te.stdout || '' ).replace("[","").replace("]",""),
+                  errorStackTrace: (te.errorStackTrace || '').replace("[","").replace("]",""),
+                  buildUrl: tc.url.match(regexp)[0],
+                  appView: $scope.view.name
+                };
+                solrReport.push(document);
               });
             });
-
             $http.post('http://localhost:8983/solr/stats/update?commit=true', solrReport)
               .then(function(response) {
                 console.log(response);
               });
-
             console.log("Indexing in solr", solrReport);
           };
 
@@ -101,4 +101,8 @@ angular.module('testReporterApp')
             $scope.tableParameters.filter({displayName: $scope.jobSearch});
           });
         });
+
+      $scope.assignErrorReport = function () {
+        $scope.errorReport = $scope.testReport;
+      }
     }]);

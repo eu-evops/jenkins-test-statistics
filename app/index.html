@@ -40,21 +40,14 @@
       <div class="collapse navbar-collapse" id="js-navbar-collapse">
         <ul class="nav navbar-nav">
           <li ng-class="{ active: navigation.active(menu)}" ng-repeat="menu in navigation.menus"><a href="{{ menu.route }}">{{ menu.name }}</a></li>
+          <li>
+            <div class="panel-body">
+              <!--<label for="numberOfRecentBuilds">Number of recent builds</label>-->
+              <input type="number" value="Number of recent builds" id="numberOfRecentBuilds" ng-change="saveNumberOfBuildsAndRefresh()" ng-model="$root.numberOfRecentBuilds"/>
+            </div>
+          </li>
           <li ng-if="authenticated"><a ng-click="signOut()">Sign out <strong>{{ jenkins.name }}</strong></a></li>
         </ul>
-      </div>
-    </div>
-  </div>
-
-  <div class="container" ng-if="authenticated">
-    <div class="panel panel-default">
-      <div class="panel-heading">Settings</div>
-      <div class="panel-body">
-        <div>
-          <label for="numberOfRecentBuilds">Number of recent builds</label>
-          <input type="number" id="numberOfRecentBuilds" ng-model="$root.numberOfRecentBuilds"/>
-          <button ng-click="saveNumberOfBuildsAndRefresh()" type="button">Update</button>
-        </div>
       </div>
     </div>
   </div>
@@ -122,9 +115,11 @@
 <script src="/scripts/controllers/view.js"></script>
 <script src="/scripts/filters/filters.js"></script>
 <script src="/scripts/services/jenkinsauthenticationhttpinterceptor.js"></script>
+<script src="/scripts/services/solr.js"></script>
 <script src="/scripts/directives/passrate.js"></script>
 <script src="/scripts/directives/view-breadcrumbs.js"></script>
 <script src="/scripts/directives/test-report.js"></script>
+<script src="/scripts/directives/error-report.js"></script>
 <!-- endbuild -->
 
 <!-- build:js(app) scripts/ngConstants.js -->

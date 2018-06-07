@@ -7,7 +7,7 @@
  * # passRate
  */
 angular.module('testReporterApp')
-  .directive('testReport', ['NgTableParams', 'FileSaver', function (NgTableParams, FileSaver) {
+  .directive('testReport', ['NgTableParams', 'FileSaver','SolrSearch', function (NgTableParams, FileSaver, SolrSearch) {
     return {
       templateUrl: '/views/directives/test-report.html',
       restrict: 'A',
@@ -39,6 +39,13 @@ angular.module('testReporterApp')
             });
 
         });
+
+        $scope.showError = function (id) {
+          $scope.showException = true;
+          SolrSearch.getSimilarDocuments(id).then(function (docs) {
+            $scope.testNames = SolrSearch.getTestNames(docs)
+          });
+        };
 
         $scope.exportCsv = function () {
           var tcs = $scope.testReport.cases.map(function (tc) {

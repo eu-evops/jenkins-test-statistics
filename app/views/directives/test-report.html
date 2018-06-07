@@ -14,7 +14,7 @@
 
     <div class="panel-heading" title="{{ testReportSummary }}">
       <a class="float-right pointer" ng-click="exportCsv()">Export as CSV</a>
-      <a data-target="#testStatistics" class="pointer" data-toggle="collapse">Test report</a> -
+      <!--<a data-target="#testStatistics" class="pointer" data-toggle="collapse">Test report</a> - -->
       <small>Number of tests: {{ testReport.cases.length }}</small>
       <small>Pass rate: {{ testReport.passRate | percentage }} ({{ testReport.passingTests }})</small>
       <small>Unstable rate: {{ testReport.unstableRate | percentage }} ({{ testReport.unstableTests }})</small>
@@ -22,7 +22,8 @@
       <small>Skip rate: {{ testReport.skippedRate | percentage }} ({{ testReport.skippedTests }})</small>
     </div>
 
-    <div id="testStatistics" class="panel-collapse collapse">
+    <div id="testStatistics" class="panel-collapse collapse in">
+      <!--<div class="panel-collapse collapse">-->
       <div class="panel-body">
         <table
           class="table table-bordered table-striped table-responsive table-hover"
@@ -44,10 +45,10 @@
             </td>
             <td title="'Links'">
               <a ng-href="{{ case.url }}" target="_blank">Test History</a>
-              <a ng-if="case.executions[0].error" ng-href="#" ng-click="case.showException = !case.showException">Show error</a>
+              <a ng-if="case.executions[0].error" ng-href="#" ng-click="showError(case.executions[0].id)">Show error</a>
             </td>
           </tr>
-          <tr ng-repeat-end ng-if="case.showException">
+          <tr ng-repeat-end ng-if="showException">
             <td colspan="8">
               <h3>Exception</h3>
               <pre>{{ case.executions[0].error }}</pre>
@@ -63,6 +64,12 @@
               <div ng-if="case.executions[0].stdout">
                 <h3>Standard output</h3>
                 <pre>{{ case.executions[0].stdout}}</pre>
+              </div>
+              <div>
+                <h4>There are {{testNames.length}} tests in the test run</h4>
+                <ul>
+                  <li ng-repeat="testName in testNames track by $index">{{testName}}</li>
+                </ul>
               </div>
             </td>
           </tr>

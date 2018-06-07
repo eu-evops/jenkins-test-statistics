@@ -1,0 +1,21 @@
+<div>
+  <p>{{idsToQuery}}</p>
+  <table class="table" ng-table="tableParameters">
+    <tr ng-repeat-start="details in errorDetails track by $index">
+      <td width="30px" title ="'Error'">{{details.error}}</td>
+      <td title="'Number'">{{details.tests.length}}</td>
+      <td title="'Links'">
+        <a ng-href="#" ng-show="!showErrors" ng-click="showErrors = true">Expand</a>
+        <a ng-href="#" ng-show="showErrors" ng-click="showErrors = false">Collapse</a>
+      </td>
+    </tr>
+    <tr ng-repeat-end ng-if="showErrors">
+      <td colspan="8">
+        <ul>
+          <li ng-repeat="test in details.tests"><a href="{{test.appView}}">{{test.appView}}  </a><a href="{{test.buildUrl}}/{{test.className}}/{{test.name}}">{{test.name}}</a></li>
+        </ul>
+      </td>
+    </tr>
+
+  </table>
+</div>
