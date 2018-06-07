@@ -21,6 +21,10 @@ angular.module('testReporterApp')
         $scope.downloadProgress = downloadProgress;
       });
 
+      $scope.$on('error-report', function (event, downloadProgress) {
+        $scope.errorProgress = downloadProgress;
+      });
+
       jenkins.view($scope.view.name)
         .then(function (view) {
           $scope.jobs = view.allJobs;

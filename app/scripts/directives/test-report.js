@@ -43,7 +43,19 @@ angular.module('testReporterApp')
         $scope.showError = function (execution) {
           execution.showException = true;
           SolrSearch.getSimilarDocuments(execution.id).then(function (docs) {
-            $scope.testNames = docs.response.docs;
+            var dcs = [];
+            docs.response.docs.forEach(function (doc) {
+              if(dcs.length == 0) {
+                dcs.push(doc);
+              } else {
+                if(dcs.find(function (d) {
+                  return d.name === doc.name;
+                }) == null){
+                  dcs.push(doc);
+                }
+              }
+            });
+            $scope.testNames = dcs;
           });
         };
 

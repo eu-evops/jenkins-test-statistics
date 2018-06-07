@@ -1,6 +1,6 @@
 'use strict';
 angular.module('testReporterApp')
-  .directive('errorReport', [ '$http', '$q','SolrSearch', function ($http, $q, SolrSearch) {
+  .directive('errorReport', [ '$http', '$q','SolrSearch','$rootScope', function ($http, $q, SolrSearch, $rootScope) {
     return {
         templateUrl: '/views/directives/errors-report.html',
         restrict: 'A',
@@ -13,6 +13,15 @@ angular.module('testReporterApp')
                 return;
               }
               var promises = [];
+              var collectedRecords = 0;
+              var totalIds=0;
+              testReport.cases.forEach(function (tc) {
+                if(tc.status !== 'Passed') {
+                  tc.executions.forEach(function (tcE) {
+                     totalIds++;
+                   })
+                }
+              });
               testReport.cases.forEach(function (tc) {
                 if(tc.status !== 'Passed') {
                   tc.executions.forEach(function (tcE) {
@@ -31,6 +40,17 @@ angular.module('testReporterApp')
                               }
                             }).catch(function (error) {
                             console.log(error);
+                          }).finally(function (response) {
+                            collectedRecords++;
+                            var progress = Math.ceil(collectedRecords / totalIds * 100);
+                            if(progress % 10 === 0) {
+                              $rootScope.$broadcast('error-report', {
+                                progress: progress,
+                                processed: collectedRecords,
+                                total: totalIds
+                              });
+                            }
+                            return response;
                           })
                         );
                     }

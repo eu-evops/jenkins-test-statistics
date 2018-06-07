@@ -73,12 +73,8 @@
                   <table class="table table-boardered table-striped table-response table-hover">
                     <tr ng-repeat="test in testNames track by $index">
                       <td title="Index">{{$index+1}}</td>
-                      <td title="Jenkins View"><a href="{{test.appView}}">{{test.appView}}</a></td>
-                      <td title="test name" class="csstooltip"><a href="{{test.buildUrl}}">{{test.name}}</a></td>
-                      <div class="tooltiptext">
-                        <span>{{test.error}}</span>
-                        <span>{{test.errorStackTrace}}</span>
-                      </div>
+                      <td title="Jenkins View"><a view-breadcrumbs="test.appView">{{test.appView}}</a></td>
+                      <td><div title="Error {{test.error}}  Stack Trace  {{test.errorStackTrace}}"><a href="{{test.buildUrl}}">{{test.name}}</a></div></td>
                     </tr>
                   </table>
                 </ul>
