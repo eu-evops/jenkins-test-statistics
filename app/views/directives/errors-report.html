@@ -11,11 +11,20 @@
     </tr>
     <tr ng-repeat-end ng-if="showErrors">
       <td colspan="8">
+        <h4>There are {{details.tests.length}} affected test cases in the test run</h4>
         <ul>
-          <li ng-repeat="test in details.tests"><a href="{{test.appView}}">{{test.appView}}  </a><a href="{{test.buildUrl}}/{{test.className}}/{{test.name}}">{{test.name}}</a></li>
+          <li ng-repeat="test in details.tests">
+            <a href="{{test.appView}}">{{test.appView}} </a>
+            <a ng-mouseover="showToolTop = true" ng-mouseleave="showToolTop = false" href="{{test.buildUrl}}">{{test.name}}</a></li>
+            <div ng-if="showToolTop">
+              <h4>Error</h4>
+              <p>{{test.error}}</p>
+              <br/>
+              <h4>Stack Trace</h4>
+              <p>{{test.errorStackTrace}}</p>
+            </div>
         </ul>
       </td>
     </tr>
-
   </table>
 </div>

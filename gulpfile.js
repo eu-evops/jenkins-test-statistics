@@ -119,7 +119,7 @@ gulp.task('start:server', function() {
         ];
     }
   });
-  browserSync.init({ proxy: 'localhost:9000' });
+  // browserSync.init({ proxy: 'localhost:9000' });
 });
 
 gulp.task('start:server:test', function() {
