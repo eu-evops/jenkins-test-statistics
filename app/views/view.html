@@ -4,7 +4,8 @@
   <div class="panel-heading">Statistics</div>
   <div class="panel-body">
     <p>Number of jobs in view: {{ view.allJobs.length }}</p>
-    <p>Build pass rate: {{ view.passRate | percentage:0 }}</p>
+    <p ng-if="testReport.cases">Number of tests: {{ testReport.cases.length }}</p>
+    <p ng-if="testReport.passRate">Pass rate: {{ testReport.passRate | percentage:0 }}</p>
   </div>
 </div>
 

@@ -46,15 +46,16 @@ angular.module('testReporterApp')
                 tc.executions.forEach(function (te) {
                   var document = {
                     id: te.id,
-                    name: te.name.replace("]", "").replace("[", ""),
-                    className: te.className.replace("]", "").replace("[", ""),
-                    error: (te.error || '').replace("[", "").replace("]", ""),
-                    shortError: (te.shortError || '').substr(0, 255).replace("[", "").replace("]", ""),
-                    stderr: (te.stderr || '').replace("[", "").replace("]", ""),
-                    stdout: (te.stdout || '' ).replace("[", "").replace("]", ""),
-                    errorStackTrace: (te.errorStackTrace || '').replace("[", "").replace("]", ""),
+                    name: te.name,
+                    className: te.className,
+                    error: (te.error || ''),
+                    shortError: (te.shortError || '').substr(0, 255),
+                    stderr: (te.stderr || ''),
+                    stdout: (te.stdout || '' ),
+                    errorStackTrace: (te.errorStackTrace || ''),
                     buildUrl: tc.url.match(regexp)[0],
-                    appView: $scope.view.name
+                    appView: $scope.view.name,
+                    time_to_live_s: '+1DAYS'
                   };
                   solrReport.push(document);
                 });

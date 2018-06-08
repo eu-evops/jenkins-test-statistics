@@ -1,0 +1,16 @@
+version: '3'
+services:
+  solr:
+    image: solr
+    ports:
+     - "8983:8983"
+    volumes:
+      - data:/opt/solr/server/solr/stats
+      - ./managed-schema:/docker-entrypoint-initdb.d/managed-schema
+      - ./solrconfig.xml:/docker-entrypoint-initdb.d/solrconfig.xml
+      - ./copy_configs.sh:/docker-entrypoint-initdb.d/copy_configs.sh
+    entrypoint:
+      - solr-precreate
+      - stats
+volumes:
+  data:
