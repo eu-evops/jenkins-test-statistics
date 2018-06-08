@@ -1235,18 +1235,6 @@
         <str name="fieldType">tdoubles</str>
       </lst>
     </processor>
-    <processor class="solr.TimestampUpdateProcessorFactory">
-      <str name="fieldName">timestamp_dt</str>
-    </processor>
-    <processor class="solr.processor.DocExpirationUpdateProcessorFactory">
-      <int name="autoDeletePeriodSeconds">30</int> <!-- want automatic deletes -->
-      <null name="ttleParamName"/><!-- ignores _ttl_ request parameter -->
-      <str name="ttlFieldName">time_to_live_s</str>
-      <str name="expirationFieldName">expire_at_dt</str>
-    </processor>
-    <processor class="solr.TimestampUpdateProcessorFactory">
-      <str name="fieldName">timestamp_dt</str>
-    </processor>
     <processor class="solr.LogUpdateProcessorFactory"/>
     <processor class="solr.DistributedUpdateProcessorFactory"/>
     <processor class="solr.RunUpdateProcessorFactory"/>
@@ -1311,20 +1299,10 @@
           <str name="config_param">example config parameter</str>
         </lst>
       </processor>
-      <processor class="solr.TimestampUpdateProcessorFactory">
-         <str name="fieldName">timestamp_dt</str>
-      </processor>
-      <processor class="solr.processor.DocExpirationUpdateProcessorFactory">
-         <int name="autoDeletePeriodSeconds">30</int>
-         <str name="ttlFieldName">time_to_live_s</str>
-         <str name="expirationFieldName">expire_at_dt</str>
-      </processor>
-      <processor class="solr.FirstFieldValueUpdateProcessorFactory">
-         <str name="fieldName">expire_at_dt</str>
-      </processor>
       <processor class="solr.RunUpdateProcessorFactory" />
     </updateRequestProcessorChain>
-   -->
+  -->
+
   <!-- Response Writers
 
        http://wiki.apache.org/solr/QueryResponseWriter

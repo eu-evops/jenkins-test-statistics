@@ -14,8 +14,8 @@ angular.module('testReporterApp')
         });
     };
 
-    this.getSimilarDocuments = function (id) {
-      var url = "http://localhost:8983/solr/stats/mlt?q=id:\""+id+"\"&mlt=true&mlt.fl=error" +
+    this.getSimilarDocuments = function (execution) {
+      var url = "http://localhost:8983/solr/stats/mlt?q=id:\""+execution.id+"\"&mlt=true&mlt.fl=error" +
         "&mlt.mindf=1&mlt.mintf=1&mlt.minwl=1&mlt.maxqt=1000&mlt.count=3" +
         "&mlt.interestingTerms=details&mlt.match.include=false&wt=json&mlt.maxwl=50";
       return http.get(url).then(function (data) {
