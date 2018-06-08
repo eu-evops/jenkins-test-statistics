@@ -16,3 +16,17 @@ services:
       - .:/app
       - /app/node_modules
       - /app/bower_components
+
+  solr:
+    image: solr
+    ports:
+     - "8983:8983"
+    volumes:
+      - data:/opt/solr/server/solr/stats
+      - $PWD/solr_docker/solrconfig:/solrconfig
+    entrypoint:
+      - solr-precreate
+      - stats
+      - /solrconfig
+  volumes:
+    data:
