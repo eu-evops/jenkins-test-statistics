@@ -6,11 +6,10 @@ services:
      - "8983:8983"
     volumes:
       - data:/opt/solr/server/solr/stats
-      - ./managed-schema:/docker-entrypoint-initdb.d/managed-schema
-      - ./solrconfig.xml:/docker-entrypoint-initdb.d/solrconfig.xml
-      - ./copy_configs.sh:/docker-entrypoint-initdb.d/copy_configs.sh
+      - $PWD:/solrconfig
     entrypoint:
       - solr-precreate
       - stats
+      - /solrconfig
 volumes:
   data:
