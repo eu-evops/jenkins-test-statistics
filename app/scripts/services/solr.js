@@ -22,7 +22,7 @@ angular.module('testReporterApp')
       var query = {
         q: "id:\""+test.id+"\"",
         mlt: true,
-        "mlt.fl": "shortError",
+        "mlt.fl": "error",
         "mlt.mindf":1,
         "mlt.mintf":1,
         "mlt.minwl":5,
