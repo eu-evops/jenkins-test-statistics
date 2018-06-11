@@ -112,9 +112,11 @@ gulp.task('start:client', ['start:server', 'styles'], function () {
   openURL('http://localhost:9000');
 });
 
-app.get('/solr/*', function(req, res) {
+let proxyToSolrInstance = function(req, res) {
   proxy.web(req, res);
-});
+};
+app.get('/solr*', proxyToSolrInstance);
+app.post('/solr*', proxyToSolrInstance);
 
 gulp.task('start:server', function() {
   $.connect.server({
