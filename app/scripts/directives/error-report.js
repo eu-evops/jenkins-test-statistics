@@ -33,6 +33,8 @@ angular.module('testReporterApp')
                 .then(function _(response) {
                   var error = {
                     error: response.test.error,
+                    interestingTerms: response.data.interestingTerms,
+                    url: response.url,
                     affectedTests: [response.test]
                   };
 
@@ -58,7 +60,9 @@ angular.module('testReporterApp')
                 .then(function() {
                   console.log('Found all the errors', errors);
                   $rootScope.$broadcast('error-report', errors);
-                  $scope.errorDetails = errors;
+                  $scope.errorDetails = errors.sort(function (a, b) {
+                    return b.affectedTests.length - a.affectedTests.length;
+                  });
                 });
 
               // console.log(erroredExecutions);

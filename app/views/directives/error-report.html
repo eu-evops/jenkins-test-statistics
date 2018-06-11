@@ -1,0 +1,50 @@
+<div ng-show="!errorDetails.length > 0">
+  <div class="spinner">
+    <div class="dot1"></div>
+    <div class="dot2"></div>
+  </div>
+  <div class="message">Collecting Errors... This can take quite some time</div>
+  <uib-progressbar ng-show="errorProgress.progress < 100" value="errorProgress.processed" max="errorProgress.total">
+    <span style="color:white; white-space:nowrap;">{{ errorProgress.processed }} / {{ errorProgress.total }}</span>
+  </uib-progressbar>
+</div>
+
+<div ng-if="errorDetails.length > 0">
+  <table class="table" ng-table="tableParameters">
+    <tr ng-repeat-start="details in errorDetails track by $index">
+      <td>{{ details.affectedTests[0].id }}</td>
+      <td>{{details.error.substr(0, 200)}}</td>
+      <td title="'Number'">{{details.affectedTests.length}}</td>
+      <td>{{ details.interestingTerms.join(', ') }}</td>
+      <td><a href="{{ details.url }}" target="_blank">Solr Link</a></td>
+      <td title="'Links'">
+        <a ng-href="#" ng-show="!showErrors" ng-click="showErrors = true">Expand</a>
+        <a ng-href="#" ng-show="showErrors" ng-click="showErrors = false">Collapse</a>
+      </td>
+    </tr>
+    <tr ng-repeat-end ng-if="showErrors">
+      <td colspan="8">
+        <div>
+          <h4>There <ng-pluralize count="details.affectedTests.length" when="{ '0': 'are', '1': 'is', 'other': 'are' }" />
+             {{details.affectedTests.length}} affected test case<ng-pluralize count="details.affectedTests.length" when="{ '0': 's', '1': '', 'other': 's' }" /> in the test run</h4>
+          <ul>
+            <table class="table table-boardered table-striped table-response table-hover">
+              <tr ng-repeat="test in details.affectedTests track by $index">
+                <td title="Id">{{test.id}}</td>
+                <td title="Jenkins View">
+                  <a view-breadcrumbs="test.build.job.view">{{test.build.job.view}}</a></td>
+                <td>
+                  <div title="Error: {{test.error}} Stack Trace: {{test.errorStackTrace}}">
+                    <a href="{{test.url}}" target="_blank">{{test.name}}</a></div>
+                </td>
+                <td>
+                  {{ test.error.substr(0, 200)}}
+                </td>
+              </tr>
+            </table>
+          </ul>
+        </div>
+      </td>
+    </tr>
+  </table>
+</div>

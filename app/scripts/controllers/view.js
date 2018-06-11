@@ -9,13 +9,23 @@
  */
 angular.module('testReporterApp')
   .controller('ViewCtrl', [
-    '$scope', 'jenkins', 'NgTableParams', 'FileSaver', 'Blob', '$rootScope', '$filter', '$stateParams', '$http','$q',
-    function ($scope, jenkins, NgTableParams, FileSaver, Blob, $rootScope, $filter, $stateParams, $http,$q) {
+    '$scope', 'jenkins', 'NgTableParams', 'FileSaver', 'Blob', '$rootScope', '$filter', '$stateParams', '$http','$q', 'SolrSearch',
+    function ($scope, jenkins, NgTableParams, FileSaver, Blob, $rootScope, $filter, $stateParams, $http, $q, SolrSearch) {
       var percentageFilter = $filter('percentage');
 
       $scope.view = {
         name: $stateParams.view
       };
+
+      $scope.search = {
+        jobSearch: '',
+        testSearch: '',
+        errorSearch: ''
+      };
+
+      $scope.testSearch = "";
+      $scope.solrIndexed = false;
+
 
       $scope.$on('jenkins-report', function (event, downloadProgress) {
         $scope.downloadProgress = downloadProgress;
@@ -38,7 +48,7 @@ angular.module('testReporterApp')
           });
 
           var indexInSolr = function(testReport) {
-            console.log('Received test report', testReport.getHash());
+            console.log('Received test report', testReport.getHash(), testReport);
             var solrReport = [];
             var regexp = new RegExp('.*?\/testReport\/');
             testReport.cases.forEach(function(tc) {
@@ -51,11 +61,13 @@ angular.module('testReporterApp')
                     name: te.name,
                     className: te.className,
                     error: te.error,
-                    shortError: te.shortError,
+                    shortError: (te.error || '').split(/\n/)[0],
                     stderr: te.stderr,
                     stdout: te.stdout,
+                    view: tc.job.view,
+                    url: te.url,
                     errorStackTrace: te.errorStackTrace,
-                    time_to_live_s: '+1DAYS'
+                    time_to_live_s: '+1HOUR'
                   };
                   solrReport.push(document);
                 });
@@ -74,6 +86,7 @@ angular.module('testReporterApp')
               })
               .then(function (response) {
                 console.log("Indexed data in solr", response);
+                $scope.solrIndexed = true;
               });
 
 
@@ -117,10 +130,21 @@ angular.module('testReporterApp')
               dataset: view.allJobs
             });
 
-          $scope.$watch('jobSearch', function () {
-            $scope.tableParameters.filter({displayName: $scope.jobSearch});
+          $scope.$watch('search.jobSearch', function () {
+            $scope.tableParameters.filter({displayName: $scope.search.jobSearch});
+          });
+
+          $scope.$watch('search.testSearch', function (term) {
+            console.log("Searching for a term", term);
+            console.log($scope.testReport.testReportId);
+
+            SolrSearch.search({ error: term, testReportId: $scope.testReport.testReportId })
+              .then(function(results) {
+                $scope.search.testSearchResults = results.response.docs;
+              })
           });
         });
+
 
       $scope.assignErrorReport = function () {
         $scope.errorReport = $scope.testReport;

@@ -17,11 +17,15 @@
     ></div>
   </uib-tab>
 
-  <uib-tab index="1" heading="Errors" select="assignErrorReport()">
+  <uib-tab index="1" heading="Errors" select="assignErrorReport()" disable="!solrIndexed">
     <div error-report="errorReport"></div>
   </uib-tab>
 
   <uib-tab index="2" heading="Jobs">
+    <bloquote ng-if="search.jobSearch">Filtered by: <strong>{{ search.jobSearch }}</strong>, found: {{ tableParameters.total() }}</bloquote>
+
+    <p><input type="text" placeholder="Filter builds by name..." ng-model="search.jobSearch" class="form-control"></p>
+
     <table ng-table="tableParameters" class="table">
       <tr data-pass-rate="job.report.passRate" ng-repeat="job in $data">
         <td title="'View'"><span view-breadcrumbs="job.view"></span></td>
@@ -36,6 +40,23 @@
         <td title="'Test count'" sortable="'report.cases.length'">{{ job.report.cases.length }}</td>
 
         <td title="'Build Pass rate'" sortable="'passRate'">{{ job.passRate | percentage:0 }}</td>
+      </tr>
+    </table>
+  </uib-tab>
+
+  <uib-tab index="3" heading="Search" disable="!solrIndexed">
+    <p><input ng-model="search.testSearch" ng-model-options="{ debounce: 500 }" placeholder="Search for a test" class="form-control" /></p>
+
+    <p ng-if="search.testSearchResults">
+      Found {{ search.testSearchResults.length }} results for '{{ search.testSearch }}'.
+    </p>
+
+    <table class="table table-striped">
+      <tr ng-repeat="result in search.testSearchResults">
+        <td><span view-breadcrumbs="result.view"></span></td>
+        <td>{{ result.className }}</td>
+        <td><a href="{{ result.url }}" target="_blank">{{ result.name }}</a></td>
+        <td>{{ result.shortError }}</td>
       </tr>
     </table>
   </uib-tab>
