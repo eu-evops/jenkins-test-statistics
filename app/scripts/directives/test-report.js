@@ -43,7 +43,6 @@ angular.module('testReporterApp')
         $scope.showError = function (execution) {
           execution.showException = true;
           SolrSearch.getSimilarDocuments(execution).then(function (docs) {
-            console.log(docs);
             var dcs = [];
             docs.data.response.docs.forEach(function (doc) {
               if(dcs.length == 0) {

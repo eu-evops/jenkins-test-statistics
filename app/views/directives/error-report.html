@@ -12,7 +12,7 @@
 <div ng-if="errorDetails.length > 0">
   <table class="table" ng-table="tableParameters">
     <tr ng-repeat-start="details in errorDetails track by $index">
-      <td width="30px" title ="'Error'">{{details.error}}</td>
+      <td>{{details.error.substr(0, 100)}}</td>
       <td title="'Number'">{{details.affectedTests.length}}</td>
       <td title="'Links'">
         <a ng-href="#" ng-show="!showErrors" ng-click="showErrors = true">Expand</a>
@@ -21,17 +21,30 @@
     </tr>
     <tr ng-repeat-end ng-if="showErrors">
       <td colspan="8">
+        <h3>Error message</h3>
         <div>
-          <h4>There are {{details.affectedTests.length}} affected test cases in the test run</h4>
-          <ul>
+          <pre>{{ details.error }}</pre>
+        </div>
+
+        <p>Search automatically generated based on these terms: {{ details.interestingTerms.join(', ') }}</p>
+        <p>Link to SOLR query: <a href="{{ details.url }}" target="_blank">Solr Link</a></p>
+
+        <div>
+          <h4>There <ng-pluralize count="details.affectedTests.length" when="{ '0': 'are', '1': 'is', 'other': 'are' }" />
+             {{details.affectedTests.length}} affected test case<ng-pluralize count="details.affectedTests.length" when="{ '0': 's', '1': '', 'other': 's' }" /> in the test run</h4>
             <table class="table table-boardered table-striped table-response table-hover">
               <tr ng-repeat="test in details.affectedTests track by $index">
-                <td title="Index">{{$index+1}}</td>
-                <td title="Jenkins View"><a view-breadcrumbs="test.view">{{test.view}}</a></td>
-                <td><div title="Error: {{test.error}} Stack Trace: {{test.errorStackTrace}}"><a href="{{test.url}}">{{test.name}}</a></div></td>
+                <td title="Jenkins View">
+                  <a view-breadcrumbs="test.build.job.view">{{test.build.job.view}}</a></td>
+                <td>
+                  <div title="Error: {{test.error}} Stack Trace: {{test.errorStackTrace}}">
+                    <a href="{{test.url}}" target="_blank">{{test.name}}</a></div>
+                </td>
+                <td>
+                  {{ test.error.substr(0, 100)}}
+                </td>
               </tr>
             </table>
-          </ul>
         </div>
       </td>
     </tr>

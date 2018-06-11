@@ -11,6 +11,8 @@ var runSequence = require('run-sequence');
 var ngConstant = require('gulp-ng-constant');
 var browserSync = require('browser-sync').create();
 var history = require('connect-history-api-fallback');
+var express = require('express');
+var proxy = require('http-proxy');
 
 var yeoman = {
   app: require('./bower.json').appPath || 'app',
@@ -61,6 +63,11 @@ var styles = lazypipe()
 var jenkinsServers = process.env.JENKINS_SERVERS || 'http://localhost:8080/jenkins';
 jenkinsServers = jenkinsServers.split(/\s*,\s*/);
 
+var solrAddress = process.env.SOLR_ADDRESS || 'http://localhost:8983';
+var app = express();
+var proxy = proxy.createProxyServer({ target: solrAddress });
+
+
 gulp.task('config', function () {
     return ngConstant({
         name: 'testReporterApp',
@@ -105,6 +112,10 @@ gulp.task('start:client', ['start:server', 'styles'], function () {
   openURL('http://localhost:9000');
 });
 
+app.get('/solr/*', function(req, res) {
+  proxy.web(req, res);
+});
+
 gulp.task('start:server', function() {
   $.connect.server({
     root: [yeoman.app, '.tmp'],
@@ -113,6 +124,7 @@ gulp.task('start:server', function() {
     port: 9000,
     middleware: function(connect) {
         return [
+          app,
           connect().use('/bower_components', connect.static('bower_components')),
           connect().use('/node_modules', connect.static('node_modules')),
           history()

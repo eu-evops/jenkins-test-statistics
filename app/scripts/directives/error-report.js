@@ -12,7 +12,6 @@ angular.module('testReporterApp')
               if(!testReport) {
                 return;
               }
-
               var erroredExecutions = [];
               var errors = [];
               testReport.cases.forEach(function (tc) {
@@ -22,6 +21,7 @@ angular.module('testReporterApp')
                   }
                 });
               });
+
               var failingTest = erroredExecutions.shift();
               SolrSearch.getSimilarDocuments(failingTest)
                 .then(function _(response) {
