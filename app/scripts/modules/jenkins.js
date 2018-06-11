@@ -113,6 +113,7 @@
           }
         });
       });
+
     });
 
     this.passingTests = 0;
@@ -154,7 +155,32 @@
     this.failRate = this.failingTests / this.cases.length || 0;
     this.unstableRate = this.unstableTests / this.cases.length || 0;
     this.skippedRate = this.skippedTests / this.cases.length || 0;
+
+    this.testReportId = this.getHash();
+
+    var self = this;
+    this.cases.forEach(function(tc) {
+      tc.executions.forEach(function(te) {
+        te.testReportId = self.testReportId;
+      })
+    })
   }
+
+  TestReport.prototype.getHash = function() {
+    if(this.hash) {
+      return this.hash;
+    }
+
+    var hashString = "";
+    this.cases.forEach(function(tc) {
+      tc.executions.forEach(function (te) {
+        hashString += te.id;
+      })
+    });
+
+    this.hash = objectHash(hashString);
+    return this.hash;
+  };
 
   TestReport.prototype.numberPassingTimes = function (n) {
     var testsPassing = 0;

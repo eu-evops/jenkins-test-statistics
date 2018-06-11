@@ -38,6 +38,7 @@ angular.module('testReporterApp')
           });
 
           var indexInSolr = function(testReport) {
+            console.log('Received test report', testReport.getHash());
             var solrReport = [];
             var regexp = new RegExp('.*?\/testReport\/');
             testReport.cases.forEach(function(tc) {
@@ -46,25 +47,36 @@ angular.module('testReporterApp')
                 tc.executions.forEach(function (te) {
                   var document = {
                     id: te.id,
+                    testReportId: testReport.testReportId,
                     name: te.name,
                     className: te.className,
-                    error: (te.error || ''),
-                    shortError: (te.shortError || '').substr(0, 255),
-                    stderr: (te.stderr || ''),
-                    stdout: (te.stdout || '' ),
-                    errorStackTrace: (te.errorStackTrace || ''),
-                    buildUrl: tc.url.match(regexp)[0],
-                    appView: $scope.view.name,
+                    error: te.error,
+                    shortError: te.shortError,
+                    stderr: te.stderr,
+                    stdout: te.stdout,
+                    errorStackTrace: te.errorStackTrace,
                     time_to_live_s: '+1DAYS'
                   };
                   solrReport.push(document);
                 });
               }
             });
-            $http.post('http://localhost:8983/solr/stats/update?commit=true', solrReport)
+
+            $http.get('http://localhost:8983/solr/stats/select?q=testReportId:' + testReport.getHash())
               .then(function(response) {
-                console.log(response);
+                console.log('Have we indexed it already?', response.data.response.numFound);
+                if(response.data.response.numFound === 0) {
+                  return $http.post('http://localhost:8983/solr/stats/update?commit=true', solrReport)
+                    .then(function(response) {
+                      console.log(response);
+                    });
+                }
+              })
+              .then(function (response) {
+                console.log("Indexed data in solr", response);
               });
+
+
             console.log("Indexing in solr", solrReport);
           };
 
