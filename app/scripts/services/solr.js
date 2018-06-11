@@ -1,25 +1,45 @@
 'use strict';
 
 angular.module('testReporterApp')
-  .service('SolrSearch', ['$http', function (http) {
+  .service('SolrSearch', ['$http', '$httpParamSerializer', function (http, httpParamSerializer) {
 
+    this.search = function(parameters) {
+      console.log("Searching for", parameters);
+      var url = 'http://localhost:8983/solr/stats/select?';
+      url += httpParamSerializer({
+        q: 'error:' + parameters.error.replace(/"/g, '\\"').split(/\s+/).map(function(el) { return '"' + el + '"'}).join(" AND ") + ' AND testReportId:' + parameters.testReportId,
+        rows: 9999
+      });
 
-    this.getSimilarDocs = function (ids) {
-      var url = "http://localhost:8983/solr/stats/mlt?q=id:\""+id+"\"&mlt=true&mlt.fl=error" +
-        "&mlt.mindf=1&mlt.mintf=1&mlt.minwl=1&mlt.maxqt=1000&mlt.count=3" +
-        "&mlt.interestingTerms=details&mlt.match.include=false&wt=json&mlt.maxwl=50";
       return http.get(url)
-        .then(function (response) {
+        .then(function(response) {
           return response.data;
         });
     };
 
-    this.getSimilarDocuments = function (execution) {
-      var url = "http://localhost:8983/solr/stats/mlt?q=id:\""+execution.id+"\"&mlt=true&mlt.fl=error" +
-        "&mlt.mindf=1&mlt.mintf=1&mlt.minwl=1&mlt.maxqt=1000&mlt.count=3" +
-        "&mlt.interestingTerms=details&mlt.match.include=false&wt=json&mlt.maxwl=50";
+    this.getSimilarDocuments = function (test) {
+
+      var query = {
+        q: "id:\""+test.id+"\"",
+        mlt: true,
+        "mlt.fl": "error",
+        "mlt.mindf":1,
+        "mlt.mintf":1,
+        "mlt.minwl":5,
+        "mlt.maxqt":30,
+        // "fl": "id",
+        "mlt.interestingTerms":"details",
+        "mlt.match.include":false,
+        "wt": "json",
+        "mlt.maxwl":50,
+        "rows":9999,
+        "fq": "testReportId:" + test.testReportId
+      };
+
+      var url = "http://localhost:8983/solr/stats/mlt?" + httpParamSerializer(query);
+
       return http.get(url).then(function (data) {
-        return data.data;
+        return { test: test, data: data.data, url: url,view:test.view };
       });
     };
 

@@ -45,12 +45,12 @@
             </td>
             <td title="'Links'">
               <a ng-href="{{ case.url }}" target="_blank">Test History</a>
-              <a ng-if="case.executions[case.executions.length-1].error && !case.executions[case.executions.length-1].showException" ng-href="#" ng-click="showError(case.executions[case.executions.length-1])">Show error</a>
-              <a ng-if="case.executions[case.executions.length-1].error && case.executions[case.executions.length-1].showException"
-                 ng-href="#" ng-click="case.executions[case.executions.length-1].showException = false">Collapse</a>
+              <a ng-if="case.executions[0].error && !case.executions[0].showException" ng-href="#" ng-click="showError(case.executions[0])">Show error</a>
+              <a ng-if="case.executions[0].error && case.executions[0].showException"
+                 ng-href="#" ng-click="case.executions[0].showException = false">Collapse</a>
             </td>
           </tr>
-          <tr ng-repeat-end ng-if="case.executions[case.executions.length-1].showException">
+          <tr ng-repeat-end ng-if="case.executions[0].showException">
             <td colspan="8">
               <h3>Exception</h3>
               <pre>{{ case.executions[0].error }}</pre>
@@ -73,8 +73,8 @@
                   <table class="table table-boardered table-striped table-response table-hover">
                     <tr ng-repeat="test in testNames track by $index">
                       <td title="Index">{{$index+1}}</td>
-                      <td title="Jenkins View"><a view-breadcrumbs="test.appView">{{test.appView}}</a></td>
-                      <td><div title="Error {{test.error}}  Stack Trace  {{test.errorStackTrace}}"><a href="{{test.buildUrl}}">{{test.name}}</a></div></td>
+                      <td title="Jenkins View"><a view-breadcrumbs="test.view">{{test.view}}</a></td>
+                      <td><div title="Error: {{test.error}}  Stack Trace:  {{test.errorStackTrace}}"><a href="{{test.url}}">{{test.name}}</a></div></td>
                     </tr>
                   </table>
                 </ul>

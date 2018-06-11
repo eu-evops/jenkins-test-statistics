@@ -9,13 +9,23 @@
  */
 angular.module('testReporterApp')
   .controller('ViewCtrl', [
-    '$scope', 'jenkins', 'NgTableParams', 'FileSaver', 'Blob', '$rootScope', '$filter', '$stateParams', '$http','$q',
-    function ($scope, jenkins, NgTableParams, FileSaver, Blob, $rootScope, $filter, $stateParams, $http,$q) {
+    '$scope', 'jenkins', 'NgTableParams', 'FileSaver', 'Blob', '$rootScope', '$filter', '$stateParams', '$http','$q', 'SolrSearch',
+    function ($scope, jenkins, NgTableParams, FileSaver, Blob, $rootScope, $filter, $stateParams, $http, $q, SolrSearch) {
       var percentageFilter = $filter('percentage');
 
       $scope.view = {
         name: $stateParams.view
       };
+
+      $scope.search = {
+        jobSearch: '',
+        testSearch: '',
+        errorSearch: ''
+      };
+
+      $scope.testSearch = "";
+      $scope.solrIndexed = false;
+
 
       $scope.$on('jenkins-report', function (event, downloadProgress) {
         $scope.downloadProgress = downloadProgress;
@@ -38,6 +48,7 @@ angular.module('testReporterApp')
           });
 
           var indexInSolr = function(testReport) {
+            console.log('Received test report', testReport.getHash(), testReport);
             var solrReport = [];
             var regexp = new RegExp('.*?\/testReport\/');
             testReport.cases.forEach(function(tc) {
@@ -46,24 +57,33 @@ angular.module('testReporterApp')
                 tc.executions.forEach(function (te) {
                   var document = {
                     id: te.id,
+                    testReportId: testReport.testReportId,
                     name: te.name,
                     className: te.className,
-                    error: (te.error || ''),
-                    shortError: (te.shortError || '').substr(0, 255),
-                    stderr: (te.stderr || ''),
-                    stdout: (te.stdout || '' ),
-                    errorStackTrace: (te.errorStackTrace || ''),
-                    buildUrl: tc.url.match(regexp)[0],
-                    appView: $scope.view.name,
-                    time_to_live_s: '+1DAYS'
+                    error: te.error,
+                    shortError: (te.error || '').split(/\n/)[0],
+                    stderr: te.stderr,
+                    stdout: te.stdout,
+                    view: tc.job.view,
+                    url: te.url,
+                    errorStackTrace: te.errorStackTrace,
+                    time_to_live_s: '+1HOUR'
                   };
                   solrReport.push(document);
                 });
               }
             });
-            $http.post('http://localhost:8983/solr/stats/update?commit=true', solrReport)
+
+            $http.get('http://localhost:8983/solr/stats/select?q=testReportId:' + testReport.getHash())
               .then(function(response) {
-                console.log(response);
+                console.log('Have we indexed it already?', response.data.response.numFound);
+                if(response.data.response.numFound === 0) {
+                  return SolrSearch.indexData(solrReport);
+                }
+              })
+              .then(function (response) {
+                console.log("Indexed data in solr", response);
+                $scope.solrIndexed = true;
               });
             console.log("Indexing in solr", solrReport);
           };
@@ -105,10 +125,18 @@ angular.module('testReporterApp')
               dataset: view.allJobs
             });
 
-          $scope.$watch('jobSearch', function () {
-            $scope.tableParameters.filter({displayName: $scope.jobSearch});
+          $scope.$watch('search.jobSearch', function () {
+            $scope.tableParameters.filter({displayName: $scope.search.jobSearch});
+          });
+
+          $scope.$watch('search.testSearch', function (term) {
+            SolrSearch.search({ error: term, testReportId: $scope.testReport.testReportId })
+              .then(function(results) {
+                $scope.search.testSearchResults = results.response.docs;
+              })
           });
         });
+
 
       $scope.assignErrorReport = function () {
         $scope.errorReport = $scope.testReport;

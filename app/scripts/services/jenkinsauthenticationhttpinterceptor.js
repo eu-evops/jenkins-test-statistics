@@ -11,6 +11,7 @@ angular.module('testReporterApp')
   .service('JenkinsAuthenticationHttpInterceptor', ['$base64', 'configuration', function (base64, configuration) {
 
     this.request = function (config) {
+      // If request for SOLR ignore jenkins auth
       if(config.url.indexOf('solr') !== -1) {
         return config;
       }

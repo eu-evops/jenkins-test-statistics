@@ -23,7 +23,7 @@ services:
      - "8983:8983"
     volumes:
       - data:/opt/solr/server/solr/stats
-      - $PWD/solr_docker/solrconfig:/solrconfig
+      - $PWD/solrconfig:/solrconfig
     entrypoint:
       - solr-precreate
       - stats
