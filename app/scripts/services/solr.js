@@ -32,6 +32,7 @@ angular.module('testReporterApp')
         "mlt.mintf":1,
         "mlt.minwl":5,
         "mlt.maxqt":30,
+        "fl": "id",
         "mlt.interestingTerms":"details",
         "mlt.match.include":false,
         "wt": "json",

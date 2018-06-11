@@ -29,7 +29,7 @@ angular.module('testReporterApp')
                     error: response.test.error,
                     interestingTerms: response.data.interestingTerms,
                     url: response.url,
-                    affectedTests: []
+                    affectedTests: [response.test]
                   };
                   var docs = response.data.response.docs;
 
@@ -44,10 +44,9 @@ angular.module('testReporterApp')
                     });
 
                     if(match !== -1) {
-                      erroredExecutions.splice(match, 1);
-                      error.affectedTests.push(doc);
+                      error.affectedTests.push(erroredExecutions.splice(match, 1)[0]);
                     }
-                  })
+                  });
 
                   errors.push(error);
                   var nextError = erroredExecutions.shift();
