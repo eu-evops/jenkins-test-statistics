@@ -28,7 +28,7 @@
     return hash;
   };
 
-  function testCaseUrlName(name) {
+  function testUrlName(name) {
     return name.replace(/\s/g, '_').replace(/[^a-zA-Z\d]/g, '_');
   }
 
@@ -49,7 +49,7 @@
     var packageName = urlComps.splice(0, urlComps.length - 1).join('.') || '(root)';
     var className = urlComps[urlComps.length - 1];
 
-    this.url = this.build.url + 'testReport/' + packageName + '/' + className + "/" + testCaseUrlName(this.execution.name);
+    this.url = this.build.url + 'testReport/' + packageName + '/' + className.replace(/\//g, '_') + "/" + testUrlName(this.execution.name);
     this.passing = (this.execution.status === 'PASSED' || this.execution.status === 'FIXED');
     this.skipped = this.execution.status === 'SKIPPED';
   }
@@ -58,13 +58,13 @@
     this.job = job;
     this.name = testCase.name;
     this.className = testCase.className;
-    this.urlName = testCaseUrlName(this.name);
+    this.urlName = testUrlName(this.name);
 
     var urlComps = testCase.className.split('.');
     var packageName = urlComps.splice(0, urlComps.length - 1).join('.') || '(root)';
     var className = urlComps[urlComps.length - 1];
 
-    this.url = build.url + "testReport/" + packageName + "/" + className + "/" + this.urlName + "/history/";
+    this.url = build.url + "testReport/" + packageName + "/" + className.replace(/\//g, '_') + "/" + this.urlName + "/history/";
     this.build = build;
     this.executions = [];
 
