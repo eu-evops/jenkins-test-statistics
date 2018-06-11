@@ -10,17 +10,26 @@
 </div>
 
 <div ng-if="errorDetails.length > 0">
-  <table class="table" ng-table="tableParameters">
+  <h2>Error report</h2>
+
+  <p>This view presents to list of errors grouped by the error message. The grouping is done using Apache Lucene's
+  index and we're using feature called More Like This. The results are not perfect but should give you an indicate
+  of the impact of a particular error. We recommend you use the search feature to complement this view when doing
+  test results analysis.</p>
+
+  <p>There are {{ errorDetails.length }} types of errors in the table below.</p>
+
+  <table class="table testErrorsTable" ng-table="tableParameters">
     <tr ng-repeat-start="details in errorDetails track by $index">
-      <td>{{details.error.substr(0, 100)}}</td>
-      <td title="'Number'">{{details.affectedTests.length}}</td>
+      <td title="'Error message'">{{details.error.substr(0, 200)}}</td>
+      <td title="'# of affected tests'">{{details.affectedTests.length}}</td>
       <td title="'Links'">
         <a ng-href="#" ng-show="!showErrors" ng-click="showErrors = true">Expand</a>
         <a ng-href="#" ng-show="showErrors" ng-click="showErrors = false">Collapse</a>
       </td>
     </tr>
     <tr ng-repeat-end ng-if="showErrors">
-      <td colspan="8">
+      <td colspan="8" class="details">
         <h3>Error message</h3>
         <div>
           <pre>{{ details.error }}</pre>
@@ -41,11 +50,15 @@
                     <a href="{{test.url}}" target="_blank">{{test.name}}</a></div>
                 </td>
                 <td>
-                  {{ test.error.substr(0, 100)}}
+                  {{ test.error.substr(0, 200)}}
                 </td>
               </tr>
             </table>
         </div>
+
+        <p>
+          <a ng-href="#" ng-click="showErrors = false">Collapse</a>
+        </p>
       </td>
     </tr>
   </table>

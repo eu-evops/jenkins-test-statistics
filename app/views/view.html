@@ -51,13 +51,24 @@
       Found {{ search.testSearchResults.length }} results for '{{ search.testSearch }}'.
     </p>
 
-    <table class="table table-striped">
-      <tr ng-repeat="result in search.testSearchResults">
-        <td><span view-breadcrumbs="result.view"></span></td>
-        <td>{{ result.className }}</td>
-        <td><a href="{{ result.url }}" target="_blank">{{ result.name }}</a></td>
-        <td>{{ result.shortError }}</td>
-      </tr>
-    </table>
+    <div ng-if="search.testSearchResults">
+      <h3>Breakdown per Jenkins view:</h3>
+      <table class="table">
+        <tr ng-repeat="(v, n) in search.facet_fields.view">
+          <td><span view-breadcrumbs="v"></span></td>
+          <td>{{ n }}</td>
+        </tr>
+      </table>
+
+      <h3>Affected tests</h3>
+      <table class="table table-striped">
+        <tr ng-repeat="result in search.testSearchResults">
+          <td><span view-breadcrumbs="result.view"></span></td>
+          <td>{{ result.className }}</td>
+          <td><a href="{{ result.url }}" target="_blank">{{ result.name }}</a></td>
+          <td>{{ result.shortError }}</td>
+        </tr>
+      </table>
+    </div>
   </uib-tab>
 </uib-tabset>

@@ -8,6 +8,11 @@ angular.module('testReporterApp')
       var url = '/solr/stats/select?';
       url += httpParamSerializer({
         q: 'error:' + parameters.error.replace(/"/g, '\\"').split(/\s+/).map(function(el) { return '"' + el + '"'}).join(" AND ") + ' AND testReportId:' + parameters.testReportId,
+        facet: true,
+        "facet.field": 'view',
+        "facet.mincount": 1,
+        "fq": 'testReportId:' + parameters.testReportId,
+        "json.nl": "map",
         rows: 9999
       });
 

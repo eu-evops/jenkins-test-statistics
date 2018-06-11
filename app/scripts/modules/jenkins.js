@@ -29,7 +29,7 @@
   };
 
   function testCaseUrlName(name) {
-    return name.replace(/\s+/g, '_').replace(/[^a-zA-Z\d]/g, '_');
+    return name.replace(/\s/g, '_').replace(/[^a-zA-Z\d]/g, '_');
   }
 
   function TestCaseExecution(execution, build) {

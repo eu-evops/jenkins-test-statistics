@@ -195,7 +195,11 @@ body {
 }
 
 
-table[ng-table=testTableParameters] {
+table[ng-table=testTableParameters], table.testErrorsTable {
+  td.details {
+    background-color: aliceblue;
+  }
+
   td {
     max-width: 200px;
     overflow: scroll;
