@@ -63,6 +63,11 @@ var styles = lazypipe()
 var jenkinsServers = process.env.JENKINS_SERVERS || 'http://localhost:8080/jenkins';
 jenkinsServers = jenkinsServers.split(/\s*,\s*/);
 
+var solrAddress = process.env.SOLR_ADDRESS || 'http://localhost:8983';
+var app = express();
+var proxy = proxy.createProxyServer({ target: solrAddress });
+
+
 gulp.task('config', function () {
     return ngConstant({
         name: 'testReporterApp',
@@ -106,9 +111,6 @@ gulp.task('clean:tmp', function (cb) {
 gulp.task('start:client', ['start:server', 'styles'], function () {
   openURL('http://localhost:9000');
 });
-
-var app = express();
-var proxy = proxy.createProxyServer({ target: 'http://localhost:8983'});
 
 app.get('/solr/*', function(req, res) {
   proxy.web(req, res);
