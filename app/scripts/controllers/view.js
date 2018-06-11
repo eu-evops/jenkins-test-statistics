@@ -74,11 +74,12 @@ angular.module('testReporterApp')
               }
             });
 
-            $http.get('http://localhost:8983/solr/stats/select?q=testReportId:' + testReport.getHash())
+
+            $http.get('/solr/stats/select?q=testReportId:' + testReport.getHash())
               .then(function(response) {
                 console.log('Have we indexed it already?', response.data.response.numFound);
                 if(response.data.response.numFound === 0) {
-                  return $http.post('http://localhost:8983/solr/stats/update?commit=true', solrReport)
+                  return $http.post('/solr/stats/update?commit=true', solrReport)
                     .then(function(response) {
                       console.log(response);
                     });

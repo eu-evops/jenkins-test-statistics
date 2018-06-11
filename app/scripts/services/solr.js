@@ -5,7 +5,7 @@ angular.module('testReporterApp')
 
     this.search = function(parameters) {
       console.log("Searching for", parameters);
-      var url = 'http://localhost:8983/solr/stats/select?';
+      var url = '/solr/stats/select?';
       url += httpParamSerializer({
         q: 'error:' + parameters.error.replace(/"/g, '\\"').split(/\s+/).map(function(el) { return '"' + el + '"'}).join(" AND ") + ' AND testReportId:' + parameters.testReportId,
         rows: 9999
@@ -36,7 +36,7 @@ angular.module('testReporterApp')
         "fq": "testReportId:" + test.testReportId
       };
 
-      var url = "http://localhost:8983/solr/stats/mlt?" + httpParamSerializer(query);
+      var url = "/solr/stats/mlt?" + httpParamSerializer(query);
 
       return http.get(url).then(function (data) {
         return { test: test, data: data.data, url: url };
@@ -44,7 +44,7 @@ angular.module('testReporterApp')
     };
 
     this.indexData = function (data) {
-      return http.post('http://localhost:8983/solr/stats/update?commit=true', data)
+      return http.post('/solr/stats/update?commit=true', data)
         .then(function(response) {
           return response;
         });
