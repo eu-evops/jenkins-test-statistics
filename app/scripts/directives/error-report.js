@@ -34,11 +34,6 @@ angular.module('testReporterApp')
                   var docs = response.data.response.docs;
 
                   docs.forEach(function (doc) {
-
-                    if(doc.id == response.test.id) {
-                      error.affectedTests.push(doc);
-                    }
-
                     var match = erroredExecutions.findIndex(function(te) {
                       return te.id == doc.id;
                     });
