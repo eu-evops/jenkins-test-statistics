@@ -49,7 +49,7 @@
     var packageName = urlComps.splice(0, urlComps.length - 1).join('.') || '(root)';
     var className = urlComps[urlComps.length - 1];
 
-    this.url = this.build.url + 'testReport/' + packageName + '/' + className.replace(/\//g, '_') + "/" + testUrlName(this.execution.name);
+    this.url = this.build.url + 'testReport/' + packageName + '/' + className.replace(/\//g, '_').replace(/^$/, '(empty)') + "/" + testUrlName(this.execution.name);
     this.passing = (this.execution.status === 'PASSED' || this.execution.status === 'FIXED');
     this.skipped = this.execution.status === 'SKIPPED';
   }
@@ -64,7 +64,7 @@
     var packageName = urlComps.splice(0, urlComps.length - 1).join('.') || '(root)';
     var className = urlComps[urlComps.length - 1];
 
-    this.url = build.url + "testReport/" + packageName + "/" + className.replace(/\//g, '_') + "/" + this.urlName + "/history/";
+    this.url = build.url + "testReport/" + packageName + "/" + className.replace(/\//g, '_').replace(/^$/, '(empty)') + "/" + this.urlName + "/history/";
     this.build = build;
     this.executions = [];
 
@@ -89,6 +89,7 @@
 
   function TestReport(buildsWithTestReports) {
     var self = this;
+    this.executions = {};
     this.cases = [];
     buildsWithTestReports = buildsWithTestReports || [];
 
@@ -102,6 +103,8 @@
         suite.cases.forEach(function (testCase) {
           var tc = new TestCase(testCase, build, build.job);
           var tce = new TestCaseExecution(testCase, build);
+
+          self.executions[tce.id] = tce;
 
           if (testCaseMapping[tc.mapping()]) {
             var previousTC = testCaseMapping[tc.mapping()];
@@ -165,6 +168,10 @@
       })
     })
   }
+
+  TestReport.prototype.getExecution = function (id) {
+    return this.executions[id];
+  };
 
   TestReport.prototype.getHash = function() {
     if(this.hash) {

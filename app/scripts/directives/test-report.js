@@ -42,19 +42,14 @@ angular.module('testReporterApp')
 
         $scope.showError = function (execution) {
           execution.showException = true;
-          SolrSearch.getSimilarDocuments(execution).then(function (docs) {
+
+          SolrSearch.getSimilarDocuments(execution).then(function (response) {
             var dcs = [];
-            docs.data.response.docs.forEach(function (doc) {
-              if(dcs.length == 0) {
-                dcs.push(doc);
-              } else {
-                if(dcs.find(function (d) {
-                  return d.name === doc.name;
-                }) == null){
-                  dcs.push(doc);
-                }
-              }
+            response.data.response.docs.forEach(function (doc) {
+
+              dcs.push($scope.testReport.getExecution(doc.id));
             });
+
             $scope.testNames = dcs;
           });
         };
@@ -74,7 +69,7 @@ angular.module('testReporterApp')
             }).join(",");
           }).join("\n");
 
-          var header = "Job, Test Suite,Test Name,Number of executions,Passing count,Pass rate,Jenkins Test history URL";
+          var header = "Job, Test Suite,Test Name,Number of testExecutions,Passing count,Pass rate,Jenkins Test history URL";
           var exportBlob = new Blob([header + "\n" + tcs], {type: 'text/csv'});
           FileSaver.saveAs(exportBlob, "TestReport.csv");
         };

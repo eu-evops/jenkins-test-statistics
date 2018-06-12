@@ -63,18 +63,20 @@
                 <pre>{{ case.executions[0].stderr}}</pre>
               </div>
 
-              <div ng-if="case.executions[0].stdout">
-                <h3>Standard output</h3>
-                <pre>{{ case.executions[0].stdout}}</pre>
-              </div>
               <div>
                 <h4>There are {{testNames.length}} tests in the test run</h4>
                 <ul>
                   <table class="table table-boardered table-striped table-response table-hover">
                     <tr ng-repeat="test in testNames track by $index">
                       <td title="Index">{{$index+1}}</td>
-                      <td title="Jenkins View"><a view-breadcrumbs="test.view">{{test.view}}</a></td>
-                      <td><div title="Error: {{test.error}}  Stack Trace:  {{test.errorStackTrace}}"><a href="{{test.url}}">{{test.name}}</a></div></td>
+                      <td title="Jenkins View"><span view-breadcrumbs="test.build.job.view"></span></td>
+                      <td title="Job"><a href="{{ test.build.url }}" target="_blank">{{ test.build.job.displayName }} #{{ test.build.number }}</a></td>
+                      <td>
+                        <div title="Error: {{test.error}}  Stack Trace:  {{test.errorStackTrace}}">
+                          <a href="{{test.url}}" target="_blank">{{test.name}}</a>
+                        </div>
+                      </td>
+                      <td>{{ test.error.substr(0, 200) }}</td>
                     </tr>
                   </table>
                 </ul>

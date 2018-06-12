@@ -134,7 +134,9 @@ angular.module('testReporterApp')
           $scope.$watch('search.testSearch', function (term) {
             SolrSearch.search({ error: term, testReportId: $scope.testReport.testReportId })
               .then(function(results) {
-                $scope.search.testSearchResults = results.response.docs;
+                $scope.search.testSearchResults = results.response.docs.map(function (doc) {
+                  return $scope.testReport.getExecution(doc.id);
+                });
                 $scope.search.facet_fields = results.facet_counts.facet_fields;
               })
           });
