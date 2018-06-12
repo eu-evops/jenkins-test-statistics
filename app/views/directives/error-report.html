@@ -13,9 +13,9 @@
   <h2>Error report</h2>
 
   <p>This view presents to list of errors grouped by the error message. The grouping is done using Apache Lucene's
-  index and we're using feature called More Like This. The results are not perfect but should give you an indicate
-  of the impact of a particular error. We recommend you use the search feature to complement this view when doing
-  test results analysis.</p>
+    index and we're using feature called More Like This. The results are not perfect but should give you an indicate
+    of the impact of a particular error. We recommend you use the search feature to complement this view when doing
+    test results analysis.</p>
 
   <p>There are {{ errorDetails.length }} types of errors in the table below.</p>
 
@@ -39,21 +39,42 @@
         <p>Link to SOLR query: <a href="{{ details.url }}" target="_blank">Solr Link</a></p>
 
         <div>
-          <h4>There <ng-pluralize count="details.affectedTests.length" when="{ '0': 'are', '1': 'is', 'other': 'are' }" />
-             {{details.affectedTests.length}} affected test case<ng-pluralize count="details.affectedTests.length" when="{ '0': 's', '1': '', 'other': 's' }" /> in the test run</h4>
-            <table class="table table-boardered table-striped table-response table-hover">
-              <tr ng-repeat="test in details.affectedTests track by $index">
-                <td title="Jenkins View">
-                  <a view-breadcrumbs="test.build.job.view">{{test.build.job.view}}</a></td>
-                <td>
-                  <div title="Error: {{test.error}} Stack Trace: {{test.errorStackTrace}}">
-                    <a href="{{test.url}}" target="_blank">{{test.name}}</a></div>
-                </td>
-                <td>
-                  {{ test.error.substr(0, 200)}}
-                </td>
-              </tr>
-            </table>
+          <h4>There
+            <ng-pluralize count="details.affectedTests.length" when="{ '0': 'are', '1': 'is', 'other': 'are' }"/>
+            {{details.affectedTests.length}} affected test case
+            <ng-pluralize count="details.affectedTests.length" when="{ '0': 's', '1': '', 'other': 's' }"/>
+            in the test run
+          </h4>
+          <table class="table table-boardered table-striped table-response table-hover">
+            <thead>
+            <tr>
+              <th>Jenkins view</th>
+              <th>Job</th>
+              <th>Suite</th>
+              <th>Test</th>
+              <th>Error</th>
+            </tr>
+            </thead>
+            <tbody>
+
+            <tr ng-repeat="test in details.affectedTests track by $index">
+              <td title="Jenkins View">
+                <a view-breadcrumbs="test.build.job.view">{{test.build.job.view}}</a>
+              </td>
+              <td>
+                <a href="{{ test.build.url}}">{{ test.build.job.displayName }} #{{ test.build.number }}</a>
+              </td>
+              <td>{{ test.className }}</td>
+              <td>
+                <div title="Error: {{test.error}} Stack Trace: {{test.errorStackTrace}}">
+                  <a href="{{test.url}}" target="_blank">{{test.name}}</a></div>
+              </td>
+              <td>
+                {{ test.error.substr(0, 200)}}
+              </td>
+            </tr>
+            </tbody>
+          </table>
         </div>
 
         <p>
