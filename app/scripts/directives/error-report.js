@@ -54,6 +54,8 @@ angular.module('testReporterApp')
                   $rootScope.$broadcast('error-report', errors);
                   $scope.errorDetails = errors.sort(function (a, b) {
                     return b.affectedTests.length - a.affectedTests.length;
+                  }).filter(function (e) {
+                    return e.affectedTests.length > 1;
                   });
                 });
           });
