@@ -414,7 +414,7 @@
   <field name="buildUrl" type="strings" multiValued="false"/>
   <field name="className" type="strings" multiValued="false" termVectors="true"/>
   <field name="error" type="text_general" multiValued="false" termVectors="true"/>
-  <field name="shortError" type="strings" multiValued="false" termVectors="true"/>
+  <field name="shortError" type="text_general" multiValued="false" termVectors="true"/>
   <field name="errorStackTrace" type="text_general" multiValued="false" termVectors="true"/>
   <field name="id" type="string" multiValued="false" indexed="true" required="true" stored="true"/>
   <field name="name" type="strings" multiValued="false" termVectors="true"/>

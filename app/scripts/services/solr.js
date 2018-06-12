@@ -27,16 +27,16 @@ angular.module('testReporterApp')
       var query = {
         q: "id:\""+test.id+"\"",
         mlt: true,
-        "mlt.fl": "error",
+        "mlt.fl": "shortError",
         "mlt.mindf":1,
         "mlt.mintf":1,
         "mlt.minwl":5,
-        "mlt.maxqt":30,
+        "mlt.maxqt":100,
         "fl": "id",
         "mlt.interestingTerms":"details",
         "mlt.match.include":false,
         "wt": "json",
-        "mlt.maxwl":50,
+        "mlt.maxwl":100,
         "rows":9999,
         "fq": "testReportId:" + test.testReportId
       };
