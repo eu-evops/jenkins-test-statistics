@@ -43,7 +43,7 @@
     this.duration = execution.duration;
     this.build = build;
     //
-    this.id = (build.url + this.className + this.name).hashCode();
+    this.id = (build.url + this.className + this.name + execution.duration.toString()).hashCode();
 
     var urlComps = this.execution.className.split('.');
     var packageName = urlComps.splice(0, urlComps.length - 1).join('.') || '(root)';
