@@ -38,44 +38,7 @@
         <p>Search automatically generated based on these terms: {{ details.interestingTerms.join(', ') }}</p>
         <p>Link to SOLR query: <a href="{{ details.url }}" target="_blank">Solr Link</a></p>
 
-        <div>
-          <h4>There
-            <ng-pluralize count="details.affectedTests.length" when="{ '0': 'are', '1': 'is', 'other': 'are' }"/>
-            {{details.affectedTests.length}} affected test case
-            <ng-pluralize count="details.affectedTests.length" when="{ '0': 's', '1': '', 'other': 's' }"/>
-            in the test run
-          </h4>
-          <table class="table table-boardered table-striped table-response table-hover">
-            <thead>
-            <tr>
-              <th>Jenkins view</th>
-              <th>Job</th>
-              <th>Suite</th>
-              <th>Test</th>
-              <th>Error</th>
-            </tr>
-            </thead>
-            <tbody>
-
-            <tr ng-repeat="test in details.affectedTests track by $index">
-              <td title="Jenkins View">
-                <a view-breadcrumbs="test.build.job.view">{{test.build.job.view}}</a>
-              </td>
-              <td>
-                <a href="{{ test.build.url}}">{{ test.build.job.displayName }} #{{ test.build.number }}</a>
-              </td>
-              <td>{{ test.className }}</td>
-              <td>
-                <div title="Error: {{test.error}} Stack Trace: {{test.errorStackTrace}}">
-                  <a href="{{test.url}}" target="_blank">{{test.name}}</a></div>
-              </td>
-              <td>
-                {{ test.error.substr(0, 200)}}
-              </td>
-            </tr>
-            </tbody>
-          </table>
-        </div>
+        <test-report-table tests="details.affectedTests"></test-report-table>
 
         <p>
           <a ng-href="#" ng-click="showErrors = false">Collapse</a>

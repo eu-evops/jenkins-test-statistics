@@ -71,28 +71,31 @@
         </tr>
       </table>
 
-      <h3>Affected tests</h3>
-      <table class="table table-striped">
-        <thead>
-        <tr>
-          <th>View</th>
-          <th>Job</th>
-          <th>Suite</th>
-          <th>Test</th>
-          <th>Error</th>
-        </tr>
-        </thead>
-        <tbody>
+      <test-report-table tests="search.testSearchResults"></test-report-table>
 
-        <tr ng-repeat="result in search.testSearchResults">
-          <td><span view-breadcrumbs="result.build.job.view"></span></td>
-          <td title="Job"><a href="{{ result.build.url }}" target="_blank">{{ result.build.job.displayName }} #{{ result.build.number }}</a></td>
-          <td>{{ result.className }}</td>
-          <td><a href="{{ result.url }}" target="_blank">{{ result.name }}</a></td>
-          <td>{{ result.error.substr(0, 200) }}</td>
-        </tr>
-        </tbody>
-      </table>
+      <!---->
+      <!--<h3>Affected tests</h3>-->
+      <!--<table class="table table-striped">-->
+        <!--<thead>-->
+        <!--<tr>-->
+          <!--<th>View</th>-->
+          <!--<th>Job</th>-->
+          <!--<th>Suite</th>-->
+          <!--<th>Test</th>-->
+          <!--<th>Error</th>-->
+        <!--</tr>-->
+        <!--</thead>-->
+        <!--<tbody>-->
+
+        <!--<tr ng-repeat="result in search.testSearchResults">-->
+          <!--<td><span view-breadcrumbs="result.build.job.view"></span></td>-->
+          <!--<td title="Job"><a href="{{ result.build.url }}" target="_blank">{{ result.build.job.displayName }} #{{ result.build.number }}</a></td>-->
+          <!--<td>{{ result.className }}</td>-->
+          <!--<td><a href="{{ result.url }}" target="_blank">{{ result.name }}</a></td>-->
+          <!--<td>{{ result.error.substr(0, 200) }}</td>-->
+        <!--</tr>-->
+        <!--</tbody>-->
+      <!--</table>-->
     </div>
   </uib-tab>
 </uib-tabset>

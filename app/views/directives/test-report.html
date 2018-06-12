@@ -55,38 +55,7 @@
                 <h3>Standard error</h3>
                 <pre>{{ case.executions[0].stderr}}</pre>
               </div>
-
-              <div>
-                <h4>There are {{testNames.length}} tests in the test run</h4>
-                <ul>
-                  <table class="table table-boardered table-striped table-response table-hover">
-                    <thead>
-                      <tr>
-                        <th>Index</th>
-                        <th>View</th>
-                        <th>Job</th>
-                        <th>Suite</th>
-                        <th>Test</th>
-                        <th>Error</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                    <tr ng-repeat="test in testNames track by $index">
-                      <td title="Index">{{$index+1}}</td>
-                      <td title="Jenkins View"><span view-breadcrumbs="test.build.job.view"></span></td>
-                      <td title="Job"><a href="{{ test.build.url }}" target="_blank">{{ test.build.job.displayName }} #{{ test.build.number }}</a></td>
-                      <td title="Suite">{{ test.className }}</td>
-                      <td>
-                        <div title="Error: {{test.error}}  Stack Trace:  {{test.errorStackTrace}}">
-                          <a href="{{test.url}}" target="_blank">{{test.name}}</a>
-                        </div>
-                      </td>
-                      <td>{{ test.error.substr(0, 200) }}</td>
-                    </tr>
-                    </tbody>
-                  </table>
-                </ul>
-              </div>
+              <test-report-table tests="testNames"></test-report-table>
             </td>
           </tr>
         </table>
