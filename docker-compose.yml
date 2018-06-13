@@ -18,15 +18,12 @@ services:
       - /app/bower_components
 
   solr:
-    image: solr
     ports:
-     - "8983:8983"
-    volumes:
-      - data:/opt/solr/server/solr/stats
-      - $PWD/solrconfig:/solrconfig
+      - 8983:8983
+    build:
+      context: ./solrconfig
     entrypoint:
+      - docker-entrypoint.sh
       - solr-precreate
       - stats
-      - /solrconfig
-  volumes:
-    data:
+      - /tmp/stats
