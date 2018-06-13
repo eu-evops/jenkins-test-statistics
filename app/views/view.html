@@ -5,10 +5,10 @@
   <div class="panel-body">
     <p>Number of jobs in view: {{ view.allJobs.length }}</p>
     <p ng-if="testReport.cases">Number of tests: {{ testReport.cases.length }}</p>
-    <p ng-if="testReport.passRate">Pass rate: {{ testReport.passRate | percentage:0 }}</p>
-    <p ng-if="testReport.failRate">Fail rate: {{ testReport.failRate | percentage:0 }}</p>
-    <p ng-if="testReport.skippedRate">Skipped rate: {{ testReport.skippedRate | percentage:0 }}</p>
-    <p ng-if="testReport.unstableRate">Unstable rate: {{ testReport.unstableRate | percentage:0 }}</p>
+    <p ng-if="testReport.passRate">Pass rate: {{ testReport.passRate | percentage:0 }}  - {{ testReport.passingTests }} tests</p>
+    <p ng-if="testReport.failRate">Fail rate: {{ testReport.failRate | percentage:0 }} - {{ testReport.failingTests }} tests</p>
+    <p ng-if="testReport.skippedRate">Skipped rate: {{ testReport.skippedRate | percentage:0 }} - {{ testReport.skippedTests }} tests</p>
+    <p ng-if="testReport.unstableRate">Unstable rate: {{ testReport.unstableRate | percentage:0 }} - {{ testReport.unstableTests }} tests</p>
   </div>
 </div>
 

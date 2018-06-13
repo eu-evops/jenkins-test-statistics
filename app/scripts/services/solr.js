@@ -31,12 +31,12 @@ angular.module('testReporterApp')
         "mlt.mindf":1,
         "mlt.mintf":1,
         "mlt.minwl":5,
-        "mlt.maxqt":100,
+        "mlt.maxqt":5,
         "fl": "id",
         "mlt.interestingTerms":"details",
         "mlt.match.include":false,
         "wt": "json",
-        "mlt.maxwl":100,
+        "mlt.maxwl":255,
         "rows":9999,
         "fq": "testReportId:" + test.testReportId
       };

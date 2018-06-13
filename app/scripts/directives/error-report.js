@@ -57,6 +57,17 @@ angular.module('testReporterApp')
                   }).filter(function (e) {
                     return e.affectedTests.length > 1;
                   });
+
+                  $scope.ungroupedTests = errors.sort(function (a, b) {
+                    return b.affectedTests.length - a.affectedTests.length;
+                  }).filter(function (e) {
+                    return e.affectedTests.length === 1;
+                  });
+
+                  $scope.errorDetails.sumOfAffectedTests = $scope.errorDetails.reduce(function(start, current) {
+                    start += current.affectedTests.length;
+                    return start;
+                  }, 0)
                 });
           });
         }

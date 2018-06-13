@@ -410,20 +410,20 @@
   <field name="_root_" type="string" docValues="false" indexed="true" stored="false"/>
   <field name="_text_" type="text_general" multiValued="true" indexed="true" stored="false"/>
   <field name="_version_" type="long" indexed="false" stored="false"/>
-  <field name="appView" type="strings" multiValued="false"/>
-  <field name="buildUrl" type="strings" multiValued="false"/>
-  <field name="className" type="strings" multiValued="false" termVectors="true"/>
-  <field name="error" type="text_general" multiValued="false" termVectors="true"/>
-  <field name="shortError" type="text_general" multiValued="false" termVectors="true"/>
-  <field name="errorStackTrace" type="text_general" multiValued="false" termVectors="true"/>
-  <field name="id" type="string" multiValued="false" indexed="true" required="true" stored="true"/>
-  <field name="name" type="strings" multiValued="false" termVectors="true"/>
-  <field name="stderr" type="text_general" multiValued="false" termVectors="true"/>
-  <field name="stdout" type="text_general" multiValued="false" termVectors="true"/>
-  <field name="time_to_live_s" type="strings" multiValued="false"/>
-  <field name="url" type="strings" multiValued="false"/>
-  <field name="view" type="strings" multiValued="false"/>
-  <field name="testReportId" type="strings" multiValued="false"/>
+  <field name="appView" type="string" />
+  <field name="buildUrl" type="string" />
+  <field name="className" type="string" termVectors="true"/>
+  <field name="error" type="text_en" termVectors="true"/>
+  <field name="shortError" type="string" multiValued="false" />
+  <field name="errorStackTrace" type="text_en" termVectors="true"/>
+  <field name="id" type="string" indexed="true" required="true" stored="true"/>
+  <field name="name" type="string" termVectors="true"/>
+  <field name="stderr" type="text_en" termVectors="true"/>
+  <field name="stdout" type="text_en" termVectors="true"/>
+  <field name="time_to_live_s" type="string" />
+  <field name="url" type="string" />
+  <field name="view" type="string" />
+  <field name="testReportId" type="string" />
   <dynamicField name="*_txt_en_split_tight" type="text_en_splitting_tight" indexed="true" stored="true"/>
   <dynamicField name="*_descendent_path" type="descendent_path" indexed="true" stored="true"/>
   <dynamicField name="*_ancestor_path" type="ancestor_path" indexed="true" stored="true"/>
