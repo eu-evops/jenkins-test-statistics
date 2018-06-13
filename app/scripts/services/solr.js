@@ -48,6 +48,13 @@ angular.module('testReporterApp')
       });
     };
 
+    this.selectByTestReportId = function (testReportId) {
+      return http.get('/solr/stats/select?q=testReportId:' + testReportId)
+        .then(function(response) {
+          return response;
+        });
+    };
+
     this.indexData = function (data) {
       return http.post('/solr/stats/update?commit=true', data)
         .then(function(response) {
