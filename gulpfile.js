@@ -174,11 +174,14 @@ gulp.task('serve', function (cb) {
     'watch', cb);
 });
 
-gulp.task('serve:prod', ['config:prod'], function() {
+gulp.task('serve:prod', ['config:prod', 'build'], function() {
   $.connect.server({
     root: [yeoman.dist],
     livereload: false,
-    port: 9000
+    port: 9000,
+    middleware: function () {
+      return [app];
+    }
   });
 });
 

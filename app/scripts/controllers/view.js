@@ -48,9 +48,7 @@ angular.module('testReporterApp')
           });
 
           var indexInSolr = function(testReport) {
-            console.log('Received test report', testReport.getHash(), testReport);
             var solrReport = [];
-            var regexp = new RegExp('.*?\/testReport\/');
             testReport.cases.forEach(function(tc) {
               //index only failures
               if(tc.status !== 'Passed') {
@@ -67,27 +65,22 @@ angular.module('testReporterApp')
                     view: tc.job.view,
                     url: te.url,
                     errorStackTrace: te.errorStackTrace,
-                    time_to_live_s: '+1HOUR'
+                    time_to_live_s: '+1DAYS'
                   };
                   solrReport.push(document);
                 });
               }
             });
 
-            $http.get('/solr/stats/select?q=testReportId:' + testReport.getHash())
+            SolrSearch.selectByTestReportId(testReport.getHash())
               .then(function(response) {
-                console.log('Have we indexed it already?', response.data.response.numFound);
                 if(response.data.response.numFound === 0) {
                   return SolrSearch.indexData(solrReport);
                 }
               })
               .then(function (response) {
-                console.log("Indexed data in solr", response);
                 $scope.solrIndexed = true;
               });
-
-
-            console.log("Indexing in solr", solrReport);
           };
 
           jenkins.testReport(allBuilds)

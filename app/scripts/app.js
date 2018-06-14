@@ -29,8 +29,6 @@ angular
     localStorageServiceProvider.setPrefix('testReporter');
   }])
   .config(['$httpProvider', function ($httpProvider) {
-    $httpProvider.defaults.useXDomain = true;
-    delete $httpProvider.defaults.headers.common['X-Requested-With'];
     $httpProvider.interceptors.push('JenkinsAuthenticationHttpInterceptor');
   }])
   .config(function ($stateProvider, $locationProvider) {
