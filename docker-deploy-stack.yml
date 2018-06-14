@@ -1,0 +1,19 @@
+version: "3"
+
+services:
+  app:
+    image: evops/jenkins-test-statistics:latest
+    deploy:
+      replicas: 2
+    environment:
+       - SOLR_ADDRESS=http://solr:8983
+    ports:
+      - 9000:9000
+
+  solr:
+    image: evops/jenkins-test-statistics:solr-latest
+    entrypoint:
+      - docker-entrypoint.sh
+      - solr-precreate
+      - stats
+      - /tmp/stats
