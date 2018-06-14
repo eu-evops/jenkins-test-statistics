@@ -9,8 +9,8 @@
  */
 angular.module('testReporterApp')
   .controller('LoginCtrl', [
-    '$scope', '$rootScope', 'jenkins', 'localStorageService', 'configuration', 'ngTableParams', 'jenkinsServers', '$location',
-    function ($scope, $rootScope, jenkins, storage, configuration, ngTableParams, jenkinsServers, $location) {
+    '$scope', '$rootScope', 'jenkins', 'localStorageService', 'configuration', 'jenkinsServers', '$location',
+    function ($scope, $rootScope, jenkins, storage, configuration, jenkinsServers, $location) {
 
       $scope.jenkins = configuration.get('jenkins') || {
           server: jenkinsServers[0]
@@ -26,16 +26,17 @@ angular.module('testReporterApp')
         jenkins.baseUrl = $scope.jenkins.server;
 
         $scope.authenticating = true;
-        console.log($scope.jenkins.server);
+
         jenkins.login($scope.jenkins.username, $scope.jenkins.token, $scope.jenkins.server)
-          .then(function () {
+          .then(function (jenkinsConfiguration) {
             $rootScope.authenticated = $scope.authenticated = true;
-            $rootScope.jenkins = $scope.jenkins;
-            configuration.set('jenkins', $scope.jenkins);
+            $rootScope.jenkins = $scope.jenkins = jenkinsConfiguration;
+
             var destination = '/';
             if ($rootScope.redirectTo) {
               destination = $rootScope.redirectTo;
             }
+
             $location.path(destination);
           })
           .catch(function () {

@@ -10,9 +10,20 @@ networks:
 services:
   app:
     build: .
+    environment:
+       - SOLR_ADDRESS=http://solr:8983
     ports:
       - 9000:9000
     volumes:
       - .:/app
       - /app/node_modules
       - /app/bower_components
+
+  solr:
+    build:
+      context: ./solrconfig
+    entrypoint:
+      - docker-entrypoint.sh
+      - solr-precreate
+      - stats
+      - /tmp/stats

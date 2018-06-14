@@ -193,3 +193,26 @@ body {
     border-bottom: 0;
   }
 }
+
+
+table[ng-table=testTableParameters], table.testErrorsTable {
+  td.details {
+    background-color: aliceblue;
+  }
+
+  td {
+    max-width: 200px;
+    overflow: scroll;
+    -ms-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+  }
+
+  td[data-title-text='Suite'] {
+    direction: rtl;
+  }
+
+  pre {
+    white-space: pre-wrap;
+  }
+}
+

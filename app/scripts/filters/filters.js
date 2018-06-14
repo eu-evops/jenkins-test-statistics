@@ -36,7 +36,6 @@ angular.module('testReporterApp')
             str += item[prop];
           }
         }
-        console.log(str);
         return r.test(str);
       });
     };
@@ -57,6 +56,6 @@ angular.module('testReporterApp')
       return input.split(/\/?view\/?/).map(function(item) {
         return item.replace('/', '').replace(/^$/, 'Home');
       }).join(" / ");
-    }
+    };
   })
 ;

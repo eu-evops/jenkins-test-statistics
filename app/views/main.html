@@ -6,7 +6,7 @@
   <div class="message">Loading jenkins views...</div>
 </div>
 <div ng-show="jenkinsViews">
-  <h2>Jenkins views </h2>
+  <h2>Jenkins views ({{ jenkinsViews.length }})</h2>
   <bloquote ng-if="search">Filtered by: <strong>{{ search }}</strong>, found: {{ tableParameters.total() }}</bloquote>
   <p>Select jenkins view on which you want to report</p>
   <p><input type="text" ng-model="search" class="form-control" placeholder="Filter builds by name..." autofocus="true"></p>
@@ -14,10 +14,9 @@
   <table class="table table-bordered table-responsive table-striped" ng-table="tableParameters">
     <tr ng-repeat="view in $data" data-pass-rate="view.passRate">
       <td title="'View Name'" sortable="'fullName'">
-        <a ng-href="#/views{{ view.relativeUrl }}">{{ view.fullName }}</a>
+        <a ui-sref="view({ view: view.relativeUrl })">{{ view.fullName }}</a>
       </td>
       <td title="'Number of jobs'" sortable="'allJobs.length'">{{ view.allJobs.length }}</td>
-      <td title="'Job pass rate'" sortable="'passRate'">{{ view.passRate | percentage:0 }}</td>
     </tr>
   </table>
 </div>

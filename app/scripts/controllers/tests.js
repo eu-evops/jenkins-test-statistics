@@ -9,14 +9,13 @@
  */
 angular.module('testReporterApp')
   .controller('TestsCtrl', [
-    '$scope', '$routeParams', 'jenkins', 'ngTableParams',
-    function ($scope, route, jenkins, NgTableParams) {
-      $scope.job = route.job;
+    '$scope', '$stateParams', 'jenkins', 'NgTableParams',
+    function ($scope, $stateParams, jenkins, NgTableParams) {
+      $scope.job = $stateParams.job;
       var job;
 
-      $scope.progress = 0;
-      $scope.$on('jenkins-report', function (event, progress) {
-        $scope.progress = progress;
+      $scope.$on('jenkins-report', function (event, downloadProgress) {
+        $scope.downloadProgress = downloadProgress;
       });
 
       jenkins.job($scope.job)
@@ -47,11 +46,11 @@ angular.module('testReporterApp')
               }
             },
             {
-              data: $scope.testReport.cases
+              dataset: $scope.testReport.cases
             });
 
           $scope.$watch('testSearch', function () {
-            $scope.testTableParameters.filter({name: $scope.testSearch});
+            $scope.testTableParameters.filter({name: $scope.testSearch });
           });
         });
     }]);

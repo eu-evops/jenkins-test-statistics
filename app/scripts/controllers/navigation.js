@@ -16,8 +16,8 @@ angular.module('testReporterApp')
   .controller('NavigationCtrl', function ($location) {
     this.menus = [
       { name: 'Home', route: '/' },
-      { name: 'About', route: '/about' },
-      { name: 'Settings', route: '/settings' }
+      { name: 'About', route: 'about' },
+      { name: 'Settings', route: 'settings' }
     ];
 
     this.active = function(item) {

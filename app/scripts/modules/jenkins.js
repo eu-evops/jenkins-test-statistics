@@ -17,15 +17,42 @@
 (function (window, angular) {
   'use strict';
 
-  function testCaseUrlName(name) {
-    return name.replace(/\s+/g, '_').replace(/[^a-zA-Z\d]/g, '_');
+  String.prototype.hashCode = function() {
+    var hash = 0, i, chr;
+    if (this.length === 0) return hash;
+    for (i = 0; i < this.length; i++) {
+      chr   = this.charCodeAt(i);
+      hash  = ((hash << 5) - hash) + chr;
+      hash |= 0; // Convert to 32bit integer
+    }
+    return hash;
+  };
+
+  function testUrlName(name) {
+    return name.replace(/\s/g, '_').replace(/[^a-zA-Z\d]/g, '_');
+  }
+
+  function testReportUrl(buildUrl, packageName, className, urlName) {
+    return buildUrl + 'testReport/' + packageName + '/' + className.replace(/\//g, '_').replace(/^$/, '(empty)') + "/" + testUrlName(urlName);
   }
 
   function TestCaseExecution(execution, build) {
+    this.name = execution.name;
+    this.className = execution.className;
     this.execution = execution;
+    this.error = execution.errorDetails || execution.stderr;
+    this.errorStackTrace = execution.errorStackTrace;
+    this.stderr = execution.stderr;
+    this.stdout = execution.stdout;
     this.duration = execution.duration;
     this.build = build;
-    this.url = this.build.url + 'testReport/(root)/' + this.execution.className + "/" + testCaseUrlName(this.execution.name);
+    this.id = (build.url + this.className + this.name + execution.duration.toString()).hashCode();
+
+    var urlComps = this.execution.className.split('.');
+    var packageName = urlComps.splice(0, urlComps.length - 1).join('.') || '(root)';
+    var className = urlComps[urlComps.length - 1];
+
+    this.url = testReportUrl(this.build.url, packageName , className, this.execution.name);
     this.passing = (this.execution.status === 'PASSED' || this.execution.status === 'FIXED');
     this.skipped = this.execution.status === 'SKIPPED';
   }
@@ -34,8 +61,13 @@
     this.job = job;
     this.name = testCase.name;
     this.className = testCase.className;
-    this.urlName = testCaseUrlName(this.name);
-    this.url = build.url + "testReport/(root)/" + this.className + "/" + this.urlName + "/history/";
+    this.urlName = testUrlName(this.name);
+
+    var urlComps = testCase.className.split('.');
+    var packageName = urlComps.splice(0, urlComps.length - 1).join('.') || '(root)';
+    var className = urlComps[urlComps.length - 1];
+
+    this.url = testReportUrl(build.url, packageName , className, this.name)+ "/history/";
     this.build = build;
     this.executions = [];
 
@@ -55,17 +87,18 @@
 
     this.addExecution = function (tce) {
       this.executions.push(tce);
-    }
+    };
   }
 
-  function TestReport(builds) {
+  function TestReport(buildsWithTestReports) {
     var self = this;
+    this.executions = {};
     this.cases = [];
-    builds = builds || [];
+    buildsWithTestReports = buildsWithTestReports || [];
 
     var testCaseMapping = {};
 
-    builds.forEach(function (build) {
+    buildsWithTestReports.forEach(function (build) {
       if (!build || !build.report || !build.report.suites) {
         return;
       }
@@ -73,6 +106,8 @@
         suite.cases.forEach(function (testCase) {
           var tc = new TestCase(testCase, build, build.job);
           var tce = new TestCaseExecution(testCase, build);
+
+          self.executions[tce.id] = tce;
 
           if (testCaseMapping[tc.mapping()]) {
             var previousTC = testCaseMapping[tc.mapping()];
@@ -84,6 +119,7 @@
           }
         });
       });
+
     });
 
     this.passingTests = 0;
@@ -92,26 +128,30 @@
     this.skippedTests = 0;
 
     this.cases.forEach(function (testCase) {
-      testCase.passing = testCase.executions.every(function(e) { return e.passing });
+      testCase.passing = testCase.executions.every(function (e) {
+        return e.passing;
+      });
 
       // Only check latest executions
       testCase.skipped = testCase.executions[0].skipped;
-      testCase.failing = testCase.executions.every(function(e) { return !e.passing && !e.skipped });
+      testCase.failing = testCase.executions.every(function (e) {
+        return !e.passing && !e.skipped;
+      });
       testCase.unstable = !testCase.passing && !testCase.failing && !testCase.skipped;
 
-      if(testCase.passing) {
+      if (testCase.passing) {
         testCase.status = 'Passed';
         self.passingTests += 1;
       }
-      if(testCase.skipped) {
+      if (testCase.skipped) {
         testCase.status = 'Skipped';
         self.skippedTests += 1;
       }
-      if(testCase.failing) {
+      if (testCase.failing) {
         testCase.status = 'Failed';
         self.failingTests += 1;
       }
-      if(testCase.unstable) {
+      if (testCase.unstable) {
         testCase.status = 'Unstable';
         self.unstableTests += 1;
       }
@@ -121,26 +161,61 @@
     this.failRate = this.failingTests / this.cases.length || 0;
     this.unstableRate = this.unstableTests / this.cases.length || 0;
     this.skippedRate = this.skippedTests / this.cases.length || 0;
+
+    this.testReportId = this.getHash();
+
+    var self = this;
+    this.cases.forEach(function(tc) {
+      tc.executions.forEach(function(te) {
+        te.testReportId = self.testReportId;
+      })
+    })
   }
+
+  TestReport.prototype.getExecution = function (id) {
+    return this.executions[id];
+  };
+
+  TestReport.prototype.getHash = function() {
+    if(this.hash) {
+      return this.hash;
+    }
+
+    var hashString = "";
+    this.cases.forEach(function(tc) {
+      tc.executions.forEach(function (te) {
+        hashString += te.id;
+      })
+    });
+
+    this.hash = objectHash(hashString);
+    return this.hash;
+  };
 
   TestReport.prototype.numberPassingTimes = function (n) {
     var testsPassing = 0;
     this.cases.forEach(function (testCase) {
-      var numberPassing = testCase.executions.filter(function(execution) {
-          return execution.passing;
-        }).length;
+      var numberPassing = testCase.executions.filter(function (execution) {
+        return execution.passing;
+      }).length;
 
-      if(numberPassing === testCase.executions.length || numberPassing > n - 1) {
+      if (numberPassing === testCase.executions.length || numberPassing > n - 1) {
         testsPassing += 1;
       }
     });
     return testsPassing;
-  }
+  };
 
   TestReport.prototype.passRatePassingTimes = function (n) {
     return this.numberPassingTimes(n) / this.cases.length || 0;
   };
 
+  var sanitiseBuild = function (build) {
+    build.aborted = build.result === 'ABORTED';
+    build.passing = !build.aborted && build.result !== 'FAILURE' && build.result !== 'UNSTABLE';
+
+    return build;
+  };
 
   var sanitiseJob = function (job, view) {
     job.report = new TestReport();
@@ -167,13 +242,6 @@
     }
 
     return job;
-  };
-
-  var sanitiseBuild = function (build) {
-    build.aborted = build.result === 'ABORTED';
-    build.passing = !build.aborted && build.result !== 'FAILURE' && build.result != 'UNSTABLE';
-
-    return build;
   };
 
   var jenkins = angular.module('Jenkins', ['LocalStorageModule', 'base64', 'Configuration']);
@@ -209,41 +277,64 @@
               }
             })
               .then(function (response) {
-                var match = response.data.match('name=._\.apiToken. value=["\']?([^"\']+)["\']?');
-                if (match) {
-                  jenkinsConfiguration.token = match[1];
+                var tokenMatch = response.data.match('name=._\.apiToken..*?value=["\']?([^"\']+)["\']?');
+                if (tokenMatch) {
+                  jenkinsConfiguration.token = tokenMatch[1];
                   jenkinsConfiguration.username = user;
-                  configuration.set('jenkins', jenkinsConfiguration);
                 }
+
+                var userMatch = response.data.match('name=._\.fullName..*?value="(.*?)"');
+                if (userMatch) {
+                  jenkinsConfiguration.name = userMatch[1];
+                }
+
+                var emailMatch = response.data.match('name=.email.address..*?value="(.*?)"');
+                if (emailMatch) {
+                  jenkinsConfiguration.email = emailMatch[1];
+                }
+
+                configuration.set('jenkins', jenkinsConfiguration);
+                return jenkinsConfiguration;
               });
           };
 
-          var getAllJobsRecursive = function (node) {
+          var getAllJobsRecursive = function (view, parentPath) {
             var jobs = [];
+            view.jobs = view.jobs || [];
 
-            node.jobs.forEach(function (j) {
-              jobs.push(sanitiseJob(j, node));
+            view.jobs.forEach(function (j) {
+              jobs.push(sanitiseJob(j, parentPath));
             });
 
-            if (node.views) {
+            if (view.views) {
               // TODO Fix recursion
-              node.views.forEach(function (v) {
-                getAllJobsRecursive(v).forEach(function (sj) {
+              view.views.forEach(function (v) {
+                getAllJobsRecursive(v, parentPath + '/view/' + v.name).forEach(function (sj) {
                   jobs.push(sj);
                 });
               });
             }
 
+            view.allJobs = view.allJobs || jobs;
             return jobs;
           };
 
-          var sanitiseView = function (view, viewName) {
-            view.name = viewName;
-            view.passRate = null;
-            view.allJobs = getAllJobsRecursive(view);
+          /**
+           * Flattens the view structure associating each
+           * job with it's view path
+           * @param view
+           * @param viewPath
+           * @returns {*}
+           */
+          var sanitiseView = function (view, viewPath) {
+            var sanitisedView = {};
 
-            if (view.allJobs && view.allJobs.length > 0) {
-              var sumPassRate = view.allJobs
+            sanitisedView.name = viewPath;
+            sanitisedView.passRate = null;
+            sanitisedView.allJobs = getAllJobsRecursive(view, viewPath);
+
+            if (sanitisedView.allJobs && sanitisedView.allJobs.length > 0) {
+              var sumPassRate = sanitisedView.allJobs
                 .filter(function (j) {
                   return j.passRate !== null;
                 })
@@ -253,18 +344,18 @@
                   return a + b;
                 }, 0);
 
-              view.passRate = sumPassRate / view.allJobs.filter(function (j) {
-                  return j.passRate !== null;
-                }).length || null;
+              sanitisedView.passRate = sumPassRate / sanitisedView.allJobs.filter(function (j) {
+                return j.passRate !== null;
+              }).length || null;
             }
 
-            return view;
+            return sanitisedView;
           };
 
           var generateFullViewName = function (v) {
             var n = v.name;
             var p = v.parent;
-            while (p != null && p.name !== undefined) {
+            while (p !== null && p.name !== undefined) {
               n = p.name + ' -> ' + n;
               p = p.parent;
             }
@@ -278,7 +369,7 @@
             }
 
             var views = [];
-            sanitiseView(jenkinsView, jenkinsView.name);
+            sanitiseView(jenkinsView, jenkinsView.name || "");
 
             jenkinsView.parent = parent;
             jenkinsView.fullName = generateFullViewName(jenkinsView);
@@ -337,7 +428,7 @@
             angular.forEach(grouping, function (group) {
               group.forEach(function (build) {
                 promises.push(
-                  http.get(build.url + '/testReport/api/json?tree=failCount,passCount,skipCount,suites[cases[className,duration,name,skipped,status]]')
+                  http.get(build.url + '/testReport/api/json?tree=failCount,passCount,skipCount,suites[cases[className,duration,name,skipped,status,stderr,stdout,errorDetails,errorStackTrace]]')
                     .then(function (response) {
                       // Store jenkins test report under report key
                       build.report = response.data;
@@ -352,8 +443,7 @@
 
                       return build;
                     })
-                    .catch(function (error) {
-                      console.error('Error generating report', error)
+                    .catch(function () {
                       build.report = {
                         numberOfTests: 0,
                         passRate: null,
@@ -364,8 +454,14 @@
                     })
                     .finally(function (build) {
                       processedBuilds++;
-                      var progress = processedBuilds / allBuilds * 100;
-                      $rootScope.$broadcast('jenkins-report', progress);
+                      var progress = Math.ceil(processedBuilds / allBuilds * 100);
+                      if(progress % 10 === 0) {
+                        $rootScope.$broadcast('jenkins-report', {
+                          progress: progress,
+                          processed: processedBuilds,
+                          total: allBuilds
+                        });
+                      }
                       return build;
                     })
                 );
@@ -382,15 +478,16 @@
             return '{,' + $rootScope.numberOfRecentBuilds + '}';
           };
 
-          var getViews = function () {
-            return http.get(getConf().url + '/api/json?depth=100&tree=' + recursiveTreeCall(5, ['name', 'url', 'jobs[displayName,name,builds[result]' + getNumberOfBuilds() + ']']))
+          var getAllViews = function () {
+            return http.get(getConf().url + '/api/json?tree=' + recursiveTreeCall(5, ['name', 'url', 'jobs[name]']))
               .then(function (response) {
                 return flattenViews(response.data);
               });
           };
 
           var getView = function (view) {
-            return http.get(getConf().url + '/' + view + '/api/json?depth=3&tree=' + recursiveTreeCall(10, ['jobs[name,displayName,builds[name,result,number,url]' + getNumberOfBuilds() + ']']))
+            var treeCallParameters = recursiveTreeCall(10, ['name,jobs[name,displayName,builds[name,result,number,url]' + getNumberOfBuilds() + ']']);
+            return http.get(getConf().url + '/' + view + '/api/json?depth=3&tree=' + treeCallParameters)
               .then(function (response) {
                 return sanitiseView(response.data, view);
               });
@@ -421,7 +518,7 @@
 
           return {
             login: login,
-            views: getViews,
+            getAllViews: getAllViews,
             view: getView,
             job: getJob,
             builds: getBuilds,
