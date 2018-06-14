@@ -28,8 +28,12 @@
     return hash;
   };
 
-  function testCaseUrlName(name) {
-    return name.replace(/\s+/g, '_').replace(/[^a-zA-Z\d]/g, '_');
+  function testUrlName(name) {
+    return name.replace(/\s/g, '_').replace(/[^a-zA-Z\d]/g, '_');
+  }
+
+  function testReportUrl(buildUrl, packageName, className, urlName) {
+    return buildUrl + 'testReport/' + packageName + '/' + className.replace(/\//g, '_').replace(/^$/, '(empty)') + "/" + testUrlName(urlName);
   }
 
   function TestCaseExecution(execution, build) {
@@ -42,14 +46,13 @@
     this.stdout = execution.stdout;
     this.duration = execution.duration;
     this.build = build;
-    //
-    this.id = (build.url + this.className + this.name).hashCode();
+    this.id = (build.url + this.className + this.name + execution.duration.toString()).hashCode();
 
     var urlComps = this.execution.className.split('.');
     var packageName = urlComps.splice(0, urlComps.length - 1).join('.') || '(root)';
     var className = urlComps[urlComps.length - 1];
 
-    this.url = this.build.url + 'testReport/' + packageName + '/' + className + "/" + testCaseUrlName(this.execution.name);
+    this.url = testReportUrl(this.build.url, packageName , className, this.execution.name);
     this.passing = (this.execution.status === 'PASSED' || this.execution.status === 'FIXED');
     this.skipped = this.execution.status === 'SKIPPED';
   }
@@ -58,13 +61,13 @@
     this.job = job;
     this.name = testCase.name;
     this.className = testCase.className;
-    this.urlName = testCaseUrlName(this.name);
+    this.urlName = testUrlName(this.name);
 
     var urlComps = testCase.className.split('.');
     var packageName = urlComps.splice(0, urlComps.length - 1).join('.') || '(root)';
     var className = urlComps[urlComps.length - 1];
 
-    this.url = build.url + "testReport/" + packageName + "/" + className + "/" + this.urlName + "/history/";
+    this.url = testReportUrl(build.url, packageName , className, this.name)+ "/history/";
     this.build = build;
     this.executions = [];
 
@@ -89,6 +92,7 @@
 
   function TestReport(buildsWithTestReports) {
     var self = this;
+    this.executions = {};
     this.cases = [];
     buildsWithTestReports = buildsWithTestReports || [];
 
@@ -103,6 +107,8 @@
           var tc = new TestCase(testCase, build, build.job);
           var tce = new TestCaseExecution(testCase, build);
 
+          self.executions[tce.id] = tce;
+
           if (testCaseMapping[tc.mapping()]) {
             var previousTC = testCaseMapping[tc.mapping()];
             previousTC.addExecution(tce);
@@ -113,6 +119,7 @@
           }
         });
       });
+
     });
 
     this.passingTests = 0;
@@ -154,7 +161,36 @@
     this.failRate = this.failingTests / this.cases.length || 0;
     this.unstableRate = this.unstableTests / this.cases.length || 0;
     this.skippedRate = this.skippedTests / this.cases.length || 0;
+
+    this.testReportId = this.getHash();
+
+    var self = this;
+    this.cases.forEach(function(tc) {
+      tc.executions.forEach(function(te) {
+        te.testReportId = self.testReportId;
+      })
+    })
   }
+
+  TestReport.prototype.getExecution = function (id) {
+    return this.executions[id];
+  };
+
+  TestReport.prototype.getHash = function() {
+    if(this.hash) {
+      return this.hash;
+    }
+
+    var hashString = "";
+    this.cases.forEach(function(tc) {
+      tc.executions.forEach(function (te) {
+        hashString += te.id;
+      })
+    });
+
+    this.hash = objectHash(hashString);
+    return this.hash;
+  };
 
   TestReport.prototype.numberPassingTimes = function (n) {
     var testsPassing = 0;

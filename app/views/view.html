@@ -4,38 +4,74 @@
   <div class="panel-heading">Statistics</div>
   <div class="panel-body">
     <p>Number of jobs in view: {{ view.allJobs.length }}</p>
-    <p>Build pass rate: {{ view.passRate | percentage:0 }}</p>
+    <p ng-if="testReport.cases">Number of tests: {{ testReport.cases.length }}</p>
+    <p ng-if="testReport.passRate">Pass rate: {{ testReport.passRate | percentage:0 }}  - {{ testReport.passingTests }} tests</p>
+    <p ng-if="testReport.failRate">Fail rate: {{ testReport.failRate | percentage:0 }} - {{ testReport.failingTests }} tests</p>
+    <p ng-if="testReport.skippedRate">Skipped rate: {{ testReport.skippedRate | percentage:0 }} - {{ testReport.skippedTests }} tests</p>
+    <p ng-if="testReport.unstableRate">Unstable rate: {{ testReport.unstableRate | percentage:0 }} - {{ testReport.unstableTests }} tests</p>
   </div>
 </div>
 
+<div ng-show="!solrIndexed && testReport.cases.length > 0">
+  <div class="spinner">
+    <div class="dot1"></div>
+    <div class="dot2"></div>
+  </div>
+  <div class="message">Storing the test reports... This can take quite some time</div>
+</div>
 
-<div test-report="testReport"
-     test-report-summary="testReportSummary"
-></div>
+<uib-tabset active="activeForm">
 
+  <uib-tab index="0" heading="Tests">
+    <div test-report="testReport"
+         test-report-summary="testReportSummary"
+    ></div>
+  </uib-tab>
 
-<h2>Jobs</h2>
-<bloquote ng-if="jobSearch">Filtered by: <strong>{{ jobSearch }}</strong>, found: {{ tableParameters.total() }}</bloquote>
+  <uib-tab index="1" heading="Errors" select="assignErrorReport()" disable="!solrIndexed">
+    <div error-report="errorReport"></div>
+  </uib-tab>
 
-<p><input type="text" placeholder="Filter builds by name..." ng-model="jobSearch" class="form-control"></p>
+  <uib-tab index="2" heading="Jobs">
+    <bloquote ng-if="search.jobSearch">Filtered by: <strong>{{ search.jobSearch }}</strong>, found: {{ tableParameters.total() }}</bloquote>
 
+    <p><input type="text" placeholder="Filter builds by name..." ng-model="search.jobSearch" class="form-control"></p>
 
-<table ng-table="tableParameters" class="table">
+    <table ng-table="tableParameters" class="table">
+      <tr data-pass-rate="job.report.passRate" ng-repeat="job in $data">
+        <td title="'View'"><span view-breadcrumbs="job.view"></span></td>
+        <td title="'Name'" sortable="'displayName'"><a ui-sref="tests({ job: job.name })">{{
+          job.displayName }}</a></td>
+        <td title="'Number of builds'" sortable="'builds.length'">{{ job.builds.length }}</td>
 
+        <td title="'Test pass rate'" sortable="'report.passRate'">{{ job.report.passRate | percentage }}</td>
+        <td title="'Unstable rate'" sortable="'report.unstableRate'">{{ job.report.unstableRate | percentage }}</td>
+        <td title="'Fail rate'" sortable="'report.failRate'">{{ job.report.failRate | percentage }}</td>
+        <td title="'Skip rate'" sortable="'report.skippedRate'">{{ job.report.skippedRate | percentage }}</td>
+        <td title="'Test count'" sortable="'report.cases.length'">{{ job.report.cases.length }}</td>
 
+        <td title="'Build Pass rate'" sortable="'passRate'">{{ job.passRate | percentage:0 }}</td>
+      </tr>
+    </table>
+  </uib-tab>
 
-  <tr data-pass-rate="job.report.passRate" ng-repeat="job in $data">
-    <td title="'View'"><span view-breadcrumbs="job.view"></span></td>
-    <td title="'Name'" sortable="'displayName'"><a ui-sref="tests({ job: job.name })">{{
-      job.displayName }}</a></td>
-    <td title="'Number of builds'" sortable="'builds.length'">{{ job.builds.length }}</td>
+  <uib-tab index="3" heading="Search" disable="!solrIndexed">
+    <p><input ng-model="search.testSearch" ng-model-options="{ debounce: 500 }" placeholder="Search for a test" class="form-control" /></p>
 
-    <td title="'Test pass rate'" sortable="'report.passRate'">{{ job.report.passRate | percentage }}</td>
-    <td title="'Unstable rate'" sortable="'report.unstableRate'">{{ job.report.unstableRate | percentage }}</td>
-    <td title="'Fail rate'" sortable="'report.failRate'">{{ job.report.failRate | percentage }}</td>
-    <td title="'Skip rate'" sortable="'report.skippedRate'">{{ job.report.skippedRate | percentage }}</td>
-    <td title="'Test count'" sortable="'report.cases.length'">{{ job.report.cases.length }}</td>
+    <p ng-if="search.testSearchResults">
+      Found {{ search.testSearchResults.length }} results for '{{ search.testSearch }}'.
+    </p>
 
-    <td title="'Build Pass rate'" sortable="'passRate'">{{ job.passRate | percentage:0 }}</td>
-  </tr>
-</table>
+    <div ng-if="search.testSearchResults">
+      <h3>Breakdown per Jenkins view</h3>
+      <table class="table">
+        <tr ng-repeat="(v, n) in search.facet_fields.view">
+          <td><span view-breadcrumbs="v"></span></td>
+          <td>{{ n }}</td>
+        </tr>
+      </table>
+
+      <test-report-table tests="search.testSearchResults"></test-report-table>
+    </div>
+  </uib-tab>
+</uib-tabset>

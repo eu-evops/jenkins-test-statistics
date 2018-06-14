@@ -7,7 +7,7 @@
  * # passRate
  */
 angular.module('testReporterApp')
-  .directive('testReport', ['NgTableParams', 'FileSaver', function (NgTableParams, FileSaver) {
+  .directive('testReport', ['NgTableParams', 'FileSaver','SolrSearch', function (NgTableParams, FileSaver, SolrSearch) {
     return {
       templateUrl: '/views/directives/test-report.html',
       restrict: 'A',
@@ -40,6 +40,20 @@ angular.module('testReporterApp')
 
         });
 
+        $scope.showError = function (execution) {
+          execution.showException = true;
+
+          SolrSearch.getSimilarDocuments(execution).then(function (response) {
+            var dcs = [];
+            response.data.response.docs.forEach(function (doc) {
+
+              dcs.push($scope.testReport.getExecution(doc.id));
+            });
+
+            $scope.testNames = dcs;
+          });
+        };
+
         $scope.exportCsv = function () {
           var tcs = $scope.testReport.cases.map(function (tc) {
             return [
@@ -55,7 +69,7 @@ angular.module('testReporterApp')
             }).join(",");
           }).join("\n");
 
-          var header = "Job, Test Suite,Test Name,Number of executions,Passing count,Pass rate,Jenkins Test history URL";
+          var header = "Job, Test Suite,Test Name,Number of testExecutions,Passing count,Pass rate,Jenkins Test history URL";
           var exportBlob = new Blob([header + "\n" + tcs], {type: 'text/csv'});
           FileSaver.saveAs(exportBlob, "TestReport.csv");
         };

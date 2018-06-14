@@ -13,16 +13,10 @@
   <div class="panel-default panel" pass-rate="testReport.passRate">
 
     <div class="panel-heading" title="{{ testReportSummary }}">
-      <a class="float-right pointer" ng-click="exportCsv()">Export as CSV</a>
-      <a data-target="#testStatistics" class="pointer" data-toggle="collapse">Test report</a> -
-      <small>Number of tests: {{ testReport.cases.length }}</small>
-      <small>Pass rate: {{ testReport.passRate | percentage }} ({{ testReport.passingTests }})</small>
-      <small>Unstable rate: {{ testReport.unstableRate | percentage }} ({{ testReport.unstableTests }})</small>
-      <small>Fail rate: {{ testReport.failRate | percentage }} ({{ testReport.failingTests }})</small>
-      <small>Skip rate: {{ testReport.skippedRate | percentage }} ({{ testReport.skippedTests }})</small>
+      <a class="float" ng-click="exportCsv()">Export as CSV</a>
     </div>
 
-    <div id="testStatistics" class="panel-collapse collapse">
+    <div id="testStatistics" class="panel-collapse collapse in">
       <div class="panel-body">
         <table
           class="table table-bordered table-striped table-responsive table-hover"
@@ -44,10 +38,12 @@
             </td>
             <td title="'Links'">
               <a ng-href="{{ case.url }}" target="_blank">Test History</a>
-              <a ng-if="case.executions[0].error" ng-href="#" ng-click="case.showException = !case.showException">Show error</a>
+              <a ng-if="case.executions[0].error && !case.executions[0].showException" ng-href="#" ng-click="showError(case.executions[0])">Show error</a>
+              <a ng-if="case.executions[0].error && case.executions[0].showException"
+                 ng-href="#" ng-click="case.executions[0].showException = false">Collapse</a>
             </td>
           </tr>
-          <tr ng-repeat-end ng-if="case.showException">
+          <tr ng-repeat-end ng-if="case.executions[0].showException">
             <td colspan="8">
               <h3>Exception</h3>
               <pre>{{ case.executions[0].error }}</pre>
@@ -59,11 +55,7 @@
                 <h3>Standard error</h3>
                 <pre>{{ case.executions[0].stderr}}</pre>
               </div>
-
-              <div ng-if="case.executions[0].stdout">
-                <h3>Standard output</h3>
-                <pre>{{ case.executions[0].stdout}}</pre>
-              </div>
+              <test-report-table tests="testNames"></test-report-table>
             </td>
           </tr>
         </table>

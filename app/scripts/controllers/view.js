@@ -9,23 +9,36 @@
  */
 angular.module('testReporterApp')
   .controller('ViewCtrl', [
-    '$scope', 'jenkins', 'NgTableParams', 'FileSaver', 'Blob', '$rootScope', '$filter', '$stateParams', '$http',
-    function ($scope, jenkins, NgTableParams, FileSaver, Blob, $rootScope, $filter, $stateParams, $http) {
+    '$scope', 'jenkins', 'NgTableParams', 'FileSaver', 'Blob', '$rootScope', '$filter', '$stateParams', '$http','$q', 'SolrSearch',
+    function ($scope, jenkins, NgTableParams, FileSaver, Blob, $rootScope, $filter, $stateParams, $http, $q, SolrSearch) {
       var percentageFilter = $filter('percentage');
 
       $scope.view = {
         name: $stateParams.view
       };
 
+      $scope.search = {
+        jobSearch: '',
+        testSearch: '',
+        errorSearch: ''
+      };
+
+      $scope.testSearch = "";
+      $scope.solrIndexed = false;
+
+
       $scope.$on('jenkins-report', function (event, downloadProgress) {
         $scope.downloadProgress = downloadProgress;
+      });
+
+      $scope.$on('error-report', function (event, downloadProgress) {
+        $scope.errorProgress = downloadProgress;
       });
 
       jenkins.view($scope.view.name)
         .then(function (view) {
           $scope.jobs = view.allJobs;
           $scope.view = view;
-
           var allBuilds = [];
           $scope.jobs.forEach(function (j) {
             j.builds.forEach(function (b) {
@@ -36,28 +49,38 @@ angular.module('testReporterApp')
 
           var indexInSolr = function(testReport) {
             var solrReport = [];
-
             testReport.cases.forEach(function(tc) {
-              tc.executions.forEach(function (te) {
-                solrReport.push({
-                  id: te.id,
-                  name: te.name,
-                  className: te.className,
-                  error: te.error || '',
-                  shortError: (te.error || '').substr(0, 255),
-                  stderr: te.stderr || '',
-                  stdout: te.stdout || '',
-                  errorStackTrace: te.errorStackTrace || ''
+              //index only failures
+              if(tc.status !== 'Passed') {
+                tc.executions.forEach(function (te) {
+                  var document = {
+                    id: te.id,
+                    testReportId: testReport.testReportId,
+                    name: te.name,
+                    className: te.className,
+                    error: te.error,
+                    shortError: (te.error || '').split(/\n/)[0],
+                    stderr: te.stderr,
+                    stdout: te.stdout,
+                    view: tc.job.view,
+                    url: te.url,
+                    errorStackTrace: te.errorStackTrace,
+                    time_to_live_s: '+1DAYS'
+                  };
+                  solrReport.push(document);
                 });
-              });
+              }
             });
 
-            $http.post('http://localhost:8983/solr/stats/update?commit=true', solrReport)
+            SolrSearch.selectByTestReportId(testReport.getHash())
               .then(function(response) {
-                console.log(response);
+                if(response.data.response.numFound === 0) {
+                  return SolrSearch.indexData(solrReport);
+                }
+              })
+              .then(function (response) {
+                $scope.solrIndexed = true;
               });
-
-            console.log("Indexing in solr", solrReport);
           };
 
           jenkins.testReport(allBuilds)
@@ -97,8 +120,23 @@ angular.module('testReporterApp')
               dataset: view.allJobs
             });
 
-          $scope.$watch('jobSearch', function () {
-            $scope.tableParameters.filter({displayName: $scope.jobSearch});
+          $scope.$watch('search.jobSearch', function () {
+            $scope.tableParameters.filter({displayName: $scope.search.jobSearch});
+          });
+
+          $scope.$watch('search.testSearch', function (term) {
+            SolrSearch.search({ error: term, testReportId: $scope.testReport.testReportId })
+              .then(function(results) {
+                $scope.search.testSearchResults = results.response.docs.map(function (doc) {
+                  return $scope.testReport.getExecution(doc.id);
+                });
+                $scope.search.facet_fields = results.facet_counts.facet_fields;
+              })
           });
         });
+
+
+      $scope.assignErrorReport = function () {
+        $scope.errorReport = $scope.testReport;
+      }
     }]);
