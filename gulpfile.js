@@ -180,7 +180,7 @@ gulp.task('serve:prod', ['config:prod', 'build'], function() {
     livereload: false,
     port: 9000,
     middleware: function () {
-      return [app];
+      return [app,history()];
     }
   });
 });
