@@ -78,7 +78,7 @@ angular.module('testReporterApp')
                   return SolrSearch.indexData(solrReport);
                 }
               })
-              .then(function (response) {
+              .then(function () {
                 $scope.solrIndexed = true;
               });
           };
@@ -125,18 +125,22 @@ angular.module('testReporterApp')
           });
 
           $scope.$watch('search.testSearch', function (term) {
+            if(!term || !$scope.testReport) {
+              return;
+            }
+
             SolrSearch.search({ error: term, testReportId: $scope.testReport.testReportId })
               .then(function(results) {
                 $scope.search.testSearchResults = results.response.docs.map(function (doc) {
                   return $scope.testReport.getExecution(doc.id);
                 });
                 $scope.search.facet_fields = results.facet_counts.facet_fields;
-              })
+              });
           });
         });
 
 
-      $scope.assignErrorReport = function () {
+      $scope.assignErrorReport = function() {
         $scope.errorReport = $scope.testReport;
-      }
+      };
     }]);

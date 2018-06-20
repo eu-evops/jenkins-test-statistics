@@ -1,4 +1,4 @@
-<div ng-show="!errorDetails.length > 0">
+<div ng-show="!errorDetails">
   <div class="spinner">
     <div class="dot1"></div>
     <div class="dot2"></div>
@@ -17,7 +17,8 @@
     of the impact of a particular error. We recommend you use the search feature to complement this view when doing
     test results analysis.</p>
 
-  <h3>There are {{ errorDetails.length }} types of errors in the table below covering {{ errorDetails.sumOfAffectedTests }} tests</h3>
+  <h3>There are {{ errorDetails.length }} types of errors in the table below covering {{ errorDetails.sumOfAffectedTests
+    }} tests ({{ errorDetails.sumOfAffectedTests / erroredExecutions.length | percentage }} of total failed executions)</h3>
 
   <table class="table testErrorsTable" ng-table="tableParameters">
     <tr ng-repeat-start="details in errorDetails track by $index">
@@ -46,9 +47,15 @@
       </td>
     </tr>
   </table>
+</div>
 
+<div ng-if="ungroupedTests.length > 0">
 
-  <h2>Errors that are not grouped</h2>
+  <h2>Individual errors - {{ ungroupedTests.length }} test executions</h2>
+
+  <p>These are the tests that we could not automatically group based on error message. Some of them could possibly
+  be reported together if you update error messages in your tests.</p>
+
   <table class="table testErrorsTable" ng-table="tableParameters">
     <tr ng-repeat-start="details in ungroupedTests track by $index">
       <td title="'Error message'">{{details.error.substr(0, 200)}}</td>
@@ -69,12 +76,12 @@
         <p>Link to SOLR query: <a href="{{ details.url }}" target="_blank">Solr Link</a></p>
 
         <div>
-          <h4>There
+          <h3>There
             <ng-pluralize count="details.affectedTests.length" when="{ '0': 'are', '1': 'is', 'other': 'are' }"/>
             {{details.affectedTests.length}} affected test case
             <ng-pluralize count="details.affectedTests.length" when="{ '0': 's', '1': '', 'other': 's' }"/>
             in the test run
-          </h4>
+          </h3>
           <table class="table table-boardered table-striped table-response table-hover">
             <thead>
             <tr>
@@ -113,4 +120,9 @@
       </td>
     </tr>
   </table>
+</div>
+
+<div ng-if="errorDetails.length == 0 && ungroupedTests.length == 0">
+  <h2>No errors to report on - YAY :)</h2>
+  <p>There are no errors to group.</p>
 </div>

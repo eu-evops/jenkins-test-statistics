@@ -22,7 +22,16 @@ angular.module('testReporterApp')
                 });
               });
 
+              $scope.erroredExecutions = erroredExecutions.slice(0);
+
               var failingTest = erroredExecutions.shift();
+              if(!failingTest) {
+                $scope.errorDetails = [];
+                $scope.ungroupedTests = [];
+                $rootScope.$broadcast('error-report', $scope.errorDetails);
+                return;
+              }
+
               SolrSearch.getSimilarDocuments(failingTest)
                 .then(function _(response) {
                   var error = {
