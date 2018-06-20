@@ -64,6 +64,8 @@ angular.module('testReporterApp')
                     stdout: te.stdout,
                     view: tc.job.view,
                     url: te.url,
+                    jobDisplayName: te.build.job.displayName,
+                    jobName: te.build.job.name,
                     errorStackTrace: te.errorStackTrace,
                     time_to_live_s: '+1DAYS'
                   };

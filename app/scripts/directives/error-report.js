@@ -1,6 +1,6 @@
 'use strict';
 angular.module('testReporterApp')
-  .directive('errorReport', [ '$http', '$q','SolrSearch','$rootScope', function ($http, $q, SolrSearch, $rootScope) {
+  .directive('errorReport', [ '$http', '$q','SolrSearch','$rootScope', 'configuration', function ($http, $q, SolrSearch, $rootScope, configuration) {
     return {
         templateUrl: '/views/directives/error-report.html',
         restrict: 'A',
@@ -8,6 +8,7 @@ angular.module('testReporterApp')
           errorReport: '='
         },
         link: function ($scope) {
+          $scope.jenkinsConfiguration = configuration.get('jenkins');
           $scope.$watch('errorReport', function (testReport) {
               if(!testReport) {
                 return;
@@ -32,7 +33,11 @@ angular.module('testReporterApp')
                 return;
               }
 
-              SolrSearch.getSimilarDocuments(failingTest)
+              SolrSearch.getFacetedSearch(testReport.testReportId)
+                .then(function (facets) {
+                  $scope.facets = facets.facet_counts.facet_pivot['view,jobName'];
+                  return SolrSearch.getSimilarDocuments(failingTest)
+                })
                 .then(function _(response) {
                   var error = {
                     error: response.test.error,

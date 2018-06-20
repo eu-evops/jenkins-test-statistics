@@ -9,6 +9,32 @@
   </uib-progressbar>
 </div>
 
+<div ng-if="facets">
+  <h2>Location breakdown</h2>
+  <p>This table shows a breakdown of errors per view/job</p>
+  <table class="table">
+    <tbody>
+    <tr ng-repeat-start="facet in facets">
+      <td><span view-breadcrumbs="facet.value"></span></td>
+      <td>{{ facet.count }}</td>
+      <td>
+        <a href="#" ng-click="facet.showDetails=true" ng-show="!facet.showDetails">Show details</a>
+        <a href="#" ng-click="facet.showDetails=false" ng-show="facet.showDetails">Hide details</a>
+      </td>
+    </tr>
+    <tr ng-repeat="job in facet.pivot" ng-if="facet.showDetails">
+      <td >
+        &nbsp;&nbsp;&nbsp;<a href="{{ jenkinsConfiguration.server }}/job/{{ job.value}}" target="_blank">{{ job.value}}</a>
+      </td>
+      <td>
+        {{ job.count }}
+      </td>
+      </tr>
+    <tr ng-repeat-end></tr>
+    </tbody>
+  </table>
+</div>
+
 <div ng-if="errorDetails.length > 0">
   <h2>Error report</h2>
 
@@ -99,7 +125,7 @@
                 <a view-breadcrumbs="test.build.job.view">{{test.build.job.view}}</a>
               </td>
               <td>
-                <a href="{{ test.build.url}}">{{ test.build.job.displayName }} #{{ test.build.number }}</a>
+                <a href="{{ test.build.url}}" target="_blank">{{ test.build.job.displayName }} #{{ test.build.number }}</a>
               </td>
               <td>{{ test.className }}</td>
               <td>
