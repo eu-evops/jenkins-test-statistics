@@ -46,6 +46,7 @@
   <h3>There are {{ errorDetails.length }} types of errors in the table below covering {{ errorDetails.sumOfAffectedTests
     }} tests ({{ errorDetails.sumOfAffectedTests / erroredExecutions.length | percentage }} of total failed executions)</h3>
 
+
   <table class="table testErrorsTable" ng-table="tableParameters">
     <tr ng-repeat-start="details in errorDetails track by $index">
       <td title="'Error message'">{{details.error.substr(0, 200)}}</td>
@@ -57,10 +58,37 @@
     </tr>
     <tr ng-repeat-end ng-if="showErrors">
       <td colspan="8" class="details">
+
+        <h3>Location breakdown</h3>
+        <p>This table shows a breakdown of errors per view/job</p>
+        <table class="table">
+          <tbody>
+          <tr ng-repeat-start="(key,data) in details.getFacets()">
+            <td><span view-breadcrumbs="key"></span></td>
+            <td>{{ data.count }}</td>
+            <td>
+              <a href="#" ng-click="data.showDetails=true" ng-show="!data.showDetails">Show details</a>
+              <a href="#" ng-click="data.showDetails=false" ng-show="data.showDetails">Hide details</a>
+            </td>
+          </tr>
+          <tr ng-repeat="(jkey, jdata) in data.jobs" ng-if="data.showDetails">
+            <td >
+              &nbsp;&nbsp;&nbsp;<a href="{{ jenkinsConfiguration.server }}/job/{{ jkey }}" target="_blank">{{ jkey }}</a>
+            </td>
+            <td>
+              {{ jdata.count }}
+            </td>
+          </tr>
+          <tr ng-repeat-end></tr>
+          </tbody>
+        </table>
+
+
         <h3>Error message</h3>
         <div>
           <pre>{{ details.error }}</pre>
         </div>
+
 
         <p>Search automatically generated based on these terms: {{ details.interestingTerms.join(', ') }}</p>
         <p>Link to SOLR query: <a href="{{ details.url }}" target="_blank">Solr Link</a></p>
@@ -108,6 +136,12 @@
             <ng-pluralize count="details.affectedTests.length" when="{ '0': 's', '1': '', 'other': 's' }"/>
             in the test run
           </h3>
+
+          <div>
+            <h3>Break down of affected areas</h3>
+            <pre>{{ details.getFacets() | json }}</pre>
+          </div>
+
           <table class="table table-boardered table-striped table-response table-hover">
             <thead>
             <tr>

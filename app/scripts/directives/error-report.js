@@ -47,6 +47,28 @@ angular.module('testReporterApp')
                   };
                   var docs = response.data.response.docs;
 
+                  error.getFacets = function() {
+                    var self = this;
+                    if(this.facets) {
+                      return this.facets;
+                    }
+
+                    this.facets = {};
+                    this.affectedTests.forEach(function (at) {
+                      self.facets[at.build.job.view] = self.facets[at.build.job.view] || {};
+                      self.facets[at.build.job.view].count = self.facets[at.build.job.view].count || 0;
+                      self.facets[at.build.job.view].count += 1;
+
+                      self.facets[at.build.job.view].jobs = self.facets[at.build.job.view].jobs || {};
+                      self.facets[at.build.job.view].jobs[at.build.job.name] = self.facets[at.build.job.view].jobs[at.build.job.name] || {};
+                      self.facets[at.build.job.view].jobs[at.build.job.name].count = self.facets[at.build.job.view].jobs[at.build.job.name].count || 0;
+                      self.facets[at.build.job.view].jobs[at.build.job.name].count += 1;
+                      self.facets[at.build.job.view].jobs[at.build.job.name].job = at.job;
+                    });
+
+                    return this.facets;
+                  };
+
                   docs.forEach(function (doc) {
                     var match = erroredExecutions.findIndex(function(te) {
                       return te.id == doc.id;
@@ -66,6 +88,9 @@ angular.module('testReporterApp')
                 })
                 .then(function() {
                   $rootScope.$broadcast('error-report', errors);
+
+                  console.log(errors);
+
                   $scope.errorDetails = errors.sort(function (a, b) {
                     return b.affectedTests.length - a.affectedTests.length;
                   }).filter(function (e) {
