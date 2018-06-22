@@ -13,6 +13,13 @@
   <h2>Location breakdown</h2>
   <p>This table shows a breakdown of errors per view/job</p>
   <table class="table">
+    <thead>
+    <tr>
+      <th>View/Job</th>
+      <th>Numer of failed test executions</th>
+      <th>Actions</th>
+    </tr>
+    </thead>
     <tbody>
     <tr ng-repeat-start="facet in facets">
       <td><span view-breadcrumbs="facet.value"></span></td>
@@ -23,13 +30,14 @@
       </td>
     </tr>
     <tr ng-repeat="job in facet.pivot" ng-if="facet.showDetails">
-      <td >
-        &nbsp;&nbsp;&nbsp;<a href="{{ jenkinsConfiguration.server }}/job/{{ job.value}}" target="_blank">{{ job.value}}</a>
+      <td>
+        &nbsp;&nbsp;&nbsp;<a href="{{ jenkinsConfiguration.server }}/job/{{ job.value}}" target="_blank">{{
+        job.value}}</a>
       </td>
       <td>
         {{ job.count }}
       </td>
-      </tr>
+    </tr>
     <tr ng-repeat-end></tr>
     </tbody>
   </table>
@@ -43,8 +51,11 @@
     of the impact of a particular error. We recommend you use the search feature to complement this view when doing
     test results analysis.</p>
 
+  <p><a ng-click="exportCsv()" href="#">Download error report as CSV</a></p>
+
   <h3>There are {{ errorDetails.length }} types of errors in the table below covering {{ errorDetails.sumOfAffectedTests
-    }} tests ({{ errorDetails.sumOfAffectedTests / erroredExecutions.length | percentage }} of total failed executions)</h3>
+    }} tests ({{ errorDetails.sumOfAffectedTests / erroredExecutions.length | percentage }} of total failed
+    executions)</h3>
 
 
   <table class="table testErrorsTable" ng-table="tableParameters">
@@ -60,8 +71,20 @@
       <td colspan="8" class="details">
 
         <h3>Location breakdown</h3>
-        <p>This table shows a breakdown of errors per view/job</p>
+        <p>This table shows a breakdown of errors per view/job. You can trigger re-run of these
+          jobs by hitting re-run button or you can trigger individual jobs by expanding details in the table.</p>
+
+        <p>
+          <button ng-click="rerunJobs(details.getFacets())">Rerun all jobs affected by this error</button>
+        </p>
         <table class="table">
+          <thead>
+          <tr>
+            <th>View/Job</th>
+            <th>Numer of failed test executions</th>
+            <th>Actions</th>
+          </tr>
+          </thead>
           <tbody>
           <tr ng-repeat-start="(key,data) in details.getFacets()">
             <td><span view-breadcrumbs="key"></span></td>
@@ -69,15 +92,19 @@
             <td>
               <a href="#" ng-click="data.showDetails=true" ng-show="!data.showDetails">Show details</a>
               <a href="#" ng-click="data.showDetails=false" ng-show="data.showDetails">Hide details</a>
+              <a href="#" ng-click="rerunJobs(data)">Rerun jobs in view</a>
             </td>
+
           </tr>
           <tr ng-repeat="(jkey, jdata) in data.jobs" ng-if="data.showDetails">
-            <td >
-              &nbsp;&nbsp;&nbsp;<a href="{{ jenkinsConfiguration.server }}/job/{{ jkey }}" target="_blank">{{ jkey }}</a>
+            <td>
+              &nbsp;&nbsp;&nbsp;<a href="{{ jenkinsConfiguration.server }}/job/{{ jkey }}" target="_blank">{{ jkey
+              }}</a>
             </td>
             <td>
               {{ jdata.count }}
             </td>
+            <td><a href="#" ng-click="rerunJobs(jkey)">Rerun this job only</a></td>
           </tr>
           <tr ng-repeat-end></tr>
           </tbody>
@@ -108,7 +135,7 @@
   <h2>Individual errors - {{ ungroupedTests.length }} test executions</h2>
 
   <p>These are the tests that we could not automatically group based on error message. Some of them could possibly
-  be reported together if you update error messages in your tests.</p>
+    be reported together if you update error messages in your tests.</p>
 
   <table class="table testErrorsTable" ng-table="tableParameters">
     <tr ng-repeat-start="details in ungroupedTests track by $index">
@@ -159,7 +186,8 @@
                 <a view-breadcrumbs="test.build.job.view">{{test.build.job.view}}</a>
               </td>
               <td>
-                <a href="{{ test.build.url}}" target="_blank">{{ test.build.job.displayName }} #{{ test.build.number }}</a>
+                <a href="{{ test.build.url}}" target="_blank">{{ test.build.job.displayName }} #{{ test.build.number
+                  }}</a>
               </td>
               <td>{{ test.className }}</td>
               <td>

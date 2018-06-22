@@ -41,6 +41,7 @@
     this.className = execution.className;
     this.execution = execution;
     this.error = execution.errorDetails || execution.stderr;
+    this.shortError = (this.error || '').split(/\n/)[0];
     this.errorStackTrace = execution.errorStackTrace;
     this.stderr = execution.stderr;
     this.stdout = execution.stdout;
@@ -516,13 +517,27 @@
               });
           };
 
+          var rerunJobs = function (listOfJobNames) {
+            var promises = listOfJobNames.map(function (jobName) {
+              return http.post(getConf().url + '/job/' + jobName + '/build');
+            });
+
+            return Promise.all(promises)
+              .then(function (responses) {
+                return responses.filter(function (response) {
+                  return response.code !== 201
+                }).length > 0;
+              })
+          };
+
           return {
             login: login,
             getAllViews: getAllViews,
             view: getView,
             job: getJob,
             builds: getBuilds,
-            testReport: testReport
+            testReport: testReport,
+            rerunJobs: rerunJobs
           };
         }]
     ;

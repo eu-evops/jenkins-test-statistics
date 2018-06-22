@@ -66,7 +66,9 @@ jenkinsServers = jenkinsServers.split(/\s*,\s*/);
 var solrAddress = process.env.SOLR_ADDRESS || 'http://localhost:8983';
 var app = express();
 var proxy = proxy.createProxyServer({ target: solrAddress });
-
+proxy.on('error', function (error, req, res) {
+  res.status(500).send(error);
+});
 
 gulp.task('config', function () {
     return ngConstant({

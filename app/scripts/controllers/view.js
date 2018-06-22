@@ -59,7 +59,7 @@ angular.module('testReporterApp')
                     name: te.name,
                     className: te.className,
                     error: te.error,
-                    shortError: (te.error || '').split(/\n/)[0],
+                    shortError: te.shortError,
                     stderr: te.stderr,
                     stdout: te.stdout,
                     view: tc.job.view,
@@ -80,7 +80,7 @@ angular.module('testReporterApp')
                   return SolrSearch.indexData(solrReport);
                 }
               })
-              .then(function () {
+              .finally(function() {
                 $scope.solrIndexed = true;
               });
           };
