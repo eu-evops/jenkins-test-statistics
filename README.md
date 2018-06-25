@@ -16,8 +16,8 @@ JENKINS_SERVERS - Environment variable that contains comma separated list of ser
 This repository is automatically built on docker hub. You can run latest deployment by running following docker commands:
 
 ```
-docker run -d --name stats_solr -p 8983:8983 evops/jenkins-test-statistics:solr-feature_add-view-job-facet-to-error-report
+docker run -d --name stats_solr -p 8983:8983 evops/jenkins-test-statistics:solr-latest
 docker exec -it stats_solr bin/solr create -c stats -d /tmp/stats
-docker run -d --name stats -p 9000:9000 --link stats_solr:solr -e SOLR_ADDRESS=http://solr:8983 evops/jenkins-test-statistics:feature_add-view-job-facet-to-error-report
+docker run -d --name stats -p 9000:9000 --link stats_solr:solr -e SOLR_ADDRESS=http://solr:8983 evops/jenkins-test-statistics:latest
 open http://localhost:9000/
 ```
