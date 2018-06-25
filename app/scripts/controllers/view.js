@@ -59,11 +59,13 @@ angular.module('testReporterApp')
                     name: te.name,
                     className: te.className,
                     error: te.error,
-                    shortError: (te.error || '').split(/\n/)[0],
+                    shortError: te.shortError,
                     stderr: te.stderr,
                     stdout: te.stdout,
                     view: tc.job.view,
                     url: te.url,
+                    jobDisplayName: te.build.job.displayName,
+                    jobName: te.build.job.name,
                     errorStackTrace: te.errorStackTrace,
                     time_to_live_s: '+1DAYS'
                   };
@@ -78,7 +80,7 @@ angular.module('testReporterApp')
                   return SolrSearch.indexData(solrReport);
                 }
               })
-              .then(function (response) {
+              .finally(function() {
                 $scope.solrIndexed = true;
               });
           };
@@ -125,18 +127,22 @@ angular.module('testReporterApp')
           });
 
           $scope.$watch('search.testSearch', function (term) {
+            if(!term || !$scope.testReport) {
+              return;
+            }
+
             SolrSearch.search({ error: term, testReportId: $scope.testReport.testReportId })
               .then(function(results) {
                 $scope.search.testSearchResults = results.response.docs.map(function (doc) {
                   return $scope.testReport.getExecution(doc.id);
                 });
                 $scope.search.facet_fields = results.facet_counts.facet_fields;
-              })
+              });
           });
         });
 
 
-      $scope.assignErrorReport = function () {
+      $scope.assignErrorReport = function() {
         $scope.errorReport = $scope.testReport;
-      }
+      };
     }]);

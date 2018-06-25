@@ -3,6 +3,22 @@
 angular.module('testReporterApp')
   .service('SolrSearch', ['$http', '$httpParamSerializer', function (http, httpParamSerializer) {
 
+    this.getFacetedSearch = function(testReportId) {
+      var url = '/solr/stats/select?';
+      url += httpParamSerializer({
+        q: "testReportId:" + testReportId,
+        rows: 0,
+        facet: true,
+        "facet.mincount": 1,
+        "facet.pivot": "view,jobName"
+      });
+
+      return http.get(url)
+        .then(function(response) {
+          return response.data;
+        });
+    };
+
     this.search = function(parameters) {
       console.log("Searching for", parameters);
       var url = '/solr/stats/select?';

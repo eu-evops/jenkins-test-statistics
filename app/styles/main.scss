@@ -216,3 +216,12 @@ table[ng-table=testTableParameters], table.testErrorsTable {
   }
 }
 
+/* External links will have annotation */
+a[target=_blank] {
+  padding-right: 1.2em;
+  margin-right: 0.5em;
+  background-image: url(/images/link-external.png);
+  background-repeat: no-repeat;
+  background-position: right;
+  background-size: 0.9em;
+}

@@ -23,11 +23,21 @@ angular
     'Jenkins',
     'Configuration',
     'ngFileSaver',
-    'ui.router'
+    'ui.router',
+    'ui-notification'
   ])
   .config(['localStorageServiceProvider', function (localStorageServiceProvider) {
     localStorageServiceProvider.setPrefix('testReporter');
   }])
+  .config(function(NotificationProvider) {
+    NotificationProvider.setOptions({
+      delay: 3000,
+      startTop: 20,
+      startRight: 10,
+      verticalSpacing: 20,
+      horizontalSpacing: 20
+    })
+  })
   .config(['$httpProvider', function ($httpProvider) {
     $httpProvider.interceptors.push('JenkinsAuthenticationHttpInterceptor');
   }])

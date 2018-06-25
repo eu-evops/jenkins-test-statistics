@@ -12,12 +12,6 @@ angular.module('testReporterApp')
     '$scope', '$rootScope', 'jenkins', 'localStorageService', 'configuration', 'NgTableParams', 'jenkinsServers',
     function ($scope, $rootScope, jenkins, storage, configuration, NgTableParams, jenkinsServers) {
 
-      $scope.jenkins = configuration.get('jenkins') || {
-          server: jenkinsServers[0]
-        };
-
-      $scope.jenkinsServers = jenkinsServers;
-      jenkins.baseUrl = $scope.jenkins.server;
       jenkins.getAllViews()
         .then(function (views) {
           $scope.jenkinsViews = views;

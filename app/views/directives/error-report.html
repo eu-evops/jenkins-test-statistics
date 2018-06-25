@@ -1,4 +1,4 @@
-<div ng-show="!errorDetails.length > 0">
+<div ng-show="!errorDetails">
   <div class="spinner">
     <div class="dot1"></div>
     <div class="dot2"></div>
@@ -9,6 +9,40 @@
   </uib-progressbar>
 </div>
 
+<div ng-if="facets">
+  <h2>Location breakdown</h2>
+  <p>This table shows a breakdown of errors per view/job</p>
+  <table class="table">
+    <thead>
+    <tr>
+      <th>View/Job</th>
+      <th>Numer of failed test executions</th>
+      <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr ng-repeat-start="facet in facets">
+      <td><span view-breadcrumbs="facet.value"></span></td>
+      <td>{{ facet.count }}</td>
+      <td>
+        <a href="#" ng-click="facet.showDetails=true" ng-show="!facet.showDetails">Show details</a>
+        <a href="#" ng-click="facet.showDetails=false" ng-show="facet.showDetails">Hide details</a>
+      </td>
+    </tr>
+    <tr ng-repeat="job in facet.pivot" ng-if="facet.showDetails">
+      <td>
+        &nbsp;&nbsp;&nbsp;<a href="{{ jenkinsConfiguration.server }}/job/{{ job.value}}" target="_blank">{{
+        job.value}}</a>
+      </td>
+      <td>
+        {{ job.count }}
+      </td>
+    </tr>
+    <tr ng-repeat-end></tr>
+    </tbody>
+  </table>
+</div>
+
 <div ng-if="errorDetails.length > 0">
   <h2>Error report</h2>
 
@@ -17,7 +51,12 @@
     of the impact of a particular error. We recommend you use the search feature to complement this view when doing
     test results analysis.</p>
 
-  <h3>There are {{ errorDetails.length }} types of errors in the table below covering {{ errorDetails.sumOfAffectedTests }} tests</h3>
+  <p><a ng-click="exportCsv()" href="#">Download error report as CSV</a></p>
+
+  <h3>There are {{ errorDetails.length }} types of errors in the table below covering {{ errorDetails.sumOfAffectedTests
+    }} tests ({{ errorDetails.sumOfAffectedTests / erroredExecutions.length | percentage }} of total failed
+    executions)</h3>
+
 
   <table class="table testErrorsTable" ng-table="tableParameters">
     <tr ng-repeat-start="details in errorDetails track by $index">
@@ -30,10 +69,53 @@
     </tr>
     <tr ng-repeat-end ng-if="showErrors">
       <td colspan="8" class="details">
+
+        <h3>Location breakdown</h3>
+        <p>This table shows a breakdown of errors per view/job. You can trigger re-run of these
+          jobs by hitting re-run button or you can trigger individual jobs by expanding details in the table.</p>
+
+        <p>
+          <button ng-click="rerunJobs(details.getFacets())">Rerun all jobs affected by this error</button>
+        </p>
+        <table class="table">
+          <thead>
+          <tr>
+            <th>View/Job</th>
+            <th>Numer of failed test executions</th>
+            <th>Actions</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr ng-repeat-start="(key,data) in details.getFacets()">
+            <td><span view-breadcrumbs="key"></span></td>
+            <td>{{ data.count }}</td>
+            <td>
+              <a href="#" ng-click="data.showDetails=true" ng-show="!data.showDetails">Show details</a>
+              <a href="#" ng-click="data.showDetails=false" ng-show="data.showDetails">Hide details</a>
+              <a href="#" ng-click="rerunJobs(data)">Rerun jobs in view</a>
+            </td>
+
+          </tr>
+          <tr ng-repeat="(jkey, jdata) in data.jobs" ng-if="data.showDetails">
+            <td>
+              &nbsp;&nbsp;&nbsp;<a href="{{ jenkinsConfiguration.server }}/job/{{ jkey }}" target="_blank">{{ jkey
+              }}</a>
+            </td>
+            <td>
+              {{ jdata.count }}
+            </td>
+            <td><a href="#" ng-click="rerunJobs(jkey)">Rerun this job only</a></td>
+          </tr>
+          <tr ng-repeat-end></tr>
+          </tbody>
+        </table>
+
+
         <h3>Error message</h3>
         <div>
           <pre>{{ details.error }}</pre>
         </div>
+
 
         <p>Search automatically generated based on these terms: {{ details.interestingTerms.join(', ') }}</p>
         <p>Link to SOLR query: <a href="{{ details.url }}" target="_blank">Solr Link</a></p>
@@ -46,9 +128,15 @@
       </td>
     </tr>
   </table>
+</div>
 
+<div ng-if="ungroupedTests.length > 0">
 
-  <h2>Errors that are not grouped</h2>
+  <h2>Individual errors - {{ ungroupedTests.length }} test executions</h2>
+
+  <p>These are the tests that we could not automatically group based on error message. Some of them could possibly
+    be reported together if you update error messages in your tests.</p>
+
   <table class="table testErrorsTable" ng-table="tableParameters">
     <tr ng-repeat-start="details in ungroupedTests track by $index">
       <td title="'Error message'">{{details.error.substr(0, 200)}}</td>
@@ -69,12 +157,18 @@
         <p>Link to SOLR query: <a href="{{ details.url }}" target="_blank">Solr Link</a></p>
 
         <div>
-          <h4>There
+          <h3>There
             <ng-pluralize count="details.affectedTests.length" when="{ '0': 'are', '1': 'is', 'other': 'are' }"/>
             {{details.affectedTests.length}} affected test case
             <ng-pluralize count="details.affectedTests.length" when="{ '0': 's', '1': '', 'other': 's' }"/>
             in the test run
-          </h4>
+          </h3>
+
+          <div>
+            <h3>Break down of affected areas</h3>
+            <pre>{{ details.getFacets() | json }}</pre>
+          </div>
+
           <table class="table table-boardered table-striped table-response table-hover">
             <thead>
             <tr>
@@ -92,7 +186,8 @@
                 <a view-breadcrumbs="test.build.job.view">{{test.build.job.view}}</a>
               </td>
               <td>
-                <a href="{{ test.build.url}}">{{ test.build.job.displayName }} #{{ test.build.number }}</a>
+                <a href="{{ test.build.url}}" target="_blank">{{ test.build.job.displayName }} #{{ test.build.number
+                  }}</a>
               </td>
               <td>{{ test.className }}</td>
               <td>
@@ -113,4 +208,9 @@
       </td>
     </tr>
   </table>
+</div>
+
+<div ng-if="errorDetails.length == 0 && ungroupedTests.length == 0">
+  <h2>No errors to report on - YAY :)</h2>
+  <p>There are no errors to group.</p>
 </div>
