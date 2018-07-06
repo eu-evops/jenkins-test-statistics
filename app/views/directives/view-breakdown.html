@@ -1,0 +1,32 @@
+<h2>View breakdown</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>View</th>
+            <th class="right">Tests</th>
+            <th class="right">Pass rate</th>
+            <th>%</th>
+            <th class="right">Fail rate</th>
+            <th>%</th>
+            <th class="right">Unstable rate</th>
+            <th>%</th>
+            <th class="right">Skip rate</th>
+            <th>%</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="viewAndNumberOfTests in breakdown" data-pass-rate="viewAndNumberOfTests.passRate / viewAndNumberOfTests.tests">
+            <td><span view-breadcrumbs="viewAndNumberOfTests.view"></span></td>
+            <td class="right">{{ viewAndNumberOfTests.tests }}</td>
+            <td class="right">{{ viewAndNumberOfTests.passRate }}</td>
+            <td>{{ viewAndNumberOfTests.passRate / viewAndNumberOfTests.tests | percentage }}</td>
+            <td class="right">{{ viewAndNumberOfTests.failRate }}</td>
+            <td>{{ viewAndNumberOfTests.failRate / viewAndNumberOfTests.tests | percentage }}</td>
+            <td class="right">{{ viewAndNumberOfTests.unstableRate }}</td>
+            <td>{{ viewAndNumberOfTests.unstableRate / viewAndNumberOfTests.tests | percentage }}</td>
+            <td class="right">{{ viewAndNumberOfTests.skipRate }}</td>
+            <td>{{ viewAndNumberOfTests.skipRate / viewAndNumberOfTests.tests | percentage }}</td>
+        </tr>
+    </tbody>
+</table>
