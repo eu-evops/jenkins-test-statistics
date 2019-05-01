@@ -176,7 +176,7 @@ gulp.task('serve', function (cb) {
     'watch', cb);
 });
 
-gulp.task('serve:prod', ['config:prod', 'build'], function() {
+gulp.task('serve:prod', ['config:prod'], function() {
   $.connect.server({
     root: [yeoman.dist],
     livereload: false,
@@ -221,6 +221,8 @@ gulp.task('client:build', ['html', 'styles', 'config'], function () {
     .pipe($.useref({searchPath: [yeoman.app, '.tmp']}))
     .pipe(jsFilter)
     .pipe($.ngAnnotate())
+    // .pipe($.babel({presets: ['@babel/preset-env']}))
+    .on('error', $.util.log)
     .pipe($.uglify())
     .on('error', $.util.log)
     .pipe(jsFilter.restore())
@@ -255,8 +257,8 @@ gulp.task('copy:fonts', function () {
     .pipe(gulp.dest(yeoman.dist + '/fonts'));
 });
 
-gulp.task('build', ['clean:dist'], function () {
-  runSequence(['images', 'copy:extras', 'copy:fonts', 'client:build']);
+gulp.task('build', ['clean:dist'], function (done) {
+  runSequence(['images', 'copy:extras', 'copy:fonts', 'client:build'], done);
 });
 
 gulp.task('default', ['build']);

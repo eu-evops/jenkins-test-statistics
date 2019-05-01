@@ -30,15 +30,15 @@ angular.module('testReporterApp')
             .map(function (el) {
               return decodeURIComponent(el);
             })
-            .filter((el, index) => index % 2 == 0)
+            .filter(function(el, index) { return index % 2 == 0 })
             .reduce(function (crumbsArray, currentElement) {
               var crumb = {
                 name: currentElement
               };
               crumbsArray.push(crumb);
-              crumb.path = `/${pathClassifier}/` + crumbsArray.slice(1).map(function (el) {
+              crumb.path = '/' + pathClassifier + '/' + crumbsArray.slice(1).map(function (el) {
                 return el.name;
-              }).join(`/${pathClassifier}/`);
+              }).join('/' + pathClassifier + '/');
 
               return crumbsArray;
             }, []);

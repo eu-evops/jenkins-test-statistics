@@ -5,16 +5,19 @@ ENV JENKINS_SERVERS http://localhost:8080/jenkins
 
 WORKDIR /app
 
-ADD package.json bower.json /app/
 
 RUN apk add --no-cache git zlib-dev lcms2-dev \
     libpng-dev \
     gcc \
     g++ \
     make \
+    python \
     autoconf \
-    automake && \
-    npm install -g gulp bower && \
+    automake
+
+ADD package.json bower.json /app/
+
+RUN npm install -g gulp bower && \
     npm install && \
     bower install --allow-root
 

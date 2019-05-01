@@ -420,8 +420,8 @@
                         return views;
                     }
 
-                    jenkinsView.jobs.filter(j => j._class === "com.cloudbees.hudson.plugins.folder.Folder")
-                        .forEach(folder => {
+                    jenkinsView.jobs.filter(function(j) { return j._class === "com.cloudbees.hudson.plugins.folder.Folder" })
+                        .forEach(function(folder) {
                             views.push(folder);
 
                             const subViews = flattenViews(folder, jenkinsView)
