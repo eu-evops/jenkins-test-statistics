@@ -20,21 +20,25 @@ angular.module('testReporterApp')
             return;
           }
 
-          var breadcrumbs = $scope.path.split(/\/view\/?/)
+          const isFolder = $scope.path.indexOf('/job/') > -1;
+          const pathClassifier = isFolder ? 'job' : 'view';
+
+          var breadcrumbs = $scope.path.split(/\/(view|job)\/?/)
             .map(function (el) {
               return el.replace(/^\//, '').replace(/\/$/, '').replace(/^$/, 'Home');
             })
             .map(function (el) {
               return decodeURIComponent(el);
             })
+            .filter((el, index) => index % 2 == 0)
             .reduce(function (crumbsArray, currentElement) {
               var crumb = {
                 name: currentElement
               };
               crumbsArray.push(crumb);
-              crumb.path = '/view/' + crumbsArray.slice(1).map(function (el) {
+              crumb.path = `/${pathClassifier}/` + crumbsArray.slice(1).map(function (el) {
                 return el.name;
-              }).join('/view/');
+              }).join(`/${pathClassifier}/`);
 
               return crumbsArray;
             }, []);

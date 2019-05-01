@@ -248,6 +248,7 @@
 
     var sanitiseJob = function(job, view) {
         job.report = new TestReport();
+
         job.view = view;
         job.tests = job.tests || [];
         job.builds = job.builds || [];
@@ -331,12 +332,22 @@
                     view.jobs = view.jobs || [];
 
                     view.jobs.forEach(function(j) {
-                        jobs.push(sanitiseJob(j, parentPath));
+                        if (j._class === "com.cloudbees.hudson.plugins.folder.Folder") {
+                            getAllJobsRecursive(j, parentPath + '/job/' + j.name).forEach(function(sj) {
+                                jobs.push(sj);
+                            });
+                        } else {
+                            jobs.push(sanitiseJob(j, parentPath));
+                        }
                     });
 
                     if (view.views) {
                         // TODO Fix recursion
                         view.views.forEach(function(v) {
+                            if (v.name === "All") {
+                                return;
+                            }
+
                             getAllJobsRecursive(v, parentPath + '/view/' + v.name).forEach(function(sj) {
                                 jobs.push(sj);
                             });
@@ -409,6 +420,16 @@
                         return views;
                     }
 
+                    jenkinsView.jobs.filter(j => j._class === "com.cloudbees.hudson.plugins.folder.Folder")
+                        .forEach(folder => {
+                            views.push(folder);
+
+                            const subViews = flattenViews(folder, jenkinsView)
+                            subViews.forEach(function(sv) {
+                                views.push(sv);
+                            });    
+                        })
+
                     jenkinsView.views.forEach(function(subView) {
                         views.push(subView);
 
@@ -426,7 +447,7 @@
                     var call = parameters.join(',');
 
                     for (var i = 0; i < depth; i++) {
-                        call = parameters + ',views[' + call + ']';
+                        call = parameters + ',views[' + call + '],jobs[' + call + ']';
                     }
 
 
@@ -507,14 +528,14 @@
                 };
 
                 var getAllViews = function() {
-                    return http.get(getConf().url + '/api/json?tree=' + recursiveTreeCall(5, ['name', 'url', 'jobs[name]']))
+                    return http.get(getConf().url + '/api/json?tree=' + recursiveTreeCall(5, ['name', 'url', 'jobs[name,displayName]']))
                         .then(function(response) {
                             return flattenViews(response.data);
                         });
                 };
 
                 var getView = function(view) {
-                    var treeCallParameters = recursiveTreeCall(10, ['name,jobs[name,displayName,builds[name,result,number,url]' + getNumberOfBuilds() + ']']);
+                    var treeCallParameters = recursiveTreeCall(5, ['name,displayName,builds[name,result,number,url]' + getNumberOfBuilds() + ',jobs[name,displayName,builds[name,result,number,url]' + getNumberOfBuilds() + ']']);
                     return http.get(getConf().url + '/' + view + '/api/json?depth=3&tree=' + treeCallParameters)
                         .then(function(response) {
                             return sanitiseView(response.data, view);

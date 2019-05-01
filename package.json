@@ -52,6 +52,7 @@
     "jit-grunt": "^0.9.1",
     "jshint-stylish": "^1.0.0",
     "lazypipe": "^0.2.4",
+    "natives": "^1.1.6",
     "ng-table": "^3.0.1",
     "open": "0.0.5",
     "rimraf": "^2.4.0",

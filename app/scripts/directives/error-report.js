@@ -91,8 +91,6 @@ angular.module('testReporterApp')
               .then(function () {
                 $rootScope.$broadcast('error-report', errors);
 
-                console.log(errors);
-
                 $scope.errorDetails = errors.sort(function (a, b) {
                   return b.affectedTests.length - a.affectedTests.length;
                 }).filter(function (e) {
